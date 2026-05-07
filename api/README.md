@@ -1,6 +1,6 @@
-# Hazal Mutin Real Estate — Backend
+# Hazal Muti Real Estate — Backend
 
-NestJS + Prisma + PostgreSQL backend for the Hazal Mutin real estate site.
+NestJS + Prisma + PostgreSQL backend for the Hazal Muti real estate site.
 
 Single-broker design (one admin user — Hazal). Multilingual content (TR / EN). Built for a Next.js frontend that the design team will own.
 

@@ -36,7 +36,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center animate-fade-in">
-          <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">Hazal Mutin</p>
+          <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">Hazal Muti</p>
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mt-1">
             Yükleniyor…
           </p>

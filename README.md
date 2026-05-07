@@ -1,4 +1,4 @@
-# Hazal Mutin Real Estate
+# Hazal Muti Real Estate
 
 Single-broker premium real estate platform.
 

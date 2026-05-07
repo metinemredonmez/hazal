@@ -18,8 +18,8 @@ const display = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: {
-    default: "Hazal Mutin · Admin",
-    template: "%s · Hazal Mutin Admin",
+    default: "Hazal Muti · Admin",
+    template: "%s · Hazal Muti Admin",
   },
   description: "Yönetim paneli",
   robots: { index: false, follow: false },

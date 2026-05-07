@@ -10,7 +10,7 @@ export default function ForgotPasswordPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-6 bg-background">
       <div className="w-full max-w-md text-center animate-fade-up">
-        <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E] mb-2">Hazal Mutin</p>
+        <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E] mb-2">Hazal Muti</p>
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Real Estate</p>
 
         <h1 className="font-display text-4xl font-light tracking-tight mt-12">

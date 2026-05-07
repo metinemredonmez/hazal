@@ -15,7 +15,7 @@ export class TotpService {
   }
 
   buildOtpAuthUrl(email: string, secret: string): string {
-    const issuer = this.config.get<string>('APP_NAME') ?? 'Hazal Mutin Real Estate';
+    const issuer = this.config.get<string>('APP_NAME') ?? 'Hazal Muti Real Estate';
     return authenticator.keyuri(email, issuer, secret);
   }
 

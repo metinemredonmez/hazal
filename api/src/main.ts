@@ -40,8 +40,8 @@ async function bootstrap() {
   app.use('/uploads', express.static(join(process.cwd(), uploadDir)));
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Hazal Mutin Real Estate API')
-    .setDescription('Backend API for the Hazal Mutin real estate site.')
+    .setTitle('Hazal Muti Real Estate API')
+    .setDescription('Backend API for the Hazal Muti real estate site.')
     .setVersion('0.1.0')
     .addBearerAuth()
     .build();

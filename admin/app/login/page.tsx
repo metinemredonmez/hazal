@@ -116,7 +116,7 @@ function LoginPageInner() {
         <div className="relative z-10 flex h-full flex-col justify-between p-14 text-[#F5F2EC]">
           <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
             <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">
-              Hazal Mutin
+              Hazal Muti
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.3em] text-[#F5F2EC]/60">
               Real Estate
@@ -153,7 +153,7 @@ function LoginPageInner() {
           {/* Mobile brand header */}
           <div className="mb-12 text-center lg:hidden">
             <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">
-              Hazal Mutin
+              Hazal Muti
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
               Real Estate
@@ -249,7 +249,7 @@ function LoginPageInner() {
               </Button>
 
               <p className="mt-10 text-center text-xs text-muted-foreground">
-                © {new Date().getFullYear()} Hazal Mutin Real Estate
+                © {new Date().getFullYear()} Hazal Muti Real Estate
               </p>
             </>
           ) : (

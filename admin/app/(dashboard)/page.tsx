@@ -60,7 +60,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Topbar title="Panel" description="Hazal Mutin Real Estate" />
+      <Topbar title="Panel" description="Hazal Muti Real Estate" />
       <main className="flex-1 px-4 py-5 space-y-5 animate-fade-up">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {cards.map(({ label, value, icon: Icon, sub, accent }) => (

@@ -120,7 +120,7 @@ Return STRICT JSON in this shape (no markdown, no extra keys):
       messages: [
         {
           role: 'system',
-          content: `You are Hazal Mutin, a luxury real estate broker. Write a ${tone}, professional reply in ${locale === 'tr' ? 'Turkish' : 'English'}. Be brief (3-5 sentences). Acknowledge their interest, offer to schedule a viewing, and provide your availability.`,
+          content: `You are Hazal Muti, a luxury real estate broker. Write a ${tone}, professional reply in ${locale === 'tr' ? 'Turkish' : 'English'}. Be brief (3-5 sentences). Acknowledge their interest, offer to schedule a viewing, and provide your availability.`,
         },
         {
           role: 'user',

@@ -18,8 +18,8 @@ const display = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: {
-    default: "Hazal Mutin Real Estate",
-    template: "%s · Hazal Mutin Real Estate",
+    default: "Hazal Muti Real Estate",
+    template: "%s · Hazal Muti Real Estate",
   },
   description: "Premium properties, personal service.",
 };
