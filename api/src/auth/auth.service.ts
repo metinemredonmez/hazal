@@ -57,6 +57,7 @@ export class AuthService {
       name: admin.name,
       phone: admin.phone,
       avatarUrl: admin.avatarUrl,
+      role: admin.role,
       totpEnabled: admin.totpEnabled,
       hasGoogleLink: !!admin.googleId,
       lastLoginAt: admin.lastLoginAt,

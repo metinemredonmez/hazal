@@ -51,6 +51,11 @@ enum ChatSender {
   ADMIN
 }
 
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
 model Admin {
   id                   String     @id @default(cuid())
   email                String     @unique
@@ -58,6 +63,7 @@ model Admin {
   name                 String
   phone                String?
   avatarUrl            String?
+  role                 AdminRole  @default(ADMIN)
   googleId             String?    @unique
   totpSecret           String?
   totpEnabled          Boolean    @default(false)

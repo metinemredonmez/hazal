@@ -10,6 +10,7 @@ export type ListingCategory =
   | "OTHER";
 export type Currency = "TRY" | "USD" | "EUR";
 export type InquiryStatus = "NEW" | "CONTACTED" | "HOT" | "CLOSED";
+export type AdminRole = "SUPER_ADMIN" | "ADMIN";
 
 export interface Admin {
   id: string;
@@ -17,6 +18,7 @@ export interface Admin {
   name: string;
   phone: string | null;
   avatarUrl: string | null;
+  role: AdminRole;
   totpEnabled?: boolean;
   hasGoogleLink?: boolean;
   lastLoginAt?: string | null;

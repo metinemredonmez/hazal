@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient, ListingStatus, ListingType, ListingCategory, Currency } from '@prisma/client';
+import { PrismaClient, ListingStatus, ListingType, ListingCategory, Currency, AdminRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import slugify from 'slugify';
 
@@ -195,10 +195,10 @@ async function main() {
 
   await prisma.admin.upsert({
     where: { email },
-    update: { passwordHash, name, phone },
-    create: { email, passwordHash, name, phone },
+    update: { passwordHash, name, phone, role: AdminRole.SUPER_ADMIN },
+    create: { email, passwordHash, name, phone, role: AdminRole.SUPER_ADMIN },
   });
-  console.log(`✓ Admin seeded: ${email} (${phone})`);
+  console.log(`✓ Super Admin seeded: ${email} (${phone})`);
 
   // 2) Site settings
   await prisma.siteSettings.upsert({
