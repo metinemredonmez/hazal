@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Lock, Mail, ShieldCheck } from "lucide-react";
@@ -20,16 +20,7 @@ interface LoginResponse {
 }
 
 export default function LoginPage() {
-  return (
-    <React.Suspense fallback={null}>
-      <LoginPageInner />
-    </React.Suspense>
-  );
-}
-
-function LoginPageInner() {
   const router = useRouter();
-  const params = useSearchParams();
   const setAdmin = useAuth((s) => s.setAdmin);
   const refresh = useAuth((s) => s.refresh);
 
@@ -39,13 +30,6 @@ function LoginPageInner() {
   const [code, setCode] = React.useState("");
   const [ticket, setTicket] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
-
-  React.useEffect(() => {
-    const errorParam = params.get("error");
-    if (errorParam === "google") {
-      toast.error("Google ile giriş başarısız oldu. Yetkili e-posta gerekli.");
-    }
-  }, [params]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -96,11 +80,6 @@ function LoginPageInner() {
     }
   }
 
-  function handleGoogleLogin() {
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://api.hazalmuti.com").replace(/\/$/, "");
-    window.location.href = `${apiUrl}/api/auth/google`;
-  }
-
   return (
     <main className="relative grid min-h-screen lg:grid-cols-[3fr_2fr]">
       {/* LEFT — image */}
@@ -121,7 +100,7 @@ function LoginPageInner() {
             <img
               src="/logo.png"
               alt="Hazal Muti Real Estate"
-              className="h-8 w-auto opacity-95 select-none"
+              className="h-14 w-auto opacity-95 select-none"
               draggable={false}
             />
           </div>
@@ -229,25 +208,12 @@ function LoginPageInner() {
                 </Button>
               </form>
 
-              <div className="my-7 flex items-center gap-3">
-                <span className="h-px flex-1 bg-border" />
-                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                  veya
-                </span>
-                <span className="h-px flex-1 bg-border" />
-              </div>
+              <p className="mt-10 text-center text-[11px] text-muted-foreground leading-relaxed">
+                Şifre doğru ise <strong>Google Authenticator</strong> uygulamasındaki 6 haneli
+                kod istenecektir.
+              </p>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleLogin}
-                className="w-full h-11 gap-3 border-border hover:border-[#C9A96E] hover:text-foreground"
-              >
-                <GoogleIcon className="h-4 w-4" />
-                Google ile Giriş
-              </Button>
-
-              <p className="mt-10 text-center text-xs text-muted-foreground">
+              <p className="mt-6 text-center text-xs text-muted-foreground">
                 © {new Date().getFullYear()} Hazal Muti Real Estate
               </p>
             </>
@@ -314,25 +280,3 @@ function LoginPageInner() {
   );
 }
 
-function GoogleIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path
-        fill="#EA4335"
-        d="M5.27 9.76A7.077 7.077 0 0 1 16.86 6.4l3.85-3.85A12 12 0 0 0 1.27 6.5l4 3.27z"
-      />
-      <path
-        fill="#34A853"
-        d="M16.04 18.013c-1.09.703-2.474 1.078-4.04 1.078a7.077 7.077 0 0 1-6.71-4.823l-4.04 3.067A11.96 11.96 0 0 0 12 24c2.933 0 5.735-1.043 7.834-3l-3.793-2.987z"
-      />
-      <path
-        fill="#4A90E2"
-        d="M19.834 21c2.195-2.048 3.62-5.096 3.62-9 0-.71-.109-1.473-.272-2.182H12v4.637h6.436c-.317 1.554-1.166 2.756-2.395 3.558L19.834 21z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.29 14.268a7.235 7.235 0 0 1-.038-4.5L1.222 6.6A11.844 11.844 0 0 0 0 12c0 1.92.445 3.73 1.222 5.335l4.068-3.067z"
-      />
-    </svg>
-  );
-}
