@@ -112,7 +112,9 @@ function LoginPageInner() {
               "url(/login-bg.jpg), linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/80" />
+        {/* Darken overlay for legibility */}
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-black/90" />
         <div className="relative z-10 flex h-full flex-col justify-between p-14 text-[#F5F2EC]">
           <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
             <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">

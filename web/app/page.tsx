@@ -4,13 +4,14 @@ export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#0E0E0E] text-[#F5F2EC]">
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-50"
+        className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
             "url(/login-bg.jpg), linear-gradient(135deg, #1a1a1a, #0E0E0E)",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80" />
+      <div className="absolute inset-0 bg-black/55" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/85" />
 
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-8 px-6 text-center animate-fade-up">
         <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">Hazal Muti</p>
