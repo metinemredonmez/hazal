@@ -18,7 +18,7 @@ export default function HomePage() {
         <img
           src="/logo.png"
           alt="Hazal Muti Real Estate"
-          className="h-20 sm:h-24 w-auto"
+          className="h-56 sm:h-72 w-auto -mb-12 sm:-mb-16"
           draggable={false}
         />
         <h1 className="font-display text-4xl sm:text-6xl font-light tracking-tight text-[#F5F2EC] max-w-3xl mt-2">
