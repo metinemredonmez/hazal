@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+.env.local
+.env.production
+DEPLOYMENT_SECRETS.md
+*.log
+.DS_Store
+uploads/*
+!uploads/.gitkeep
+coverage
+.idea
+.vscode
+.yarn/cache
+.yarn/install-state.gz
+.pnp.*

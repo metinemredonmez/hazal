@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# Anything inside backend/ already has its own .gitignore.
+# Keeping this top-level minimal.

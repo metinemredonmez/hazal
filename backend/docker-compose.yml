@@ -1,0 +1,45 @@
+# Local development only — Postgres + Redis for the "hazal" project.
+# Backend (NestJS) and frontend (Next.js) run on the host with `yarn dev`, NOT in Docker.
+# Production servers use native Postgres/Redis (no Docker).
+#
+# Custom host ports (5434, 6381) chosen to avoid clashing with other projects on this machine.
+
+name: hazal
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hazal-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hazal
+      POSTGRES_PASSWORD: hazal
+      POSTGRES_DB: hazal_muti
+    ports:
+      - "5434:5432"
+    volumes:
+      - hazal_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hazal -d hazal_muti"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: hazal-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6381:6379"
+    volumes:
+      - hazal_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  hazal_pg_data:
+  hazal_redis_data:

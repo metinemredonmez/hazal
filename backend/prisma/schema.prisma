@@ -1,0 +1,217 @@
+// Hazal Mutin Real Estate — Prisma schema
+// Single broker, multilingual (TR/EN), Postgres
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  SOLD
+  RENTED
+  PASSIVE
+}
+
+enum ListingType {
+  SALE
+  RENT
+}
+
+enum ListingCategory {
+  APARTMENT
+  VILLA
+  HOUSE
+  LAND
+  OFFICE
+  COMMERCIAL
+  OTHER
+}
+
+enum Currency {
+  TRY
+  USD
+  EUR
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  HOT
+  CLOSED
+}
+
+enum ChatSender {
+  VISITOR
+  ADMIN
+}
+
+model Admin {
+  id                   String     @id @default(cuid())
+  email                String     @unique
+  passwordHash         String
+  name                 String
+  phone                String?
+  avatarUrl            String?
+  googleId             String?    @unique
+  totpSecret           String?
+  totpEnabled          Boolean    @default(false)
+  pendingTotpSecret    String?
+  tokenVersion         Int        @default(0)
+  failedLoginAttempts  Int        @default(0)
+  lockedUntil          DateTime?
+  lastLoginAt          DateTime?
+  lastLoginIp          String?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  auditLogs            AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  admin     Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  action    String
+  success   Boolean  @default(true)
+  metadata  Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Listing {
+  id            String          @id @default(cuid())
+  slug          String          @unique
+  titleTr       String
+  titleEn       String
+  descriptionTr String
+  descriptionEn String
+  price         Decimal         @db.Decimal(14, 2)
+  currency      Currency        @default(TRY)
+  type          ListingType
+  category      ListingCategory
+  bedrooms      Int?
+  bathrooms     Int?
+  areaM2        Float?
+  address       String?
+  city          String?
+  district      String?
+  lat           Float?
+  lng           Float?
+  yearBuilt     Int?
+  status        ListingStatus   @default(DRAFT)
+  featured      Boolean         @default(false)
+  views         Int             @default(0)
+  videoUrl      String?
+  tourUrl       String?
+  metaTitleTr   String?
+  metaTitleEn   String?
+  metaDescTr    String?
+  metaDescEn    String?
+  images        ListingImage[]
+  inquiries     Inquiry[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([status])
+  @@index([featured])
+  @@index([type])
+  @@index([category])
+  @@index([city])
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  order     Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+}
+
+model Inquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String
+  status    InquiryStatus @default(NEW)
+  notes     String?
+  listingId String?
+  listing   Listing?      @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status])
+  @@index([listingId])
+}
+
+model ChatSession {
+  id           String        @id @default(cuid())
+  visitorId    String        @unique
+  visitorName  String?
+  visitorEmail String?
+  closed       Boolean       @default(false)
+  messages     ChatMessage[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([closed])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender    ChatSender
+  content   String
+  read      Boolean     @default(false)
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId])
+}
+
+model SiteSettings {
+  id              String   @id @default("singleton")
+  brandName       String   @default("Hazal Mutin Real Estate")
+  tagline         String?
+  logoUrl         String?
+  primaryColor    String   @default("#1a1a1a")
+  accentColor     String   @default("#c9a96e")
+  phone           String?
+  email           String?
+  whatsapp        String?
+  address         String?
+  instagram       String?
+  linkedin        String?
+  youtube         String?
+  facebook        String?
+  defaultCurrency Currency @default(TRY)
+  defaultLocale   String   @default("tr")
+  mapboxToken     String?
+  gaId            String?
+  heroTitleTr     String?
+  heroTitleEn     String?
+  heroSubtitleTr  String?
+  heroSubtitleEn  String?
+  heroMediaUrl    String?
+  aboutTr         String?
+  aboutEn         String?
+  seoTitleTr      String?
+  seoTitleEn      String?
+  seoDescTr       String?
+  seoDescEn       String?
+  updatedAt       DateTime @updatedAt
+}
