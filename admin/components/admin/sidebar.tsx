@@ -42,11 +42,14 @@ export function Sidebar() {
 
   return (
     <aside className="hidden lg:flex h-screen w-52 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border sticky top-0">
-      <div className="px-4 pt-5 pb-4">
-        <p className="text-[9px] uppercase tracking-[0.35em] text-[#C9A96E]">Hazal Muti</p>
-        <p className="mt-0.5 text-[9px] uppercase tracking-[0.25em] text-sidebar-foreground/40">
-          Real Estate
-        </p>
+      <div className="px-4 pt-4 pb-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo.png"
+          alt="Hazal Muti"
+          className="h-8 w-auto opacity-95"
+          draggable={false}
+        />
       </div>
 
       <Separator className="bg-sidebar-border" />

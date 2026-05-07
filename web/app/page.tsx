@@ -14,8 +14,14 @@ export default function HomePage() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/85" />
 
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-8 px-6 text-center animate-fade-up">
-        <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">Hazal Muti</p>
-        <h1 className="font-display text-5xl sm:text-7xl font-light tracking-tight text-[#F5F2EC] max-w-3xl">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo.png"
+          alt="Hazal Muti Real Estate"
+          className="h-20 sm:h-24 w-auto"
+          draggable={false}
+        />
+        <h1 className="font-display text-4xl sm:text-6xl font-light tracking-tight text-[#F5F2EC] max-w-3xl mt-2">
           Premium properties.
           <br />
           <span className="italic text-[#C9A96E]">Personal service.</span>

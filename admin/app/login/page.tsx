@@ -117,12 +117,13 @@ function LoginPageInner() {
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-black/90" />
         <div className="relative z-10 flex h-full flex-col justify-between p-14 text-[#F5F2EC]">
           <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-            <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">
-              Hazal Muti
-            </p>
-            <p className="mt-1 text-xs uppercase tracking-[0.3em] text-[#F5F2EC]/60">
-              Real Estate
-            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Hazal Muti Real Estate"
+              className="h-14 w-auto opacity-95 select-none"
+              draggable={false}
+            />
           </div>
 
           <div className="animate-fade-up max-w-md" style={{ animationDelay: "300ms" }}>
@@ -153,13 +154,9 @@ function LoginPageInner() {
       <section className="flex items-center justify-center bg-background px-6 py-10 lg:px-14 lg:py-0">
         <div className="w-full max-w-sm animate-slide-in-right">
           {/* Mobile brand header */}
-          <div className="mb-12 text-center lg:hidden">
-            <p className="text-xs uppercase tracking-[0.4em] text-[#C9A96E]">
-              Hazal Muti
-            </p>
-            <p className="mt-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Real Estate
-            </p>
+          <div className="mb-12 flex justify-center lg:hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-dark.png" alt="Hazal Muti Real Estate" className="h-12 w-auto" draggable={false} />
           </div>
 
           {step === "login" ? (
