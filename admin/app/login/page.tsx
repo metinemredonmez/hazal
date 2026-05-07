@@ -121,7 +121,7 @@ function LoginPageInner() {
             <img
               src="/logo.png"
               alt="Hazal Muti Real Estate"
-              className="h-14 w-auto opacity-95 select-none"
+              className="h-8 w-auto opacity-95 select-none"
               draggable={false}
             />
           </div>
