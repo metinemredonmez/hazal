@@ -166,3 +166,32 @@ export interface AuditLogEntry {
   createdAt: string;
   admin: { id: string; email: string; name: string } | null;
 }
+
+export interface Notification {
+  id: string;
+  type: "new_inquiry" | "new_chat_message" | "system";
+  title: string;
+  body: string | null;
+  link: string | null;
+  metadata: Record<string, unknown> | null;
+  read: boolean;
+  createdAt: string;
+  readAt: string | null;
+}
+
+export interface NotificationsResponse extends Paginated<Notification> {
+  unreadCount: number;
+}
+
+export interface TimeseriesPoint {
+  date: string;
+  count: number;
+}
+
+export interface TimeseriesResponse {
+  days: number;
+  since: string;
+  inquiries: TimeseriesPoint[];
+  listingsCreated: TimeseriesPoint[];
+  inquiriesByStatus: Array<{ status: InquiryStatus; count: number }>;
+}

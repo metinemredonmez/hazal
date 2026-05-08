@@ -8,6 +8,7 @@ import { ChatModule } from './chat/chat.module';
 import { SettingsModule } from './settings/settings.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { AiModule } from './ai/ai.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AiModule } from './ai/ai.module';
     SettingsModule,
     UploadsModule,
     AiModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

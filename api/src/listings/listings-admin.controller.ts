@@ -33,6 +33,11 @@ export class ListingsAdminController {
     return this.listings.stats();
   }
 
+  @Get('stats/timeseries')
+  timeseries(@Query('days') days?: string) {
+    return this.listings.timeseries(days ? parseInt(days, 10) : 30);
+  }
+
   @Get(':id')
   getOne(@Param('id') id: string) {
     return this.listings.getById(id);

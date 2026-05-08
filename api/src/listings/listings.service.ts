@@ -208,6 +208,63 @@ export class ListingsService {
     return { ok: true };
   }
 
+  async timeseries(days = 30) {
+    const since = new Date();
+    since.setDate(since.getDate() - days + 1);
+    since.setHours(0, 0, 0, 0);
+
+    const inquiriesRaw = await this.prisma.$queryRaw<Array<{ day: Date; count: bigint }>>`
+      SELECT date_trunc('day', "createdAt") AS day, COUNT(*)::bigint AS count
+      FROM "Inquiry"
+      WHERE "createdAt" >= ${since}
+      GROUP BY day
+      ORDER BY day ASC
+    `;
+    const listingsRaw = await this.prisma.$queryRaw<Array<{ day: Date; count: bigint }>>`
+      SELECT date_trunc('day', "createdAt") AS day, COUNT(*)::bigint AS count
+      FROM "Listing"
+      WHERE "createdAt" >= ${since}
+      GROUP BY day
+      ORDER BY day ASC
+    `;
+
+    const inquiries = inquiriesRaw.map((r) => ({
+      date: new Date(r.day).toISOString().slice(0, 10),
+      count: Number(r.count),
+    }));
+    const listingsCreated = listingsRaw.map((r) => ({
+      date: new Date(r.day).toISOString().slice(0, 10),
+      count: Number(r.count),
+    }));
+
+    const inquiriesByStatus = await this.prisma.inquiry.groupBy({
+      by: ['status'],
+      _count: { _all: true },
+    });
+
+    const dates: string[] = [];
+    for (let i = 0; i < days; i++) {
+      const d = new Date(since);
+      d.setDate(since.getDate() + i);
+      dates.push(d.toISOString().slice(0, 10));
+    }
+    const fillSeries = (series: Array<{ date: string; count: number }>) => {
+      const map = new Map(series.map((s) => [s.date, s.count]));
+      return dates.map((d) => ({ date: d, count: map.get(d) ?? 0 }));
+    };
+
+    return {
+      days,
+      since: since.toISOString(),
+      inquiries: fillSeries(inquiries),
+      listingsCreated: fillSeries(listingsCreated),
+      inquiriesByStatus: inquiriesByStatus.map((r) => ({
+        status: r.status,
+        count: r._count._all,
+      })),
+    };
+  }
+
   async stats() {
     const [total, active, draft, sold, rented, featured, totalViews] = await Promise.all([
       this.prisma.listing.count(),

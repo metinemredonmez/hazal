@@ -14,6 +14,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
+import { DashboardCharts } from "@/components/admin/dashboard-charts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -84,6 +85,8 @@ export default function DashboardPage() {
             </Card>
           ))}
         </section>
+
+        <DashboardCharts />
 
         <section className="grid gap-4 xl:grid-cols-3">
           <Card className="xl:col-span-2">

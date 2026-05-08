@@ -1,20 +1,43 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { Prisma, InquiryStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { UpdateInquiryDto } from './dto/update-inquiry.dto';
 import { QueryInquiriesDto } from './dto/query-inquiries.dto';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class InquiriesService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(InquiriesService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+    private readonly notificationsGateway: NotificationsGateway,
+  ) {}
 
   async create(dto: CreateInquiryDto) {
     if (dto.listingId) {
       const exists = await this.prisma.listing.findUnique({ where: { id: dto.listingId } });
       if (!exists) throw new BadRequestException('Listing not found');
     }
-    return this.prisma.inquiry.create({ data: dto });
+    const inquiry = await this.prisma.inquiry.create({ data: dto });
+
+    // Fire notification + email asynchronously
+    this.notifications
+      .notifyNewInquiry({
+        id: inquiry.id,
+        name: inquiry.name,
+        email: inquiry.email,
+        phone: inquiry.phone,
+        message: inquiry.message,
+        listingId: inquiry.listingId,
+      })
+      .then((n) => this.notificationsGateway.emitNotification(n))
+      .catch((err) => this.logger.warn(`Notification failed: ${err.message}`));
+
+    return inquiry;
   }
 
   async list(query: QueryInquiriesDto) {

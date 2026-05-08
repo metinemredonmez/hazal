@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/store";
+import { NotificationCenter } from "./notification-center";
 
 export function Topbar({ title, description }: { title: string; description?: string }) {
   const admin = useAuth((s) => s.admin);
@@ -19,6 +20,7 @@ export function Topbar({ title, description }: { title: string; description?: st
             </p>
           )}
         </div>
+        <NotificationCenter />
         <Avatar className="h-6 w-6 border border-border">
           <AvatarFallback className="text-[10px] bg-secondary">
             {admin?.name

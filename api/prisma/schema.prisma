@@ -78,6 +78,21 @@ model Admin {
   auditLogs            AuditLog[]
 }
 
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // "new_inquiry" | "new_chat_message" | "system"
+  title     String
+  body      String?
+  link      String?
+  metadata  Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  readAt    DateTime?
+
+  @@index([read, createdAt])
+  @@index([type])
+}
+
 model AuditLog {
   id        String   @id @default(cuid())
   adminId   String?
