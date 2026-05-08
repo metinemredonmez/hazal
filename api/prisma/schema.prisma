@@ -306,6 +306,19 @@ model BlogPost {
   @@index([status, publishedAt])
 }
 
+model ReportRun {
+  id           String   @id @default(uuid())
+  type         String   // "monthly"
+  periodStart  DateTime
+  periodEnd    DateTime
+  data         Json
+  emailSentTo  String?
+  emailSentAt  DateTime?
+  createdAt    DateTime @default(now())
+
+  @@unique([type, periodStart])
+}
+
 model NewsletterSubscriber {
   id          String   @id @default(uuid())
   email       String   @unique
