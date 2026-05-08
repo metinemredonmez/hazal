@@ -46,14 +46,15 @@ export function Sidebar() {
 
   return (
     <aside className="hidden lg:flex h-screen w-52 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border sticky top-0">
-      <div className="px-4 pt-4 pb-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo.png"
-          alt="Hazal Muti"
-          className="h-8 w-auto opacity-95"
-          draggable={false}
-        />
+      <div className="px-4 pt-5 pb-4">
+        <Link href="/" className="block select-none">
+          <p className="font-display text-base tracking-[0.18em] uppercase leading-none">
+            HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+          </p>
+          <p className="mt-1.5 text-[8px] tracking-[0.4em] uppercase text-sidebar-foreground/45">
+            Real Estate · Admin
+          </p>
+        </Link>
       </div>
 
       <Separator className="bg-sidebar-border" />

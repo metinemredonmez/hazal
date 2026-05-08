@@ -100,14 +100,13 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-black/90" />
         <div className="relative z-10 flex h-full flex-col justify-between p-14 text-[#F5F2EC]">
-          <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.png"
-              alt="Hazal Muti Real Estate"
-              className="h-20 w-auto opacity-95 select-none"
-              draggable={false}
-            />
+          <div className="animate-fade-in select-none" style={{ animationDelay: "100ms" }}>
+            <p className="font-display text-3xl tracking-[0.18em] uppercase leading-none">
+              HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+            </p>
+            <p className="mt-2 text-[10px] tracking-[0.5em] uppercase text-[#F5F2EC]/55">
+              Real Estate
+            </p>
           </div>
 
           <div className="animate-fade-up max-w-md" style={{ animationDelay: "300ms" }}>
@@ -138,9 +137,13 @@ export default function LoginPage() {
       <section className="flex items-center justify-center bg-background px-6 py-10 lg:px-14 lg:py-0">
         <div className="w-full max-w-sm animate-slide-in-right">
           {/* Mobile brand header */}
-          <div className="mb-12 flex justify-center lg:hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-dark.png" alt="Hazal Muti Real Estate" className="h-12 w-auto" draggable={false} />
+          <div className="mb-12 flex flex-col items-center lg:hidden select-none">
+            <p className="font-display text-2xl tracking-[0.18em] uppercase">
+              HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+            </p>
+            <p className="mt-1.5 text-[9px] tracking-[0.5em] uppercase text-foreground/50">
+              Real Estate
+            </p>
           </div>
 
           {step === "login" ? (
