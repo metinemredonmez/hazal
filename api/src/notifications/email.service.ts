@@ -26,13 +26,20 @@ export class EmailService {
       `Hazal Muti Real Estate <noreply@hazalmuti.com>`;
 
     if (host && user && pass) {
+      // CyberPanel + self-hosted mail servers usually have self-signed certs.
+      // Set SMTP_TLS_REJECT_UNAUTHORIZED=false in env to accept them.
+      const rejectUnauthorized =
+        this.config.get<string>('SMTP_TLS_REJECT_UNAUTHORIZED') !== 'false';
       this.transporter = nodemailer.createTransport({
         host,
         port,
         secure: port === 465,
         auth: { user, pass },
+        tls: { rejectUnauthorized },
       });
-      this.logger.log(`✉️  SMTP configured: ${host}:${port} (from ${this.from})`);
+      this.logger.log(
+        `✉️  SMTP configured: ${host}:${port} (from ${this.from}, tls.rejectUnauthorized=${rejectUnauthorized})`,
+      );
     } else {
       this.logger.warn('SMTP not configured — emails will be logged but not sent');
     }

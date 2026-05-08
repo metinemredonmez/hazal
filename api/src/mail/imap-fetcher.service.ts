@@ -38,12 +38,15 @@ export class ImapFetcherService {
     const secure = this.config.get<string>('IMAP_SECURE') !== 'false';
     const folder = 'INBOX';
 
+    const rejectUnauthorized =
+      this.config.get<string>('IMAP_TLS_REJECT_UNAUTHORIZED') !== 'false';
     const client = new ImapFlow({
       host,
       port,
       secure,
       auth: { user, pass },
       logger: false,
+      tls: { rejectUnauthorized },
     });
 
     let fetched = 0;
