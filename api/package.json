@@ -1,7 +1,7 @@
 {
   "name": "hazal-muti-api",
   "version": "0.1.0",
-  "description": "Hazal Mutin Real Estate — backend API",
+  "description": "Hazal Muti Real Estate — backend API",
   "private": true,
   "scripts": {
     "build": "nest build",

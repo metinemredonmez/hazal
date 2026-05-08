@@ -1,4 +1,4 @@
-// Hazal Mutin Real Estate — Prisma schema
+// Hazal Muti Real Estate — Prisma schema
 // Single broker, multilingual (TR/EN), Postgres
 
 generator client {
@@ -238,7 +238,7 @@ model ChatMessage {
 
 model SiteSettings {
   id              String   @id @default("singleton")
-  brandName       String   @default("Hazal Mutin Real Estate")
+  brandName       String   @default("Hazal Muti Real Estate")
   tagline         String?
   logoUrl         String?
   primaryColor    String   @default("#1a1a1a")

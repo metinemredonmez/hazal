@@ -410,7 +410,7 @@ export default function InquiriesPage() {
                   {reply && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       <Button asChild size="sm" variant="outline" className="gap-1.5">
-                        <a href={`mailto:${selected.email}?subject=Hazal%20Mutin%20Real%20Estate&body=${encodeURIComponent(reply)}`}>
+                        <a href={`mailto:${selected.email}?subject=Hazal%20Muti%20Real%20Estate&body=${encodeURIComponent(reply)}`}>
                           <Mail className="h-3 w-3" /> Email gönder
                         </a>
                       </Button>
