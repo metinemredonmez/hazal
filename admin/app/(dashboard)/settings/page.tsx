@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Save, Globe, ArrowRight, Upload, ImageIcon, X as XIcon } from "lucide-react";
+import { Loader2, Save, Globe, ArrowRight, Upload, ImageIcon, X as XIcon, Mail } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -96,21 +96,39 @@ export default function SettingsPage() {
     <>
       <Topbar title="Site Ayarları" description="Marka, iletişim, içerik" />
       <main className="flex-1 px-4 py-5 space-y-4 animate-fade-up max-w-4xl">
-        <Link
-          href="/settings/web"
-          className="flex items-center justify-between px-4 py-3 border border-[#C9A96E]/40 bg-[#C9A96E]/5 hover:bg-[#C9A96E]/10 rounded-md group transition-colors"
-        >
-          <div className="flex items-center gap-2.5">
-            <Globe className="h-4 w-4 text-[#C9A96E]" />
-            <div>
-              <p className="text-sm font-medium">Web Sayfaları</p>
-              <p className="text-xs text-muted-foreground">
-                Anasayfa, Hakkımda, İletişim sayfalarının metinlerini düzenle
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Link
+            href="/settings/web"
+            className="flex items-center justify-between px-4 py-3 border border-[#C9A96E]/40 bg-[#C9A96E]/5 hover:bg-[#C9A96E]/10 rounded-md group transition-colors"
+          >
+            <div className="flex items-center gap-2.5">
+              <Globe className="h-4 w-4 text-[#C9A96E]" />
+              <div>
+                <p className="text-sm font-medium">Web Sayfaları</p>
+                <p className="text-xs text-muted-foreground">
+                  Anasayfa, Hakkımda, İletişim metinleri
+                </p>
+              </div>
             </div>
-          </div>
-          <ArrowRight className="h-4 w-4 text-[#C9A96E] transition-transform group-hover:translate-x-1" />
-        </Link>
+            <ArrowRight className="h-4 w-4 text-[#C9A96E] transition-transform group-hover:translate-x-1" />
+          </Link>
+
+          <Link
+            href="/settings/emails"
+            className="flex items-center justify-between px-4 py-3 border border-[#C9A96E]/40 bg-[#C9A96E]/5 hover:bg-[#C9A96E]/10 rounded-md group transition-colors"
+          >
+            <div className="flex items-center gap-2.5">
+              <Mail className="h-4 w-4 text-[#C9A96E]" />
+              <div>
+                <p className="text-sm font-medium">E-posta Şablonları</p>
+                <p className="text-xs text-muted-foreground">
+                  Yeni talep, randevu, otomatik yanıt mailleri
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-[#C9A96E] transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
 
         <Card>
           <CardHeader className="py-3 px-4 border-b border-border">

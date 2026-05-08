@@ -113,12 +113,61 @@ export class NotificationsService {
     phone: string | null;
     message: string;
     listingId?: string | null;
+    listingTitle?: string | null;
   }) {
     const adminEmail = this.config.get<string>('ADMIN_EMAIL') ?? 'hazalmuti@hotmail.com';
     const frontendUrl = (this.config.get<string>('FRONTEND_URL') ?? 'https://hazalmuti.com').replace(/\/$/, '');
     const adminUrl = frontendUrl.replace('://hazalmuti', '://admin.hazalmuti');
 
-    const html = `
+    // Try to use admin-customized template first
+    const settings = await this.prisma.siteSettings.findUnique({ where: { id: 'singleton' } });
+    const tmpl = (settings?.emailTemplates as Record<string, unknown> | null)?.newInquiryAdmin as
+      | { subject?: { tr?: string; en?: string }; body?: { tr?: string; en?: string } }
+      | undefined;
+    const customSubject = tmpl?.subject?.tr;
+    const customBody = tmpl?.body?.tr;
+
+    const variables = {
+      name: inquiry.name,
+      email: inquiry.email,
+      phone: inquiry.phone ?? '',
+      message: inquiry.message,
+      listingTitle: inquiry.listingTitle ?? '',
+      adminUrl,
+    };
+    const replaceVars = (s: string) =>
+      Object.entries(variables).reduce(
+        (acc, [k, v]) => acc.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v)),
+        s,
+      );
+
+    let subject: string;
+    let html: string;
+
+    if (customSubject && customBody) {
+      // Use admin's template — wrap plain text in branded HTML
+      subject = replaceVars(customSubject);
+      const plainBody = replaceVars(customBody);
+      html = `
+        <div style="font-family: Inter, system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #14141A;">
+          <p style="text-transform: uppercase; letter-spacing: 0.4em; color: #C9A96E; font-size: 11px; margin: 0;">Hazal Muti · Real Estate</p>
+          <div style="margin-top: 24px; white-space: pre-wrap; font-size: 14px; line-height: 1.6;">${escapeHtml(plainBody)}</div>
+          <p style="color: #6E6E73; font-size: 11px; margin-top: 32px; text-align: center;">© ${new Date().getFullYear()} Hazal Muti Real Estate</p>
+        </div>
+      `;
+      return this.create({
+        type: 'new_inquiry',
+        title: `Yeni talep: ${inquiry.name}`,
+        body: inquiry.message.substring(0, 200),
+        link: `/inquiries`,
+        metadata: { inquiryId: inquiry.id, email: inquiry.email },
+        email: { to: adminEmail, subject, html, replyTo: inquiry.email },
+      });
+    }
+
+    // Fallback: original hardcoded HTML template
+    subject = `Yeni müşteri talebi — ${inquiry.name}`;
+    html = `
       <div style="font-family: Inter, system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #14141A;">
         <p style="text-transform: uppercase; letter-spacing: 0.4em; color: #C9A96E; font-size: 11px; margin: 0;">Hazal Muti · Real Estate</p>
         <h1 style="font-family: Georgia, serif; font-size: 24px; font-weight: 400; margin: 16px 0;">Yeni müşteri talebi</h1>
@@ -144,12 +193,7 @@ export class NotificationsService {
       body: inquiry.message.substring(0, 200),
       link: `/inquiries`,
       metadata: { inquiryId: inquiry.id, email: inquiry.email },
-      email: {
-        to: adminEmail,
-        subject: `Yeni müşteri talebi — ${inquiry.name}`,
-        html,
-        replyTo: inquiry.email,
-      },
+      email: { to: adminEmail, subject, html, replyTo: inquiry.email },
     });
   }
 }

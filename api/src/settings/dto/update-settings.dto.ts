@@ -35,4 +35,5 @@ export class UpdateSettingsDto {
   // Validated only as a generic object — shape is enforced via the typed
   // PageContent interface on both frontend and backend.
   @IsOptional() @IsObject() pageContent?: PageContent;
+  @IsOptional() @IsObject() emailTemplates?: Record<string, unknown>;
 }
