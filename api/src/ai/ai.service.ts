@@ -15,7 +15,7 @@ export class AiService {
   ) {
     const key = this.config.get<string>('OPENAI_API_KEY');
     if (key && key.length > 10) {
-      this.client = new OpenAI({ apiKey: key });
+      this.client = new OpenAI({ apiKey: key, timeout: 60_000, maxRetries: 1 });
     } else {
       this.logger.warn('OPENAI_API_KEY not set — AI endpoints will return 503');
     }
@@ -58,19 +58,28 @@ Length: ~120 words per language.
 Return STRICT JSON in this shape (no markdown, no extra keys):
 {"titleTr":"...", "titleEn":"...", "descriptionTr":"...", "descriptionEn":"..."}`;
 
-    const completion = await client.chat.completions.create({
-      model: this.model,
-      response_format: { type: 'json_object' },
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a luxury real estate copywriter for a single-broker boutique agency. You write tasteful, accurate copy in Turkish and English.',
-        },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.7,
-    });
+    let completion;
+    try {
+      completion = await client.chat.completions.create({
+        model: this.model,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a luxury real estate copywriter for a single-broker boutique agency. You write tasteful, accurate copy in Turkish and English.',
+          },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+      });
+    } catch (err: any) {
+      this.logger.error(`OpenAI generateDescription failed: ${err?.message ?? err}`);
+      const status = err?.status ?? err?.response?.status;
+      if (status === 401) throw new ServiceUnavailableException('OpenAI API key invalid');
+      if (status === 429) throw new ServiceUnavailableException('OpenAI quota exceeded or rate limited');
+      throw new ServiceUnavailableException(`OpenAI request failed: ${err?.message ?? 'unknown'}`);
+    }
 
     const raw = completion.choices[0]?.message?.content ?? '{}';
     try {

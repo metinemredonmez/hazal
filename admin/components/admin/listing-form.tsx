@@ -140,6 +140,8 @@ export function ListingForm({ existing }: { existing?: Listing }) {
       if (existing) {
         await api(`/api/admin/listings/${existing.id}`, { method: "PATCH", body: payload });
         toast.success("İlan güncellendi");
+        router.push("/listings");
+        return;
       } else {
         const created = await api<Listing>("/api/admin/listings", {
           method: "POST",
