@@ -213,24 +213,62 @@ async function main() {
   });
   console.log(`✓ Super Admin seeded: ${email} (${phone})`);
 
-  // 2) Site settings
-  await prisma.siteSettings.upsert({
-    where: { id: 'singleton' },
-    update: { brandName: 'Hazal Muti Real Estate' },
-    create: {
-      id: 'singleton',
-      brandName: 'Hazal Muti Real Estate',
-      tagline: 'Premium properties, personal service.',
-      defaultLocale: 'tr',
-      heroTitleTr: 'Hayalinizdeki Eve Bir Adım Daha Yakın',
-      heroTitleEn: 'One Step Closer to Your Dream Home',
-      heroSubtitleTr: 'Seçkin ilanlar, kişisel hizmet.',
-      heroSubtitleEn: 'Curated listings, personal service.',
-      aboutTr: 'Hazal Muti hakkında metin buraya...',
-      aboutEn: 'About Hazal Muti text here...',
-    },
-  });
-  console.log('✓ Site settings seeded');
+  // 2) Site settings — non-destructive: only fill empty fields
+  const existingSettings = await prisma.siteSettings.findUnique({ where: { id: 'singleton' } });
+  const SETTINGS_DEFAULTS = {
+    brandName: 'Hazal Muti',
+    tagline: 'İstanbul lüks gayrimenkul · Kişisel danışmanlık',
+    phone: '+90 532 512 76 28',
+    whatsapp: '+90 532 512 76 28',
+    email: 'info@hazalmuti.com',
+    address: 'İstanbul, Türkiye',
+    instagram: 'https://instagram.com/hazalmuti',
+    linkedin: 'https://linkedin.com/in/hazalmuti',
+    youtube: '',
+    facebook: '',
+    primaryColor: '#14141A',
+    accentColor: '#C9A96E',
+    defaultCurrency: Currency.TRY,
+    defaultLocale: 'tr',
+    heroTitleTr: 'İstanbul\'da seçkin gayrimenkul',
+    heroTitleEn: 'Curated real estate in Istanbul',
+    heroSubtitleTr: 'Bebek\'ten Bodrum\'a — şahsen seçilmiş portföy.',
+    heroSubtitleEn: 'From Bebek to Bodrum — a personally curated portfolio.',
+    aboutTr:
+      'Hazal Muti, İstanbul\'un en prestijli semtlerinde lüks gayrimenkul danışmanlığı yapmaktadır. Müşterilerine birebir özen göstererek doğru ev, doğru zaman ve doğru fiyat üçgeninde rehberlik eder.',
+    aboutEn:
+      'Hazal Muti is a luxury real estate advisor focused on Istanbul\'s most prestigious neighborhoods. She works one-on-one with each client to find the right home at the right moment and the right price.',
+    seoTitleTr: 'Hazal Muti · İstanbul lüks gayrimenkul',
+    seoTitleEn: 'Hazal Muti · Istanbul luxury real estate',
+    seoDescTr:
+      'Bebek, Etiler, Cihangir, Bodrum — özenle seçilmiş satılık ve kiralık lüks daireler, villalar. Kişisel danışmanlık ve diskresyon.',
+    seoDescEn:
+      'Bebek, Etiler, Cihangir, Bodrum — hand-picked luxury homes and villas for sale and rent. Personal advisory with full discretion.',
+  };
+
+  if (!existingSettings) {
+    await prisma.siteSettings.create({ data: { id: 'singleton', ...SETTINGS_DEFAULTS } });
+    console.log('✓ Site settings created with defaults');
+  } else {
+    // Only fill blanks; don't overwrite anything Hazal has set
+    const fillBlanks: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(SETTINGS_DEFAULTS)) {
+      const current = (existingSettings as Record<string, unknown>)[key];
+      if (current === null || current === undefined || current === '') {
+        fillBlanks[key] = val;
+      }
+    }
+    // Always fix the brand if it still says the old value
+    if (existingSettings.brandName === 'Hazal Mutin' || existingSettings.brandName === 'Hazal Muti Real Estate') {
+      fillBlanks.brandName = 'Hazal Muti';
+    }
+    if (Object.keys(fillBlanks).length > 0) {
+      await prisma.siteSettings.update({ where: { id: 'singleton' }, data: fillBlanks });
+      console.log(`✓ Site settings: filled ${Object.keys(fillBlanks).length} blank field(s)`);
+    } else {
+      console.log('ℹ Site settings already complete');
+    }
+  }
 
   // 3) Demo listings (only if none exist OR SEED_DEMO=force)
   const existingCount = await prisma.listing.count();

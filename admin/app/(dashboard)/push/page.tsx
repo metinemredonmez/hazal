@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Send, BellRing, AlertCircle } from "lucide-react";
+import { Send, BellRing, AlertCircle, Sparkles, Home, TrendingDown, Calendar, Newspaper } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,55 @@ interface SendResult {
   recipients: number;
 }
 
+interface Template {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  titleTr: string;
+  titleEn: string;
+  bodyTr: string;
+  bodyEn: string;
+}
+
+const TEMPLATES: Template[] = [
+  {
+    id: "new-listing",
+    label: "Yeni İlan",
+    icon: Home,
+    titleTr: "Yeni ilan: Bebek'te deniz manzaralı 3+1",
+    titleEn: "New listing: 3+1 sea-view in Bebek",
+    bodyTr: "Tarihi yapıda yenilenmiş, geniş teras, panoramik Boğaz manzarası. Detaylar için tıklayın.",
+    bodyEn: "Renovated historic building, large terrace, panoramic Bosphorus view. Click for details.",
+  },
+  {
+    id: "price-drop",
+    label: "Fiyat İndirimi",
+    icon: TrendingDown,
+    titleTr: "Fiyat güncellendi · Cihangir 2+1",
+    titleEn: "Price update · 2+1 in Cihangir",
+    bodyTr: "Beğendiğiniz daire için fiyat güncellendi. Hızlı değerlendirin.",
+    bodyEn: "The price has been updated for this listing. Move fast.",
+  },
+  {
+    id: "open-house",
+    label: "Açık Ev / Randevu",
+    icon: Calendar,
+    titleTr: "Açık ev: Cumartesi Etiler portföyü",
+    titleEn: "Open house: Saturday in Etiler",
+    bodyTr: "Bu hafta sonu seçili ilanlar için randevu açık. Gelmek için kayıt olun.",
+    bodyEn: "Selected listings open for visits this weekend. Register to attend.",
+  },
+  {
+    id: "market-report",
+    label: "Aylık Rapor",
+    icon: Newspaper,
+    titleTr: "Mayıs market raporu yayında",
+    titleEn: "May market report is live",
+    bodyTr: "İstanbul lüks gayrimenkul piyasası — bu ayın özet analizi.",
+    bodyEn: "Istanbul luxury real estate — this month's summary analysis.",
+  },
+];
+
 export default function PushPage() {
   const [titleTr, setTitleTr] = React.useState("");
   const [titleEn, setTitleEn] = React.useState("");
@@ -30,6 +79,14 @@ export default function PushPage() {
   const [sending, setSending] = React.useState(false);
   const [status, setStatus] = React.useState<PushStatus | null>(null);
   const [lastResult, setLastResult] = React.useState<SendResult | null>(null);
+
+  function applyTemplate(t: Template) {
+    setTitleTr(t.titleTr);
+    setTitleEn(t.titleEn);
+    setBodyTr(t.bodyTr);
+    setBodyEn(t.bodyEn);
+    toast.success(`Şablon yüklendi: ${t.label}`);
+  }
 
   React.useEffect(() => {
     api<PushStatus>("/api/admin/push/status")
@@ -94,6 +151,37 @@ export default function PushPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
+              <Sparkles className="h-4 w-4 text-[#C9A96E]" /> Hazır şablonlar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {TEMPLATES.map((t) => {
+                const Icon = t.icon;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => applyTemplate(t)}
+                    className="flex items-start gap-2 p-3 text-left border border-border rounded-md hover:border-[#C9A96E] hover:bg-amber-50/40 transition-colors"
+                  >
+                    <Icon className="h-4 w-4 text-[#C9A96E] mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{t.label}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                        {t.titleTr}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
               <BellRing className="h-4 w-4 text-[#C9A96E]" /> Yeni bildirim
             </CardTitle>
           </CardHeader>
@@ -105,9 +193,12 @@ export default function PushPage() {
                   id="titleTr"
                   value={titleTr}
                   onChange={(e) => setTitleTr(e.target.value)}
-                  placeholder="Yeni ilan: Bebek deniz manzaralı..."
+                  placeholder="Örn: Yeni ilan: Bebek'te deniz manzaralı 3+1"
                   maxLength={120}
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  Kısa, dikkat çekici bir başlık. {titleTr.length}/120
+                </p>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="titleEn">Title (EN)</Label>
@@ -115,9 +206,12 @@ export default function PushPage() {
                   id="titleEn"
                   value={titleEn}
                   onChange={(e) => setTitleEn(e.target.value)}
-                  placeholder="New listing: Bebek seaview..."
+                  placeholder="E.g.: New listing: 3+1 sea-view in Bebek"
                   maxLength={120}
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  Yabancı abonelere gider. {titleEn.length}/120
+                </p>
               </div>
             </div>
 
@@ -130,8 +224,11 @@ export default function PushPage() {
                   onChange={(e) => setBodyTr(e.target.value)}
                   rows={4}
                   maxLength={500}
-                  placeholder="Detayları görmek için tıklayın"
+                  placeholder="Örn: Tarihi yapıda yenilenmiş, geniş teras, panoramik Boğaz manzarası. Detaylar için tıklayın."
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  1-2 cümle, ilanın en çekici özelliği. {bodyTr.length}/500
+                </p>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="bodyEn">Body (EN)</Label>
@@ -141,8 +238,11 @@ export default function PushPage() {
                   onChange={(e) => setBodyEn(e.target.value)}
                   rows={4}
                   maxLength={500}
-                  placeholder="Click to view details"
+                  placeholder="E.g.: Renovated historic building, large terrace, panoramic Bosphorus view. Click for details."
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  Yabancı abonelere gider. {bodyEn.length}/500
+                </p>
               </div>
             </div>
 
@@ -153,8 +253,11 @@ export default function PushPage() {
                   id="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://hazalmuti.com/ilanlar/..."
+                  placeholder="https://hazalmuti.com/ilanlar/bebek-3-1-deniz-manzarali"
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  Bildirime tıklayan kullanıcı buraya yönlendirilir.
+                </p>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="imageUrl">Görsel URL (opsiyonel)</Label>
@@ -162,8 +265,11 @@ export default function PushPage() {
                   id="imageUrl"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://..."
+                  placeholder="https://hazalmuti.com/uploads/.../kapak.jpg"
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  Bildirimde görünür (en iyi 1024×512). Boş bırakılabilir.
+                </p>
               </div>
             </div>
 

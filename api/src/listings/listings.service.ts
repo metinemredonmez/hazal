@@ -1,14 +1,47 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { Prisma, ListingStatus } from '@prisma/client';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Prisma, ListingStatus, type Listing, type ListingImage } from '@prisma/client';
 import slugify from 'slugify';
 import { PrismaService } from '../prisma/prisma.service';
+import { PushService } from '../push/push.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { QueryListingsDto } from './dto/query-listings.dto';
 
 @Injectable()
 export class ListingsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(ListingsService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly push: PushService,
+    private readonly config: ConfigService,
+  ) {}
+
+  /** Best-effort auto push when a listing becomes ACTIVE. Never throws. */
+  private async autoPushOnPublish(listing: Listing & { images?: ListingImage[] }) {
+    if (listing.status !== ListingStatus.ACTIVE) return;
+    if (!this.push.isConfigured()) return;
+    try {
+      const frontendUrl = this.config.get<string>('FRONTEND_URL') ?? 'https://hazalmuti.com';
+      const url = `${frontendUrl}/ilanlar/${listing.slug}`;
+      const cover = listing.images?.find((i) => i.isPrimary)?.url ?? listing.images?.[0]?.url;
+      const priceStr = new Intl.NumberFormat('tr-TR').format(Number(listing.price));
+      const location = listing.district ?? listing.city ?? '';
+      const tag = location ? `${location} · ` : '';
+      await this.push.send({
+        titleTr: `Yeni ilan: ${listing.titleTr}`,
+        titleEn: `New listing: ${listing.titleEn}`,
+        bodyTr: `${tag}${priceStr} ${listing.currency}`,
+        bodyEn: `${tag}${priceStr} ${listing.currency}`,
+        url,
+        imageUrl: cover,
+      });
+      this.logger.log(`Auto-push sent for listing ${listing.id} (${listing.slug})`);
+    } catch (err) {
+      this.logger.warn(`Auto-push failed for listing ${listing.id}: ${(err as Error).message}`);
+    }
+  }
 
   private buildSort(sort?: string): Prisma.ListingOrderByWithRelationInput[] {
     switch (sort) {
@@ -125,10 +158,13 @@ export class ListingsService {
 
   async create(dto: CreateListingDto) {
     const slug = await this.generateUniqueSlug(dto.titleEn || dto.titleTr);
-    return this.prisma.listing.create({
+    const created = await this.prisma.listing.create({
       data: { ...dto, slug },
       include: { images: true },
     });
+    // Fire-and-forget auto push on publish
+    void this.autoPushOnPublish(created);
+    return created;
   }
 
   async update(id: string, dto: UpdateListingDto) {
@@ -144,11 +180,20 @@ export class ListingsService {
       data.slug = await this.generateUniqueSlug(dto.titleEn || dto.titleTr || existing.titleEn, id);
     }
 
-    return this.prisma.listing.update({
+    const updated = await this.prisma.listing.update({
       where: { id },
       data,
       include: { images: { orderBy: { order: 'asc' } } },
     });
+
+    // Auto-push only on the DRAFT→ACTIVE transition (not on every edit of an ACTIVE listing)
+    const becamePublished =
+      existing.status !== ListingStatus.ACTIVE && updated.status === ListingStatus.ACTIVE;
+    if (becamePublished) {
+      void this.autoPushOnPublish(updated);
+    }
+
+    return updated;
   }
 
   async remove(id: string) {
@@ -195,6 +240,15 @@ export class ListingsService {
 
   async bulkUpdate(ids: string[], patch: { status?: any; featured?: boolean }) {
     if (!ids || ids.length === 0) return { ok: true, updated: 0 };
+
+    // Snapshot pre-update statuses to detect DRAFT→ACTIVE transitions
+    const before = patch.status === ListingStatus.ACTIVE
+      ? await this.prisma.listing.findMany({
+          where: { id: { in: ids } },
+          select: { id: true, status: true },
+        })
+      : [];
+
     const data: Prisma.ListingUpdateManyMutationInput = {};
     if (patch.status !== undefined) data.status = patch.status;
     if (patch.featured !== undefined) data.featured = patch.featured;
@@ -202,6 +256,19 @@ export class ListingsService {
       where: { id: { in: ids } },
       data,
     });
+
+    // Auto-push for listings that just became ACTIVE
+    if (patch.status === ListingStatus.ACTIVE && before.length > 0) {
+      const transitioned = before.filter((l) => l.status !== ListingStatus.ACTIVE).map((l) => l.id);
+      if (transitioned.length > 0) {
+        const pubs = await this.prisma.listing.findMany({
+          where: { id: { in: transitioned } },
+          include: { images: { orderBy: { order: 'asc' } } },
+        });
+        for (const l of pubs) void this.autoPushOnPublish(l);
+      }
+    }
+
     return { ok: true, updated: result.count };
   }
 

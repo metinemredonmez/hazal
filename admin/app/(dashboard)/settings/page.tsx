@@ -75,21 +75,41 @@ export default function SettingsPage() {
             <CardTitle className="text-xs">Marka</CardTitle>
           </CardHeader>
           <CardContent className="p-4 grid gap-3 md:grid-cols-2">
-            <Field label="Marka adı">
-              <Input value={settings.brandName} onChange={(e) => update("brandName", e.target.value)} />
+            <Field label="Marka adı" hint="Tüm sayfalarda görünür. Örn: Hazal Muti">
+              <Input
+                value={settings.brandName}
+                onChange={(e) => update("brandName", e.target.value)}
+                placeholder="Hazal Muti"
+              />
             </Field>
-            <Field label="Slogan">
-              <Input value={settings.tagline ?? ""} onChange={(e) => update("tagline", e.target.value)} />
+            <Field label="Slogan" hint="Hero altında görünür. Kısa, akılda kalıcı.">
+              <Input
+                value={settings.tagline ?? ""}
+                onChange={(e) => update("tagline", e.target.value)}
+                placeholder="İstanbul lüks gayrimenkul · Kişisel danışmanlık"
+              />
             </Field>
-            <Field label="Logo URL">
-              <Input value={settings.logoUrl ?? ""} onChange={(e) => update("logoUrl", e.target.value)} />
+            <Field label="Logo URL" hint="Yüklediğin logonun URL'i. Boş bırakılırsa metin logo kullanılır.">
+              <Input
+                value={settings.logoUrl ?? ""}
+                onChange={(e) => update("logoUrl", e.target.value)}
+                placeholder="https://hazalmuti.com/uploads/logo.png"
+              />
             </Field>
             <div className="grid grid-cols-2 gap-2">
-              <Field label="Birincil renk">
-                <Input value={settings.primaryColor} onChange={(e) => update("primaryColor", e.target.value)} />
+              <Field label="Birincil renk" hint="HEX kodu">
+                <Input
+                  value={settings.primaryColor}
+                  onChange={(e) => update("primaryColor", e.target.value)}
+                  placeholder="#14141A"
+                />
               </Field>
-              <Field label="Aksent">
-                <Input value={settings.accentColor} onChange={(e) => update("accentColor", e.target.value)} />
+              <Field label="Aksent" hint="Vurgu rengi">
+                <Input
+                  value={settings.accentColor}
+                  onChange={(e) => update("accentColor", e.target.value)}
+                  placeholder="#C9A96E"
+                />
               </Field>
             </div>
           </CardContent>
@@ -100,14 +120,62 @@ export default function SettingsPage() {
             <CardTitle className="text-xs">İletişim & Sosyal</CardTitle>
           </CardHeader>
           <CardContent className="p-4 grid gap-3 md:grid-cols-2">
-            <Field label="Telefon"><Input value={settings.phone ?? ""} onChange={(e) => update("phone", e.target.value)} /></Field>
-            <Field label="E-posta"><Input value={settings.email ?? ""} onChange={(e) => update("email", e.target.value)} /></Field>
-            <Field label="WhatsApp"><Input value={settings.whatsapp ?? ""} onChange={(e) => update("whatsapp", e.target.value)} /></Field>
-            <Field label="Adres"><Input value={settings.address ?? ""} onChange={(e) => update("address", e.target.value)} /></Field>
-            <Field label="Instagram"><Input value={settings.instagram ?? ""} onChange={(e) => update("instagram", e.target.value)} /></Field>
-            <Field label="LinkedIn"><Input value={settings.linkedin ?? ""} onChange={(e) => update("linkedin", e.target.value)} /></Field>
-            <Field label="YouTube"><Input value={settings.youtube ?? ""} onChange={(e) => update("youtube", e.target.value)} /></Field>
-            <Field label="Facebook"><Input value={settings.facebook ?? ""} onChange={(e) => update("facebook", e.target.value)} /></Field>
+            <Field label="Telefon" hint="Web ve admin'de görünür. +90 ile başlat.">
+              <Input
+                value={settings.phone ?? ""}
+                onChange={(e) => update("phone", e.target.value)}
+                placeholder="+90 532 512 76 28"
+              />
+            </Field>
+            <Field label="E-posta" hint="Talepler buraya bildirim olarak düşer.">
+              <Input
+                value={settings.email ?? ""}
+                onChange={(e) => update("email", e.target.value)}
+                placeholder="info@hazalmuti.com"
+              />
+            </Field>
+            <Field label="WhatsApp" hint="Web'deki WhatsApp butonu bu numaraya açılır.">
+              <Input
+                value={settings.whatsapp ?? ""}
+                onChange={(e) => update("whatsapp", e.target.value)}
+                placeholder="+90 532 512 76 28"
+              />
+            </Field>
+            <Field label="Adres" hint="İletişim sayfasında görünür.">
+              <Input
+                value={settings.address ?? ""}
+                onChange={(e) => update("address", e.target.value)}
+                placeholder="Bebek, İstanbul"
+              />
+            </Field>
+            <Field label="Instagram" hint="Tam URL.">
+              <Input
+                value={settings.instagram ?? ""}
+                onChange={(e) => update("instagram", e.target.value)}
+                placeholder="https://instagram.com/hazalmuti"
+              />
+            </Field>
+            <Field label="LinkedIn" hint="Tam URL.">
+              <Input
+                value={settings.linkedin ?? ""}
+                onChange={(e) => update("linkedin", e.target.value)}
+                placeholder="https://linkedin.com/in/hazalmuti"
+              />
+            </Field>
+            <Field label="YouTube" hint="Kanal URL'i. Boş bırakılırsa footer'da gösterilmez.">
+              <Input
+                value={settings.youtube ?? ""}
+                onChange={(e) => update("youtube", e.target.value)}
+                placeholder="https://youtube.com/@hazalmuti"
+              />
+            </Field>
+            <Field label="Facebook" hint="Sayfa URL'i. Boş bırakılırsa gösterilmez.">
+              <Input
+                value={settings.facebook ?? ""}
+                onChange={(e) => update("facebook", e.target.value)}
+                placeholder="https://facebook.com/hazalmuti"
+              />
+            </Field>
           </CardContent>
         </Card>
 
@@ -138,11 +206,19 @@ export default function SettingsPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Mapbox Token (public)">
-              <Input value={settings.mapboxToken ?? ""} onChange={(e) => update("mapboxToken", e.target.value)} />
+            <Field label="Mapbox Token (public)" hint="İlan detayında harita için. mapbox.com → Account → pk.eyJ... ile başlar.">
+              <Input
+                value={settings.mapboxToken ?? ""}
+                onChange={(e) => update("mapboxToken", e.target.value)}
+                placeholder="pk.eyJ1Ijoi..."
+              />
             </Field>
-            <Field label="Google Analytics (G-...)">
-              <Input value={settings.gaId ?? ""} onChange={(e) => update("gaId", e.target.value)} />
+            <Field label="Google Analytics (G-...)" hint="GA4 Measurement ID. Boş bırakılırsa GA yüklenmez.">
+              <Input
+                value={settings.gaId ?? ""}
+                onChange={(e) => update("gaId", e.target.value)}
+                placeholder="G-XXXXXXXXXX"
+              />
             </Field>
           </CardContent>
         </Card>
@@ -152,12 +228,44 @@ export default function SettingsPage() {
             <CardTitle className="text-xs">Anasayfa Hero</CardTitle>
           </CardHeader>
           <CardContent className="p-4 grid gap-3 md:grid-cols-2">
-            <Field label="Başlık (TR)"><Input value={settings.heroTitleTr ?? ""} onChange={(e) => update("heroTitleTr", e.target.value)} /></Field>
-            <Field label="Başlık (EN)"><Input value={settings.heroTitleEn ?? ""} onChange={(e) => update("heroTitleEn", e.target.value)} /></Field>
-            <Field label="Alt yazı (TR)"><Textarea rows={2} value={settings.heroSubtitleTr ?? ""} onChange={(e) => update("heroSubtitleTr", e.target.value)} /></Field>
-            <Field label="Alt yazı (EN)"><Textarea rows={2} value={settings.heroSubtitleEn ?? ""} onChange={(e) => update("heroSubtitleEn", e.target.value)} /></Field>
+            <Field label="Başlık (TR)" hint="Anasayfa hero. Kısa, etkili — 4-7 kelime.">
+              <Input
+                value={settings.heroTitleTr ?? ""}
+                onChange={(e) => update("heroTitleTr", e.target.value)}
+                placeholder="İstanbul'da seçkin gayrimenkul"
+              />
+            </Field>
+            <Field label="Başlık (EN)" hint="Same idea in English.">
+              <Input
+                value={settings.heroTitleEn ?? ""}
+                onChange={(e) => update("heroTitleEn", e.target.value)}
+                placeholder="Curated real estate in Istanbul"
+              />
+            </Field>
+            <Field label="Alt yazı (TR)" hint="Bir cümle. Hizmet vaadini özetle.">
+              <Textarea
+                rows={2}
+                value={settings.heroSubtitleTr ?? ""}
+                onChange={(e) => update("heroSubtitleTr", e.target.value)}
+                placeholder="Bebek'ten Bodrum'a — şahsen seçilmiş portföy."
+              />
+            </Field>
+            <Field label="Alt yazı (EN)">
+              <Textarea
+                rows={2}
+                value={settings.heroSubtitleEn ?? ""}
+                onChange={(e) => update("heroSubtitleEn", e.target.value)}
+                placeholder="From Bebek to Bodrum — a personally curated portfolio."
+              />
+            </Field>
             <div className="md:col-span-2">
-              <Field label="Hero medya URL (foto/video)"><Input value={settings.heroMediaUrl ?? ""} onChange={(e) => update("heroMediaUrl", e.target.value)} /></Field>
+              <Field label="Hero medya URL (foto/video)" hint="Anasayfada arka plan. JPG/PNG/MP4. Yatay 16:9 önerilir (1920×1080+).">
+                <Input
+                  value={settings.heroMediaUrl ?? ""}
+                  onChange={(e) => update("heroMediaUrl", e.target.value)}
+                  placeholder="https://hazalmuti.com/uploads/hero-bosphorus.jpg"
+                />
+              </Field>
             </div>
           </CardContent>
         </Card>
@@ -167,8 +275,22 @@ export default function SettingsPage() {
             <CardTitle className="text-xs">Hakkımda</CardTitle>
           </CardHeader>
           <CardContent className="p-4 grid gap-3 md:grid-cols-2">
-            <Field label="Hakkımda (TR)"><Textarea rows={5} value={settings.aboutTr ?? ""} onChange={(e) => update("aboutTr", e.target.value)} /></Field>
-            <Field label="Hakkımda (EN)"><Textarea rows={5} value={settings.aboutEn ?? ""} onChange={(e) => update("aboutEn", e.target.value)} /></Field>
+            <Field label="Hakkımda (TR)" hint="2-4 paragraf. Deneyim, uzmanlık, yaklaşım. /hakkimizda sayfasında görünür.">
+              <Textarea
+                rows={5}
+                value={settings.aboutTr ?? ""}
+                onChange={(e) => update("aboutTr", e.target.value)}
+                placeholder="Hazal Muti, İstanbul'un en prestijli semtlerinde lüks gayrimenkul danışmanlığı yapmaktadır. 10+ yıllık deneyimi ile müşterilerine birebir özen göstererek doğru ev, doğru zaman ve doğru fiyat üçgeninde rehberlik eder. Bebek, Etiler, Cihangir ve Bodrum bölgelerinde uzmanlaşmış bir portföye sahiptir."
+              />
+            </Field>
+            <Field label="Hakkımda (EN)" hint="Same content in English.">
+              <Textarea
+                rows={5}
+                value={settings.aboutEn ?? ""}
+                onChange={(e) => update("aboutEn", e.target.value)}
+                placeholder="Hazal Muti is a luxury real estate advisor focused on Istanbul's most prestigious neighborhoods. With over a decade of experience, she works one-on-one with each client to find the right home at the right moment and the right price. Her portfolio specializes in Bebek, Etiler, Cihangir and Bodrum."
+              />
+            </Field>
           </CardContent>
         </Card>
 
@@ -177,10 +299,40 @@ export default function SettingsPage() {
             <CardTitle className="text-xs">SEO</CardTitle>
           </CardHeader>
           <CardContent className="p-4 grid gap-3 md:grid-cols-2">
-            <Field label="SEO Başlık (TR)"><Input value={settings.seoTitleTr ?? ""} onChange={(e) => update("seoTitleTr", e.target.value)} /></Field>
-            <Field label="SEO Başlık (EN)"><Input value={settings.seoTitleEn ?? ""} onChange={(e) => update("seoTitleEn", e.target.value)} /></Field>
-            <Field label="SEO Açıklama (TR)"><Textarea rows={2} value={settings.seoDescTr ?? ""} onChange={(e) => update("seoDescTr", e.target.value)} /></Field>
-            <Field label="SEO Açıklama (EN)"><Textarea rows={2} value={settings.seoDescEn ?? ""} onChange={(e) => update("seoDescEn", e.target.value)} /></Field>
+            <Field label="SEO Başlık (TR)" hint="Google sonuçlarında üst satır. 50-60 karakter ideal.">
+              <Input
+                value={settings.seoTitleTr ?? ""}
+                onChange={(e) => update("seoTitleTr", e.target.value)}
+                placeholder="Hazal Muti · İstanbul lüks gayrimenkul"
+                maxLength={70}
+              />
+            </Field>
+            <Field label="SEO Başlık (EN)" hint="Google'da EN ziyaretçilere gösterilir.">
+              <Input
+                value={settings.seoTitleEn ?? ""}
+                onChange={(e) => update("seoTitleEn", e.target.value)}
+                placeholder="Hazal Muti · Istanbul luxury real estate"
+                maxLength={70}
+              />
+            </Field>
+            <Field label="SEO Açıklama (TR)" hint="Google'daki snippet metni. 150-160 karakter ideal.">
+              <Textarea
+                rows={2}
+                value={settings.seoDescTr ?? ""}
+                onChange={(e) => update("seoDescTr", e.target.value)}
+                placeholder="Bebek, Etiler, Cihangir, Bodrum — özenle seçilmiş satılık ve kiralık lüks daireler, villalar. Kişisel danışmanlık ve diskresyon."
+                maxLength={170}
+              />
+            </Field>
+            <Field label="SEO Açıklama (EN)">
+              <Textarea
+                rows={2}
+                value={settings.seoDescEn ?? ""}
+                onChange={(e) => update("seoDescEn", e.target.value)}
+                placeholder="Bebek, Etiler, Cihangir, Bodrum — hand-picked luxury homes and villas for sale and rent. Personal advisory with full discretion."
+                maxLength={170}
+              />
+            </Field>
           </CardContent>
         </Card>
 
@@ -200,11 +352,20 @@ export default function SettingsPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1">
       <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</Label>
       {children}
+      {hint && <p className="text-[11px] text-muted-foreground/80 leading-snug">{hint}</p>}
     </div>
   );
 }
