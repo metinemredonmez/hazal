@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X } from "lucide-react";
+import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Topbar } from "@/components/admin/topbar";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,7 @@ import {
 import { api } from "@/lib/api";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Listing, Paginated } from "@/lib/types";
+import { SocialPostDialog } from "@/components/admin/social-post-dialog";
 
 const STATUS_COLOR: Record<string, "default" | "success" | "warning" | "destructive" | "secondary"> = {
   ACTIVE: "success",
@@ -62,6 +63,7 @@ export default function ListingsPage() {
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = React.useState<string>("");
   const [confirmBulkDelete, setConfirmBulkDelete] = React.useState(false);
+  const [shareListing, setShareListing] = React.useState<Listing | null>(null);
 
   const fetchListings = React.useCallback(() => {
     setLoading(true);
@@ -270,6 +272,7 @@ export default function ListingsPage() {
                       onToggleSelect={() => toggleSelected(l.id)}
                       onDelete={() => setConfirmDelete(l)}
                       onDuplicate={() => handleDuplicate(l)}
+                      onShare={() => setShareListing(l)}
                     />
                   ))
                 ) : (
@@ -322,6 +325,12 @@ export default function ListingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <SocialPostDialog
+        open={!!shareListing}
+        onOpenChange={(o) => !o && setShareListing(null)}
+        listing={shareListing}
+      />
     </>
   );
 }
@@ -332,12 +341,14 @@ function ListingRow({
   onToggleSelect,
   onDelete,
   onDuplicate,
+  onShare,
 }: {
   listing: Listing;
   selected: boolean;
   onToggleSelect: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  onShare: () => void;
 }) {
   const router = useRouter();
   const cover = listing.images.find((i) => i.isPrimary)?.url ?? listing.images[0]?.url;
@@ -402,6 +413,17 @@ function ListingRow({
             <Link href={`/listings/${listing.id}`}>
               <Edit3 className="h-4 w-4" />
             </Link>
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              onShare();
+            }}
+            title="Paylaş (AI sosyal medya)"
+          >
+            <Share2 className="h-4 w-4 text-[#C9A96E]" />
           </Button>
           <Button
             size="icon"
