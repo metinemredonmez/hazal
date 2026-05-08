@@ -271,3 +271,19 @@ model SiteSettings {
   pageContent     Json?
   updatedAt       DateTime @updatedAt
 }
+
+model NewsletterSubscriber {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  name        String?
+  locale      String   @default("tr")
+  source      String   @default("web") // web, footer, popup, manual
+  unsubscribed Boolean @default(false)
+  unsubscribedAt DateTime?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([unsubscribed, createdAt])
+}

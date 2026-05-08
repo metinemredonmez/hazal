@@ -11,6 +11,7 @@ import { AiModule } from './ai/ai.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { PushModule } from './push/push.module';
+import { NewsletterModule } from './newsletter/newsletter.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PushModule } from './push/push.module';
     NotificationsModule,
     AppointmentsModule,
     PushModule,
+    NewsletterModule,
   ],
 })
 export class AppModule {}

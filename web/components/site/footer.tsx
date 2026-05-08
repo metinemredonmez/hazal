@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useLocale, t } from "@/lib/i18n";
 import { useSettings } from "@/lib/use-settings";
+import { NewsletterSignup } from "./newsletter-signup";
 
 export function Footer() {
   const [locale] = useLocale();
@@ -15,19 +16,24 @@ export function Footer() {
     <footer className="bg-[#0E0E0E] text-[#F5F2EC] mt-24">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-10 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Brand */}
-          <div className="md:col-span-2">
-            <p className="font-display text-2xl tracking-[0.18em] uppercase">
-              HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
-            </p>
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mt-3">
-              Real Estate · İstanbul
-            </p>
-            <p className="text-sm text-[#F5F2EC]/60 mt-6 max-w-md leading-relaxed">
-              {locale === "tr"
-                ? "Premium gayrimenkul, kişisel hizmet. İstanbul'un seçkin lokasyonlarında alım, satım ve danışmanlık."
-                : "Premium properties, personal service. Acquisition, sales and advisory in İstanbul's distinguished neighborhoods."}
-            </p>
+          {/* Brand + Newsletter */}
+          <div className="md:col-span-2 space-y-8">
+            <div>
+              <p className="font-display text-2xl tracking-[0.18em] uppercase">
+                HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+              </p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mt-3">
+                Real Estate · İstanbul
+              </p>
+              <p className="text-sm text-[#F5F2EC]/60 mt-6 max-w-md leading-relaxed">
+                {locale === "tr"
+                  ? "Premium gayrimenkul, kişisel hizmet. İstanbul'un seçkin lokasyonlarında alım, satım ve danışmanlık."
+                  : "Premium properties, personal service. Acquisition, sales and advisory in İstanbul's distinguished neighborhoods."}
+              </p>
+            </div>
+            <div className="max-w-md">
+              <NewsletterSignup source="footer" variant="footer" />
+            </div>
           </div>
 
           {/* Contact */}
