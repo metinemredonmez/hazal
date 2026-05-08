@@ -33,6 +33,27 @@ export class ParseSearchDto {
   query: string;
 }
 
+export class ConciergeMessageDto {
+  @IsString()
+  @IsIn(['user', 'assistant'])
+  role: 'user' | 'assistant';
+
+  @IsString()
+  @MaxLength(2000)
+  content: string;
+}
+
+export class ConciergeChatDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  messages: ConciergeMessageDto[];
+
+  @IsOptional()
+  @IsIn(['tr', 'en'])
+  locale?: 'tr' | 'en';
+}
+
 export class TranslateDto {
   @IsString()
   @MaxLength(5000)

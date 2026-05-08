@@ -11,6 +11,7 @@ import {
   AnalyzeInquiryDto,
   StructureBulletsDto,
   ParseSearchDto,
+  ConciergeChatDto,
 } from './dto/ai.dto';
 import { Readable } from 'stream';
 import type { Express } from 'express';
@@ -476,5 +477,147 @@ Examples:
     }
     if (typeof parsed.q === 'string' && parsed.q.length > 0) out.q = parsed.q;
     return out;
+  }
+
+  /**
+   * AI concierge — public visitor-facing chat about Hazal's listings.
+   * Pulls a small recent-listings catalog into the system prompt so the
+   * model can recommend specific properties by slug.
+   */
+  async concierge(dto: ConciergeChatDto): Promise<{
+    reply: string;
+    recommendedSlugs: string[];
+    suggestInquiry: boolean;
+  }> {
+    const locale = dto.locale ?? 'tr';
+
+    if (!this.client) {
+      const fallback =
+        locale === 'tr'
+          ? 'Şu an AI yardımcı kapalı. Sorularınız için iletişim formunu kullanabilir veya doğrudan arayabilirsiniz.'
+          : 'AI assistant is currently offline. Please use the contact form or call directly.';
+      return { reply: fallback, recommendedSlugs: [], suggestInquiry: true };
+    }
+    const client = this.client;
+
+    // Build a compact catalog the model can search through (max 30 listings)
+    const catalog = await this.prisma.listing.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+      take: 30,
+      select: {
+        slug: true,
+        titleTr: true,
+        titleEn: true,
+        type: true,
+        category: true,
+        price: true,
+        currency: true,
+        bedrooms: true,
+        bathrooms: true,
+        areaM2: true,
+        city: true,
+        district: true,
+      },
+    });
+
+    const catalogText = catalog
+      .map(
+        (l) =>
+          `[${l.slug}] ${locale === 'tr' ? l.titleTr : l.titleEn} · ${l.type} · ${l.category} · ${
+            l.bedrooms ?? '?'
+          }+1 · ${l.areaM2 ?? '?'}m² · ${l.district ?? l.city ?? ''} · ${Number(l.price).toLocaleString('tr-TR')} ${l.currency}`,
+      )
+      .join('\n');
+
+    const systemPrompt =
+      locale === 'tr'
+        ? `Sen Hazal Muti'nin sanal gayrimenkul danışmanısın. İstanbul ve Bodrum'da lüks gayrimenkul portföyünü ziyaretçilere tanıtıyorsun.
+
+Aşağıda Hazal'ın güncel aktif portföyü var (her ilanın slug'ı [köşeli parantez] içinde):
+
+${catalogText}
+
+Kurallar:
+- Cevapların kısa, sıcak ve profesyonel olsun. Türkçe.
+- Ziyaretçinin ihtiyacını net olarak anla (bütçe, bölge, oda sayısı, kullanım amacı). Soru sor.
+- Uygun ilan(lar) varsa öner. Maksimum 3 öneri.
+- Öneri yaparken slug'ları her zaman [köşeli parantez] içinde belirt.
+- Eğer kullanıcı ciddiyse veya iletişim istiyorsa, ona "Hazal'a doğrudan ulaşman için iletişim formunu açabilirim" de.
+- Asla fiyat pazarlığı yapma, yalnızca portföydeki bilgileri ver.
+- Portföyde olmayan bir ilanı uydurma.
+
+Yanıtının sonunda STRICT JSON satırı ekle:
+\`\`\`json
+{"recommend": ["slug1","slug2"], "suggestInquiry": true|false}
+\`\`\``
+        : `You are Hazal Muti's AI real-estate concierge for luxury properties in Istanbul and Bodrum.
+
+Active portfolio (each listing's slug in [brackets]):
+
+${catalogText}
+
+Rules:
+- Keep replies short, warm, professional. English.
+- Understand the visitor's need (budget, area, bedrooms, intent). Ask follow-ups.
+- Recommend up to 3 listings. Always cite slugs in [brackets].
+- If they seem serious or want contact, offer "I can open the contact form to reach Hazal directly."
+- Never negotiate prices. Don't invent listings.
+
+End your reply with a STRICT JSON line:
+\`\`\`json
+{"recommend": ["slug1","slug2"], "suggestInquiry": true|false}
+\`\`\``;
+
+    let completion;
+    try {
+      completion = await client.chat.completions.create({
+        model: this.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...dto.messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+        temperature: 0.6,
+        max_tokens: 600,
+      });
+    } catch (err: any) {
+      this.logger.warn(`concierge OpenAI error: ${err?.message ?? err}`);
+      return {
+        reply:
+          locale === 'tr'
+            ? 'Şu anda yardımcı olamıyorum. Lütfen iletişim formunu kullanın veya tekrar deneyin.'
+            : 'I cannot help right now. Please use the contact form or try again.',
+        recommendedSlugs: [],
+        suggestInquiry: true,
+      };
+    }
+
+    const raw = completion.choices[0]?.message?.content?.trim() ?? '';
+
+    // Extract JSON tail
+    let recommend: string[] = [];
+    let suggestInquiry = false;
+    let cleanReply = raw;
+    const jsonMatch = raw.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      try {
+        const meta = JSON.parse(jsonMatch[1]);
+        if (Array.isArray(meta.recommend)) {
+          recommend = meta.recommend.filter((s: unknown): s is string => typeof s === 'string');
+        }
+        if (typeof meta.suggestInquiry === 'boolean') {
+          suggestInquiry = meta.suggestInquiry;
+        }
+      } catch {
+        // ignore
+      }
+      cleanReply = raw.replace(jsonMatch[0], '').trim();
+    }
+
+    // Validate slugs against catalog
+    const validSlugs = new Set(catalog.map((l) => l.slug));
+    const recommendedSlugs = recommend.filter((s) => validSlugs.has(s)).slice(0, 3);
+
+    return { reply: cleanReply, recommendedSlugs, suggestInquiry };
   }
 }

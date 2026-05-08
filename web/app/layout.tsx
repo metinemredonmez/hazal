@@ -5,6 +5,7 @@ import { Providers } from "@/components/providers";
 import { OneSignalProvider } from "@/components/onesignal-provider";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
+import { ConciergeWidget } from "@/components/site/concierge-widget";
 
 const sans = Inter({
   variable: "--font-sans",
@@ -113,6 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main>{children}</main>
           <Footer />
+          <ConciergeWidget />
         </Providers>
         <OneSignalProvider />
       </body>

@@ -1,11 +1,11 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AiService } from './ai.service';
-import { ParseSearchDto } from './dto/ai.dto';
+import { ParseSearchDto, ConciergeChatDto } from './dto/ai.dto';
 
 /**
  * Public AI endpoints — no auth, used by visitor-facing web site.
- * Currently exposes the smart search NL → filter parser.
+ * Smart search (NL → filter) and concierge chat.
  */
 @ApiTags('ai (public)')
 @Controller('ai')
@@ -15,5 +15,10 @@ export class AiPublicController {
   @Post('parse-search')
   parseSearch(@Body() dto: ParseSearchDto) {
     return this.ai.parseSearch(dto);
+  }
+
+  @Post('concierge')
+  concierge(@Body() dto: ConciergeChatDto) {
+    return this.ai.concierge(dto);
   }
 }
