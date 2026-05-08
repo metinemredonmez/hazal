@@ -8,6 +8,7 @@ import { useLocale, t, CATEGORY_LABEL } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
 import type { Listing } from "@/lib/types";
 import { InquiryForm } from "@/components/site/inquiry-form";
+import { ListingMap } from "@/components/site/listing-map";
 
 export default function ListingDetailView({
   slug,
@@ -223,6 +224,20 @@ export default function ListingDetailView({
               <div className="mb-10">
                 <h2 className="font-display text-2xl text-[#14141A] mb-3">{tx.listing.address}</h2>
                 <p className="text-[#14141A]/85">{listing.address}</p>
+              </div>
+            )}
+
+            {/* Map */}
+            {listing.lat != null && listing.lng != null && (
+              <div className="mb-10">
+                <h2 className="font-display text-2xl text-[#14141A] mb-3">
+                  {locale === "tr" ? "Konum" : "Location"}
+                </h2>
+                <ListingMap
+                  lat={listing.lat}
+                  lng={listing.lng}
+                  title={cityLine || (locale === "tr" ? listing.titleTr : listing.titleEn)}
+                />
               </div>
             )}
 

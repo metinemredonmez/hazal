@@ -55,6 +55,8 @@ type FormState = {
   featured: boolean;
   videoUrl: string;
   tourUrl: string;
+  lat: string;
+  lng: string;
 };
 
 const empty: FormState = {
@@ -77,6 +79,8 @@ const empty: FormState = {
   featured: false,
   videoUrl: "",
   tourUrl: "",
+  lat: "",
+  lng: "",
 };
 
 export function ListingForm({ existing }: { existing?: Listing }) {
@@ -103,6 +107,8 @@ export function ListingForm({ existing }: { existing?: Listing }) {
           featured: existing.featured,
           videoUrl: existing.videoUrl ?? "",
           tourUrl: existing.tourUrl ?? "",
+          lat: existing.lat?.toString() ?? "",
+          lng: existing.lng?.toString() ?? "",
         }
       : empty,
   );
@@ -155,6 +161,14 @@ export function ListingForm({ existing }: { existing?: Listing }) {
     if (form.yearBuilt) payload.yearBuilt = parseInt(form.yearBuilt, 10);
     if (form.videoUrl) payload.videoUrl = form.videoUrl;
     if (form.tourUrl) payload.tourUrl = form.tourUrl;
+    if (form.lat && form.lng) {
+      const lat = parseFloat(form.lat);
+      const lng = parseFloat(form.lng);
+      if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+        payload.lat = lat;
+        payload.lng = lng;
+      }
+    }
 
     try {
       if (existing) {
@@ -598,6 +612,33 @@ export function ListingForm({ existing }: { existing?: Listing }) {
               <div className="space-y-1.5">
                 <Label>Adres</Label>
                 <Input value={form.address} onChange={(e) => update("address", e.target.value)} />
+              </div>
+
+              <div className="grid gap-3 grid-cols-2 pt-2 border-t">
+                <div className="space-y-1.5">
+                  <Label>Enlem (lat)</Label>
+                  <Input
+                    value={form.lat}
+                    onChange={(e) => update("lat", e.target.value)}
+                    placeholder="41.077"
+                    type="number"
+                    step="any"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Boylam (lng)</Label>
+                  <Input
+                    value={form.lng}
+                    onChange={(e) => update("lng", e.target.value)}
+                    placeholder="29.041"
+                    type="number"
+                    step="any"
+                  />
+                </div>
+                <p className="col-span-2 text-[11px] text-muted-foreground -mt-1">
+                  💡 Google Maps'te konuma sağ tıkla → ilk satırdaki sayıları kopyala (örn:
+                  &ldquo;41.077, 29.041&rdquo;). İlan detay sayfasında harita gösterilir.
+                </p>
               </div>
             </CardContent>
           </Card>
