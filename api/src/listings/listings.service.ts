@@ -158,6 +158,59 @@ export class ListingsService {
     return { ok: true };
   }
 
+  async duplicate(id: string) {
+    const existing = await this.prisma.listing.findUnique({
+      where: { id },
+      include: { images: { orderBy: { order: 'asc' } } },
+    });
+    if (!existing) throw new NotFoundException('Listing not found');
+
+    const copyTitleTr = `${existing.titleTr} (Kopya)`;
+    const copyTitleEn = `${existing.titleEn} (Copy)`;
+    const slug = await this.generateUniqueSlug(copyTitleEn);
+
+    const { id: _id, slug: _slug, createdAt, updatedAt, views, images, ...rest } = existing;
+
+    const created = await this.prisma.listing.create({
+      data: {
+        ...rest,
+        slug,
+        titleTr: copyTitleTr,
+        titleEn: copyTitleEn,
+        status: 'DRAFT',
+        featured: false,
+        views: 0,
+        images: {
+          create: images.map((img, idx) => ({
+            url: img.url,
+            order: idx,
+            isPrimary: img.isPrimary,
+          })),
+        },
+      },
+      include: { images: { orderBy: { order: 'asc' } } },
+    });
+    return created;
+  }
+
+  async bulkUpdate(ids: string[], patch: { status?: any; featured?: boolean }) {
+    if (!ids || ids.length === 0) return { ok: true, updated: 0 };
+    const data: Prisma.ListingUpdateManyMutationInput = {};
+    if (patch.status !== undefined) data.status = patch.status;
+    if (patch.featured !== undefined) data.featured = patch.featured;
+    const result = await this.prisma.listing.updateMany({
+      where: { id: { in: ids } },
+      data,
+    });
+    return { ok: true, updated: result.count };
+  }
+
+  async bulkDelete(ids: string[]) {
+    if (!ids || ids.length === 0) return { ok: true, deleted: 0 };
+    const result = await this.prisma.listing.deleteMany({ where: { id: { in: ids } } });
+    return { ok: true, deleted: result.count };
+  }
+
   async addImages(listingId: string, urls: string[]) {
     const listing = await this.prisma.listing.findUnique({
       where: { id: listingId },

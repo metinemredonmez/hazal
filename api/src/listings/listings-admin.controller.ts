@@ -58,6 +58,24 @@ export class ListingsAdminController {
     return this.listings.remove(id);
   }
 
+  @Post(':id/duplicate')
+  duplicate(@Param('id') id: string) {
+    return this.listings.duplicate(id);
+  }
+
+  @Post('bulk/update')
+  bulkUpdate(@Body() body: { ids: string[]; status?: string; featured?: boolean }) {
+    return this.listings.bulkUpdate(body.ids, {
+      status: body.status,
+      featured: body.featured,
+    });
+  }
+
+  @Post('bulk/delete')
+  bulkDelete(@Body() body: { ids: string[] }) {
+    return this.listings.bulkDelete(body.ids);
+  }
+
   @Post(':id/images')
   addImages(@Param('id') id: string, @Body('urls') urls: string[]) {
     return this.listings.addImages(id, urls);

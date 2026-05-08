@@ -11,6 +11,30 @@ export type ListingCategory =
 export type Currency = "TRY" | "USD" | "EUR";
 export type InquiryStatus = "NEW" | "CONTACTED" | "HOT" | "CLOSED";
 export type AdminRole = "SUPER_ADMIN" | "ADMIN";
+export type AppointmentStatus =
+  | "SCHEDULED"
+  | "CONFIRMED"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "NO_SHOW";
+
+export interface Appointment {
+  id: string;
+  startsAt: string;
+  durationMin: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  listingId: string | null;
+  inquiryId: string | null;
+  listing?: { id: string; slug: string; titleTr: string; titleEn: string } | null;
+  inquiry?: { id: string; name: string; email: string } | null;
+  status: AppointmentStatus;
+  location: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Admin {
   id: string;

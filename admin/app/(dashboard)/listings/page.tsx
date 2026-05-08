@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, Eye, Star, Edit3, Trash2, ImageOff } from "lucide-react";
+import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X } from "lucide-react";
 import { toast } from "sonner";
 import { Topbar } from "@/components/admin/topbar";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,9 @@ export default function ListingsPage() {
   const [q, setQ] = React.useState("");
   const [status, setStatus] = React.useState<string>("all");
   const [confirmDelete, setConfirmDelete] = React.useState<Listing | null>(null);
+  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = React.useState<string>("");
+  const [confirmBulkDelete, setConfirmBulkDelete] = React.useState(false);
 
   const fetchListings = React.useCallback(() => {
     setLoading(true);
@@ -82,6 +85,80 @@ export default function ListingsPage() {
       await api(`/api/admin/listings/${confirmDelete.id}`, { method: "DELETE" });
       toast.success("İlan silindi");
       setConfirmDelete(null);
+      fetchListings();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Silinemedi";
+      toast.error(message);
+    }
+  }
+
+  async function handleDuplicate(listing: Listing) {
+    try {
+      const created = await api<Listing>(`/api/admin/listings/${listing.id}/duplicate`, {
+        method: "POST",
+      });
+      toast.success(`Klonlandı: ${created.titleTr}`);
+      fetchListings();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Klonlanamadı";
+      toast.error(message);
+    }
+  }
+
+  function toggleSelected(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    if (!data) return;
+    if (selected.size === data.items.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(data.items.map((l) => l.id)));
+    }
+  }
+
+  async function applyBulk() {
+    if (selected.size === 0 || !bulkAction) return;
+    const ids = Array.from(selected);
+    try {
+      let payload: Record<string, unknown> = { ids };
+      if (bulkAction.startsWith("status:")) {
+        payload.status = bulkAction.split(":")[1];
+      } else if (bulkAction === "feature:on") {
+        payload.featured = true;
+      } else if (bulkAction === "feature:off") {
+        payload.featured = false;
+      }
+      const res = await api<{ updated: number }>(`/api/admin/listings/bulk/update`, {
+        method: "POST",
+        body: payload,
+      });
+      toast.success(`${res.updated} ilan güncellendi`);
+      setSelected(new Set());
+      setBulkAction("");
+      fetchListings();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Toplu işlem başarısız";
+      toast.error(message);
+    }
+  }
+
+  async function handleBulkDelete() {
+    if (selected.size === 0) return;
+    try {
+      const res = await api<{ deleted: number }>(`/api/admin/listings/bulk/delete`, {
+        method: "POST",
+        body: { ids: Array.from(selected) },
+      });
+      toast.success(`${res.deleted} ilan silindi`);
+      setSelected(new Set());
+      setConfirmBulkDelete(false);
       fetchListings();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Silinemedi";
@@ -122,11 +199,48 @@ export default function ListingsPage() {
           </Button>
         </div>
 
+        {selected.size > 0 && (
+          <div className="flex items-center gap-2 px-3 py-2 bg-[#C9A96E]/10 border border-[#C9A96E]/30 rounded-md animate-fade-in">
+            <span className="text-xs font-medium">{selected.size} seçili</span>
+            <Select value={bulkAction} onValueChange={setBulkAction}>
+              <SelectTrigger className="h-8 w-44">
+                <SelectValue placeholder="İşlem seç..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="status:ACTIVE">Yayına al</SelectItem>
+                <SelectItem value="status:DRAFT">Taslağa al</SelectItem>
+                <SelectItem value="status:SOLD">Satıldı işaretle</SelectItem>
+                <SelectItem value="status:RENTED">Kiralandı işaretle</SelectItem>
+                <SelectItem value="status:PASSIVE">Pasif yap</SelectItem>
+                <SelectItem value="feature:on">Öne çıkar</SelectItem>
+                <SelectItem value="feature:off">Öne çıkarmayı kaldır</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button size="sm" onClick={applyBulk} disabled={!bulkAction} className="bg-[#14141A] hover:bg-black text-white">
+              Uygula
+            </Button>
+            <Button size="sm" variant="destructive" onClick={() => setConfirmBulkDelete(true)} className="gap-1">
+              <Trash2 className="h-3 w-3" /> Sil
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())} className="ml-auto gap-1">
+              <X className="h-3 w-3" /> İptal
+            </Button>
+          </div>
+        )}
+
         <Card>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <input
+                      type="checkbox"
+                      className="cursor-pointer"
+                      checked={!!data && data.items.length > 0 && selected.size === data.items.length}
+                      onChange={toggleAll}
+                    />
+                  </TableHead>
                   <TableHead className="w-16"></TableHead>
                   <TableHead>Başlık</TableHead>
                   <TableHead>Konum</TableHead>
@@ -134,23 +248,32 @@ export default function ListingsPage() {
                   <TableHead>Durum</TableHead>
                   <TableHead>Görüntülenme</TableHead>
                   <TableHead>Eklendi</TableHead>
-                  <TableHead className="w-24"></TableHead>
+                  <TableHead className="w-32"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell colSpan={8}>
+                      <TableCell colSpan={9}>
                         <Skeleton className="h-12 w-full" />
                       </TableCell>
                     </TableRow>
                   ))
                 ) : data && data.items.length > 0 ? (
-                  data.items.map((l) => <ListingRow key={l.id} listing={l} onDelete={() => setConfirmDelete(l)} />)
+                  data.items.map((l) => (
+                    <ListingRow
+                      key={l.id}
+                      listing={l}
+                      selected={selected.has(l.id)}
+                      onToggleSelect={() => toggleSelected(l.id)}
+                      onDelete={() => setConfirmDelete(l)}
+                      onDuplicate={() => handleDuplicate(l)}
+                    />
+                  ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
                       Henüz ilan yok. <Link href="/listings/new" className="text-[#C9A96E] hover:underline">İlk ilanı ekle</Link>
                     </TableCell>
                   </TableRow>
@@ -179,14 +302,53 @@ export default function ListingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={confirmBulkDelete} onOpenChange={setConfirmBulkDelete}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{selected.size} ilanı sil</DialogTitle>
+            <DialogDescription>
+              Seçili <strong>{selected.size}</strong> ilan kalıcı olarak silinecek. Bu işlem geri alınamaz.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmBulkDelete(false)}>
+              Vazgeç
+            </Button>
+            <Button variant="destructive" onClick={handleBulkDelete}>
+              Evet, hepsini sil
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
 
-function ListingRow({ listing, onDelete }: { listing: Listing; onDelete: () => void }) {
+function ListingRow({
+  listing,
+  selected,
+  onToggleSelect,
+  onDelete,
+  onDuplicate,
+}: {
+  listing: Listing;
+  selected: boolean;
+  onToggleSelect: () => void;
+  onDelete: () => void;
+  onDuplicate: () => void;
+}) {
   const cover = listing.images.find((i) => i.isPrimary)?.url ?? listing.images[0]?.url;
   return (
-    <TableRow>
+    <TableRow data-state={selected ? "selected" : undefined}>
+      <TableCell>
+        <input
+          type="checkbox"
+          className="cursor-pointer"
+          checked={selected}
+          onChange={onToggleSelect}
+        />
+      </TableCell>
       <TableCell>
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -229,12 +391,15 @@ function ListingRow({ listing, onDelete }: { listing: Listing; onDelete: () => v
       <TableCell className="text-xs text-muted-foreground">{formatDate(listing.createdAt)}</TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-1">
-          <Button asChild size="icon" variant="ghost">
+          <Button asChild size="icon" variant="ghost" title="Düzenle">
             <Link href={`/admin/listings/${listing.id}`}>
               <Edit3 className="h-4 w-4" />
             </Link>
           </Button>
-          <Button size="icon" variant="ghost" onClick={onDelete}>
+          <Button size="icon" variant="ghost" onClick={onDuplicate} title="Klonla">
+            <Copy className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="ghost" onClick={onDelete} title="Sil">
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
         </div>
