@@ -4,11 +4,13 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useLocale, t } from "@/lib/i18n";
 import { useSettings } from "@/lib/use-settings";
+import { pageContent, pick } from "@/lib/page-content";
 
 export function Hero() {
   const [locale] = useLocale();
   const tx = t[locale];
   const settings = useSettings();
+  const home = pageContent(settings).home;
 
   const heroTitle =
     locale === "tr"
@@ -18,6 +20,9 @@ export function Hero() {
     locale === "tr"
       ? settings?.heroSubtitleTr ?? "İstanbul'un seçkin lokasyonlarında premium portföy."
       : settings?.heroSubtitleEn ?? "Premium portfolio in İstanbul's distinguished neighborhoods.";
+
+  const eyebrow = pick(home?.heroEyebrow, locale, tx.hero.eyebrow);
+  const ctaLabel = pick(home?.heroCtaLabel, locale, tx.nav.explore);
 
   const mediaUrl = settings?.heroMediaUrl ?? "/login-bg.jpg";
   const isVideo = mediaUrl.match(/\.(mp4|webm|mov)$/i);
@@ -48,7 +53,7 @@ export function Hero() {
         <div className="flex items-center gap-3">
           <div className="h-px w-16 bg-[#C9A96E]" />
           <span className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E]">
-            {tx.hero.eyebrow}
+            {eyebrow}
           </span>
         </div>
       </div>
@@ -69,7 +74,7 @@ export function Hero() {
         className="hidden lg:flex absolute bottom-24 right-10 z-10 items-center gap-3 group"
       >
         <span className="text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC] group-hover:text-[#C9A96E] transition-colors">
-          {tx.nav.explore}
+          {ctaLabel}
         </span>
         <ArrowRight className="h-4 w-4 text-[#C9A96E] transition-transform group-hover:translate-x-1" />
       </Link>
@@ -80,7 +85,7 @@ export function Hero() {
           href="/ilanlar"
           className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border-b border-[#C9A96E] text-[#C9A96E] pb-1"
         >
-          {tx.nav.explore} <ArrowRight className="h-3 w-3" />
+          {ctaLabel} <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
     </section>

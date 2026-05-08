@@ -141,6 +141,7 @@ export interface SiteSettings {
   seoTitleEn: string | null;
   seoDescTr: string | null;
   seoDescEn: string | null;
+  pageContent: unknown | null;
   updatedAt: string;
 }
 

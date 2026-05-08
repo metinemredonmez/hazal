@@ -4,18 +4,41 @@ import Link from "next/link";
 import { ArrowRight, Phone, Mail } from "lucide-react";
 import { useLocale, t } from "@/lib/i18n";
 import { useSettings } from "@/lib/use-settings";
+import { pageContent, pick } from "@/lib/page-content";
 
 export default function AboutPage() {
   const [locale] = useLocale();
   const tx = t[locale];
   const settings = useSettings();
+  const about = pageContent(settings).about;
 
-  const aboutText =
+  // Fall back chain: pageContent.about.bio1/bio2/intro → settings.aboutTr/En → hardcoded TR/EN
+  const aboutFallback =
     locale === "tr"
       ? settings?.aboutTr ??
         "İstanbul'un seçkin lokasyonlarında premium gayrimenkul danışmanlığı sunuyorum. Boğaz hattı, Bebek, Etiler, Zekeriyaköy ve Bodrum'da seçkin portföy. Her müşteri için sessiz, kişisel ve sonuç odaklı bir hizmet anlayışıyla çalışıyorum."
       : settings?.aboutEn ??
         "I provide premium real estate advisory across İstanbul's most distinguished neighborhoods — the Bosphorus line, Bebek, Etiler, Zekeriyaköy and Bodrum. Discreet, personalized, results-driven service tailored to every client.";
+
+  const intro = pick(about?.intro, locale, "");
+  const bio1 = pick(about?.bio1, locale, "");
+  const bio2 = pick(about?.bio2, locale, "");
+  const specialties = pick(about?.specialties, locale, "");
+  const quote = pick(about?.quote, locale, "");
+  const heroEyebrow = pick(about?.heroEyebrow, locale, tx.about.heading);
+  const heroTitle = pick(
+    about?.heroTitle,
+    locale,
+    locale === "tr"
+      ? "Premium gayrimenkul,\nkişisel hizmet."
+      : "Premium properties,\npersonal service.",
+  );
+
+  // Content paragraphs in priority order: structured pageContent → fallback aboutText
+  const paragraphs = [intro, bio1, bio2].filter((p) => p && p.trim().length > 0);
+  const fallbackParagraphs =
+    paragraphs.length === 0 ? aboutFallback.split(/\n\n+/) : paragraphs;
+  const portrait = about?.portraitUrl ?? settings?.heroMediaUrl ?? "/login-bg.jpg";
 
   return (
     <>
@@ -23,22 +46,25 @@ export default function AboutPage() {
       <section className="bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10">
         <div className="max-w-[1600px] mx-auto">
           <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-4">
-            {tx.about.heading}
+            {heroEyebrow}
           </p>
           <h1 className="font-display font-light text-5xl lg:text-8xl leading-[0.95] max-w-5xl">
-            {locale === "tr" ? (
-              <>
-                Premium gayrimenkul,
-                <br />
-                <span className="italic text-[#C9A96E]">kişisel hizmet.</span>
-              </>
-            ) : (
-              <>
-                Premium properties,
-                <br />
-                <span className="italic text-[#C9A96E]">personal service.</span>
-              </>
-            )}
+            {(() => {
+              const lines = heroTitle.split("\n");
+              const first = lines[0];
+              const rest = lines.slice(1).join(" ");
+              return (
+                <>
+                  {first}
+                  {rest && (
+                    <>
+                      <br />
+                      <span className="italic text-[#C9A96E]">{rest}</span>
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </h1>
         </div>
       </section>
@@ -49,11 +75,7 @@ export default function AboutPage() {
           <div className="lg:col-span-5">
             <div className="aspect-[3/4] bg-[#1A1A1F] overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={settings?.heroMediaUrl ?? "/login-bg.jpg"}
-                alt="Hazal Muti"
-                className="w-full h-full object-cover"
-              />
+              <img src={portrait} alt="Hazal Muti" className="w-full h-full object-cover" />
             </div>
           </div>
 
@@ -66,10 +88,44 @@ export default function AboutPage() {
             </h2>
 
             <div className="prose prose-lg text-[#14141A]/85 leading-relaxed space-y-5 max-w-2xl">
-              {aboutText.split(/\n\n+/).map((p, i) => (
-                <p key={i}>{p}</p>
+              {fallbackParagraphs.map((p, i) => (
+                <p key={i} className="whitespace-pre-line">
+                  {p}
+                </p>
               ))}
             </div>
+
+            {specialties && (
+              <div className="mt-10">
+                <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+                  {locale === "tr" ? "Uzmanlık alanları" : "Specialties"}
+                </p>
+                <ul className="space-y-1.5 text-[#14141A]/85">
+                  {specialties
+                    .split("\n")
+                    .filter((s) => s.trim())
+                    .map((s, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-[#C9A96E] mt-1">·</span>
+                        <span>{s.trim()}</span>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
+
+            {quote && (
+              <blockquote className="mt-12 pl-6 border-l-2 border-[#C9A96E]">
+                <p className="font-display text-xl lg:text-2xl text-[#14141A] italic leading-relaxed">
+                  &ldquo;{quote}&rdquo;
+                </p>
+                {about?.quoteAuthor && (
+                  <cite className="block mt-3 text-[10px] tracking-[0.4em] uppercase text-[#6E6E73] not-italic">
+                    — {about.quoteAuthor}
+                  </cite>
+                )}
+              </blockquote>
+            )}
 
             {/* Contact lines */}
             <div className="mt-12 space-y-3">

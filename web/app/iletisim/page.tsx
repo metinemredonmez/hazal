@@ -1,14 +1,27 @@
 "use client";
 
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { useLocale, t } from "@/lib/i18n";
 import { useSettings } from "@/lib/use-settings";
+import { pageContent, pick } from "@/lib/page-content";
 import { InquiryForm } from "@/components/site/inquiry-form";
 
 export default function ContactPage() {
   const [locale] = useLocale();
   const tx = t[locale];
   const settings = useSettings();
+  const contact = pageContent(settings).contact;
+
+  const heroEyebrow = pick(contact?.heroEyebrow, locale, tx.contact.heading);
+  const heroTitle = pick(
+    contact?.heroTitle,
+    locale,
+    locale === "tr" ? "Birlikte\nçalışalım." : "Let's\nwork together.",
+  );
+  const intro = pick(contact?.intro, locale, tx.contact.sub);
+  const workingHours = pick(contact?.workingHours, locale, "");
+  const customAddress = pick(contact?.addressLine, locale, "");
+  const addressDisplay = customAddress || settings?.address || "";
 
   return (
     <div className="bg-[#FAF8F4]">
@@ -16,26 +29,27 @@ export default function ContactPage() {
       <section className="bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10">
         <div className="max-w-[1600px] mx-auto">
           <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-4">
-            {tx.contact.heading}
+            {heroEyebrow}
           </p>
           <h1 className="font-display font-light text-5xl lg:text-8xl leading-[0.95] max-w-4xl">
-            {locale === "tr" ? (
-              <>
-                Birlikte
-                <br />
-                <span className="italic text-[#C9A96E]">çalışalım.</span>
-              </>
-            ) : (
-              <>
-                Let's
-                <br />
-                <span className="italic text-[#C9A96E]">work together.</span>
-              </>
-            )}
+            {(() => {
+              const lines = heroTitle.split("\n");
+              const first = lines[0];
+              const rest = lines.slice(1).join(" ");
+              return (
+                <>
+                  {first}
+                  {rest && (
+                    <>
+                      <br />
+                      <span className="italic text-[#C9A96E]">{rest}</span>
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </h1>
-          <p className="mt-8 text-base lg:text-lg text-[#F5F2EC]/70 max-w-2xl">
-            {tx.contact.sub}
-          </p>
+          <p className="mt-8 text-base lg:text-lg text-[#F5F2EC]/70 max-w-2xl">{intro}</p>
         </div>
       </section>
 
@@ -77,12 +91,26 @@ export default function ContactPage() {
                   </p>
                 </a>
               )}
-              {settings?.address && (
+              {addressDisplay && (
                 <div>
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1">Adres</p>
-                  <p className="text-[#14141A] flex items-start gap-2">
-                    <MapPin className="h-5 w-5 text-[#C9A96E] mt-0.5" />
-                    <span>{settings.address}</span>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1">
+                    {locale === "tr" ? "Adres" : "Address"}
+                  </p>
+                  <p className="text-[#14141A] flex items-start gap-2 whitespace-pre-line">
+                    <MapPin className="h-5 w-5 text-[#C9A96E] mt-0.5 shrink-0" />
+                    <span>{addressDisplay}</span>
+                  </p>
+                </div>
+              )}
+
+              {workingHours && (
+                <div>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1">
+                    {locale === "tr" ? "Çalışma Saatleri" : "Working Hours"}
+                  </p>
+                  <p className="text-[#14141A] flex items-start gap-2 whitespace-pre-line">
+                    <Clock className="h-5 w-5 text-[#C9A96E] mt-0.5 shrink-0" />
+                    <span>{workingHours}</span>
                   </p>
                 </div>
               )}

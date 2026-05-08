@@ -5,12 +5,16 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { api } from "@/lib/api";
 import { useLocale, t } from "@/lib/i18n";
+import { useSettings } from "@/lib/use-settings";
+import { pageContent, pick } from "@/lib/page-content";
 import type { Listing } from "@/lib/types";
 import { ListingCard, ListingCardSkeleton } from "./listing-card";
 
 export function FeaturedListings() {
   const [locale] = useLocale();
   const tx = t[locale];
+  const settings = useSettings();
+  const home = pageContent(settings).home;
   const [items, setItems] = React.useState<Listing[] | null>(null);
 
   React.useEffect(() => {
@@ -19,16 +23,19 @@ export function FeaturedListings() {
       .catch(() => setItems([]));
   }, []);
 
+  const subtitle = pick(home?.featuredSubtitle, locale, tx.sections.featuredSub);
+  const title = pick(home?.featuredTitle, locale, tx.sections.featured);
+
   return (
     <section className="bg-[#FAF8F4] py-24 lg:py-32 px-6 lg:px-10">
       <div className="max-w-[1600px] mx-auto">
         <div className="flex items-end justify-between mb-12 lg:mb-16">
           <div>
             <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
-              {tx.sections.featuredSub}
+              {subtitle}
             </p>
             <h2 className="font-display font-light text-4xl lg:text-6xl text-[#14141A]">
-              {tx.sections.featured}
+              {title}
             </h2>
           </div>
           <Link

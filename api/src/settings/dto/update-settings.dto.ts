@@ -1,5 +1,6 @@
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 import { Currency } from '@prisma/client';
+import type { PageContent } from '../page-content.types';
 
 export class UpdateSettingsDto {
   @IsOptional() @IsString() @MaxLength(120) brandName?: string;
@@ -30,4 +31,8 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() seoTitleEn?: string;
   @IsOptional() @IsString() seoDescTr?: string;
   @IsOptional() @IsString() seoDescEn?: string;
+  // Free-form page content (homepage sections, about page, contact page).
+  // Validated only as a generic object — shape is enforced via the typed
+  // PageContent interface on both frontend and backend.
+  @IsOptional() @IsObject() pageContent?: PageContent;
 }

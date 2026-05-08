@@ -115,7 +115,45 @@ export interface SiteSettings {
   seoTitleEn: string | null;
   seoDescTr: string | null;
   seoDescEn: string | null;
+  pageContent: PageContent | null;
   updatedAt: string;
+}
+
+export interface BilingualText {
+  tr: string;
+  en: string;
+}
+
+export interface PageContent {
+  home?: {
+    heroEyebrow?: BilingualText;
+    heroCtaLabel?: BilingualText;
+    featuredTitle?: BilingualText;
+    featuredSubtitle?: BilingualText;
+    aboutHeading?: BilingualText;
+    aboutCtaLabel?: BilingualText;
+    contactHeading?: BilingualText;
+    contactSubtitle?: BilingualText;
+    contactCtaLabel?: BilingualText;
+  };
+  about?: {
+    heroEyebrow?: BilingualText;
+    heroTitle?: BilingualText;
+    intro?: BilingualText;
+    bio1?: BilingualText;
+    bio2?: BilingualText;
+    specialties?: BilingualText;
+    portraitUrl?: string;
+    quote?: BilingualText;
+    quoteAuthor?: string;
+  };
+  contact?: {
+    heroEyebrow?: BilingualText;
+    heroTitle?: BilingualText;
+    intro?: BilingualText;
+    workingHours?: BilingualText;
+    addressLine?: BilingualText;
+  };
 }
 
 export interface ListingStats {

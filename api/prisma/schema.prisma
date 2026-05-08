@@ -266,5 +266,8 @@ model SiteSettings {
   seoTitleEn      String?
   seoDescTr       String?
   seoDescEn       String?
+  // Page-specific editable copy (homepage sections, hakkimizda, iletisim).
+  // Shape: see PageContent type in api/src/settings/page-content.types.ts
+  pageContent     Json?
   updatedAt       DateTime @updatedAt
 }
