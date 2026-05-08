@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, Star, Loader2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Star, Loader2, Mic, MicOff, Share2, Copy, Check, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,14 @@ import { api } from "@/lib/api";
 import type { Listing } from "@/lib/types";
 import Link from "next/link";
 import { ImageManager, type ImageManagerHandle } from "@/components/admin/image-manager";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { toast as sonnerToast } from "sonner";
 
 type FormState = {
   titleTr: string;
@@ -103,6 +111,18 @@ export function ListingForm({ existing }: { existing?: Listing }) {
   const [aiLoading, setAiLoading] = React.useState(false);
   const imageManagerRef = React.useRef<ImageManagerHandle>(null);
 
+  // Voice recording
+  const [recording, setRecording] = React.useState(false);
+  const [transcribing, setTranscribing] = React.useState(false);
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const audioChunksRef = React.useRef<Blob[]>([]);
+
+  // Social post dialog
+  const [socialOpen, setSocialOpen] = React.useState(false);
+  const [socialLoading, setSocialLoading] = React.useState(false);
+  const [socialPosts, setSocialPosts] = React.useState<{ instagram: string; linkedin: string; whatsapp: string } | null>(null);
+  const [copied, setCopied] = React.useState<string | null>(null);
+
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
@@ -170,6 +190,93 @@ export function ListingForm({ existing }: { existing?: Listing }) {
     }
   }
 
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mr.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      mr.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        await transcribeAndStructure(blob);
+      };
+      mr.start();
+      mediaRecorderRef.current = mr;
+      setRecording(true);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Mikrofon erişimi reddedildi");
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+    setRecording(false);
+  }
+
+  async function transcribeAndStructure(blob: Blob) {
+    setTranscribing(true);
+    try {
+      const fd = new FormData();
+      fd.append("audio", blob, "voice.webm");
+      const transcribed = await api<{ text: string }>("/api/admin/ai/transcribe", {
+        method: "POST",
+        body: fd,
+      });
+      if (!transcribed.text?.trim()) {
+        toast.error("Ses algılanamadı");
+        return;
+      }
+      const structured = await api<{ bullets: string[] }>("/api/admin/ai/structure-bullets", {
+        method: "POST",
+        body: { raw: transcribed.text },
+      });
+      const bullets = (structured.bullets ?? []).join("\n");
+      setAiBullets((prev) => (prev ? `${prev}\n${bullets}` : bullets));
+      toast.success(`${structured.bullets?.length ?? 0} madde eklendi`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Transcribe başarısız");
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
+  async function generateSocial() {
+    if (!existing) {
+      toast.error("Önce ilanı kaydet");
+      return;
+    }
+    setSocialLoading(true);
+    setSocialOpen(true);
+    try {
+      const res = await api<{ instagram: string; linkedin: string; whatsapp: string }>(
+        "/api/admin/ai/social-post",
+        { method: "POST", body: { listingId: existing.id, locale: "tr" } },
+      );
+      setSocialPosts(res);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Sosyal post üretilemedi");
+      setSocialOpen(false);
+    } finally {
+      setSocialLoading(false);
+    }
+  }
+
+  async function copyText(key: string, text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setTimeout(() => setCopied((c) => (c === key ? null : c)), 1500);
+      sonnerToast.success("Kopyalandı");
+    } catch {
+      sonnerToast.error("Kopyalanamadı");
+    }
+  }
+
   async function handleAi() {
     const bullets = aiBullets
       .split("\n")
@@ -219,22 +326,36 @@ export function ListingForm({ existing }: { existing?: Listing }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-up">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <Button variant="ghost" size="sm" asChild className="gap-2">
           <Link href="/listings">
             <ArrowLeft className="h-4 w-4" /> İlanlar
           </Link>
         </Button>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={form.featured}
-            onCheckedChange={(v) => update("featured", v)}
-            id="featured"
-          />
-          <Label htmlFor="featured" className="cursor-pointer flex items-center gap-1.5">
-            <Star className="h-3.5 w-3.5 text-[#C9A96E]" />
-            Öne çıkar
-          </Label>
+        <div className="flex items-center gap-2 flex-wrap">
+          {existing && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={generateSocial}
+              className="gap-1.5"
+              title="Instagram, LinkedIn, WhatsApp post üret"
+            >
+              <Share2 className="h-3.5 w-3.5" /> Sosyal Medya Post
+            </Button>
+          )}
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={form.featured}
+              onCheckedChange={(v) => update("featured", v)}
+              id="featured"
+            />
+            <Label htmlFor="featured" className="cursor-pointer flex items-center gap-1.5">
+              <Star className="h-3.5 w-3.5 text-[#C9A96E]" />
+              Öne çıkar
+            </Label>
+          </div>
         </div>
       </div>
 
@@ -283,26 +404,58 @@ export function ListingForm({ existing }: { existing?: Listing }) {
 
           <Card className="border-[#C9A96E]/30">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#C9A96E]" />
-                AI ile yaz
+              <CardTitle className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#C9A96E]" />
+                  AI ile yaz
+                </span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={recording ? "destructive" : "outline"}
+                  onClick={recording ? stopRecording : startRecording}
+                  disabled={transcribing}
+                  className="gap-1.5"
+                  title="Sesli not — AI maddeleri çıkarır"
+                >
+                  {transcribing ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Çevriliyor...
+                    </>
+                  ) : recording ? (
+                    <>
+                      <MicOff className="h-3.5 w-3.5" /> Durdur
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="h-3.5 w-3.5" /> Sesli not
+                    </>
+                  )}
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                Maddeleri yaz, AI sana TR + EN başlık ve premium açıklama yazsın.
+                Maddeleri yaz, AI sana TR + EN başlık ve premium açıklama yazsın. Sesli not ile dikte de edebilirsin.
               </p>
               <Textarea
                 rows={4}
                 placeholder={"Boğaz manzarası\nYeni yapı\n2 banyo\nAkıllı ev sistemi"}
                 value={aiBullets}
                 onChange={(e) => setAiBullets(e.target.value)}
+                disabled={transcribing}
               />
+              {recording && (
+                <p className="text-xs text-red-600 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                  Kaydediliyor... Bittiğinde "Durdur"a bas, AI maddeleri çıkarır.
+                </p>
+              )}
               <Button
                 type="button"
                 variant="accent"
                 onClick={handleAi}
-                disabled={aiLoading}
+                disabled={aiLoading || transcribing}
                 className="gap-2"
               >
                 {aiLoading ? (
@@ -468,6 +621,57 @@ export function ListingForm({ existing }: { existing?: Listing }) {
           </Button>
         </div>
       </div>
+
+      <Dialog open={socialOpen} onOpenChange={setSocialOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="h-4 w-4 text-[#C9A96E]" /> Sosyal Medya Postları
+            </DialogTitle>
+            <DialogDescription>
+              Üç farklı kanal için optimize edilmiş metinler. Kopyala, yapıştır.
+            </DialogDescription>
+          </DialogHeader>
+          {socialLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-[#C9A96E]" />
+            </div>
+          ) : socialPosts ? (
+            <div className="space-y-4">
+              {([
+                { key: "instagram" as const, label: "Instagram", desc: "Caption + hashtag" },
+                { key: "linkedin" as const, label: "LinkedIn", desc: "Profesyonel duyuru" },
+                { key: "whatsapp" as const, label: "WhatsApp", desc: "Müşteriye iletim" },
+              ]).map(({ key, label, desc }) => {
+                const text = socialPosts[key];
+                return (
+                  <div key={key} className="rounded-md border border-border p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">{label}</p>
+                        <p className="text-[10px] text-muted-foreground">{desc}</p>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => copyText(`social-${key}`, text)}
+                        className="gap-1.5"
+                      >
+                        {copied === `social-${key}` ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        Kopyala
+                      </Button>
+                    </div>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/85 bg-muted/40 p-2.5 rounded">
+                      {text}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }

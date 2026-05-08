@@ -54,3 +54,29 @@ export class SuggestReplyDto {
   @IsIn(['friendly', 'formal', 'concise'])
   tone?: 'friendly' | 'formal' | 'concise';
 }
+
+export class SocialPostDto {
+  @IsString()
+  listingId: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['tr', 'en'])
+  locale?: 'tr' | 'en';
+}
+
+export class WhatsappTemplateDto {
+  @IsString()
+  inquiryId: string;
+}
+
+export class AnalyzeInquiryDto {
+  @IsString()
+  inquiryId: string;
+}
+
+export class StructureBulletsDto {
+  @IsString()
+  @MaxLength(8000)
+  raw: string;
+}

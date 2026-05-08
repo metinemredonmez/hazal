@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiTags, ApiConsumes } from '@nestjs/swagger';
+import type { Express } from 'express';
 import { AiService } from './ai.service';
-import { GenerateDescriptionDto, TranslateDto, SuggestReplyDto } from './dto/ai.dto';
+import {
+  GenerateDescriptionDto,
+  TranslateDto,
+  SuggestReplyDto,
+  SocialPostDto,
+  WhatsappTemplateDto,
+  AnalyzeInquiryDto,
+  StructureBulletsDto,
+} from './dto/ai.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('ai')
@@ -29,5 +39,32 @@ export class AiController {
   @Post('suggest-reply')
   suggestReply(@Body() dto: SuggestReplyDto) {
     return this.ai.suggestReply(dto);
+  }
+
+  @Post('social-post')
+  socialPost(@Body() dto: SocialPostDto) {
+    return this.ai.socialPost(dto);
+  }
+
+  @Post('whatsapp-template')
+  whatsappTemplate(@Body() dto: WhatsappTemplateDto) {
+    return this.ai.whatsappTemplates(dto);
+  }
+
+  @Post('analyze-inquiry')
+  analyzeInquiry(@Body() dto: AnalyzeInquiryDto) {
+    return this.ai.analyzeInquiry(dto);
+  }
+
+  @Post('structure-bullets')
+  structureBullets(@Body() dto: StructureBulletsDto) {
+    return this.ai.structureBullets(dto);
+  }
+
+  @Post('transcribe')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('audio', { limits: { fileSize: 25 * 1024 * 1024 } }))
+  transcribe(@UploadedFile() file: Express.Multer.File) {
+    return this.ai.transcribeVoice(file);
   }
 }
