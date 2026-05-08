@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { ImagePlus, Loader2, Star, Trash2, ChevronUp, ChevronDown, Info } from "lucide-react";
+import { ImagePlus, Loader2, Star, Trash2, ChevronUp, ChevronDown, Info, GripVertical } from "lucide-react";
 import { api, uploadFiles } from "@/lib/api";
 import type { Listing, ListingImage } from "@/lib/types";
 
@@ -33,6 +33,26 @@ export const ImageManager = React.forwardRef<ImageManagerHandle, Props>(function
   const [images, setImages] = React.useState<ListingImage[]>(initialImages);
   const [pending, setPending] = React.useState<PendingFile[]>([]);
   const [uploading, setUploading] = React.useState(false);
+  const [draggedIdx, setDraggedIdx] = React.useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = React.useState<number | null>(null);
+
+  async function handleDragReorder(fromIdx: number, toIdx: number) {
+    if (!listingId || fromIdx === toIdx) return;
+    const next = [...images];
+    const [moved] = next.splice(fromIdx, 1);
+    next.splice(toIdx, 0, moved);
+    setImages(next);
+    try {
+      await api(`/api/admin/listings/${listingId}/images/reorder`, {
+        method: "PATCH",
+        body: { imageIds: next.map((i) => i.id) },
+      });
+      toast.success("Sıra güncellendi");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Sıra güncellenemedi");
+      setImages(images);
+    }
+  }
   const [dragOver, setDragOver] = React.useState(false);
   const fileInput = React.useRef<HTMLInputElement>(null);
 
@@ -187,6 +207,7 @@ export const ImageManager = React.forwardRef<ImageManagerHandle, Props>(function
           </p>
           <p className="text-muted-foreground">
             İlk seçtiğin foto ana foto (kapak) olur. Star ikonuna tıklayarak değiştirebilirsin.
+            Sıralamak için fotoyu sürükle-bırak.
           </p>
         </div>
       </div>
@@ -281,15 +302,50 @@ export const ImageManager = React.forwardRef<ImageManagerHandle, Props>(function
             {images.map((img, idx) => (
               <div
                 key={img.id}
-                className="relative aspect-[4/3] rounded-md border border-border overflow-hidden group"
+                draggable
+                onDragStart={(e) => {
+                  setDraggedIdx(idx);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                onDragEnter={() => setDragOverIdx(idx)}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                }}
+                onDragLeave={() => setDragOverIdx((prev) => (prev === idx ? null : prev))}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (draggedIdx !== null && draggedIdx !== idx) {
+                    handleDragReorder(draggedIdx, idx);
+                  }
+                  setDraggedIdx(null);
+                  setDragOverIdx(null);
+                }}
+                onDragEnd={() => {
+                  setDraggedIdx(null);
+                  setDragOverIdx(null);
+                }}
+                className={
+                  "relative aspect-[4/3] rounded-md border overflow-hidden group cursor-grab active:cursor-grabbing transition-all " +
+                  (draggedIdx === idx
+                    ? "opacity-30 border-border"
+                    : dragOverIdx === idx && draggedIdx !== null
+                      ? "border-[#C9A96E] ring-2 ring-[#C9A96E]/40"
+                      : "border-border")
+                }
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.url} alt="" className="h-full w-full object-cover" />
+                <img src={img.url} alt="" className="h-full w-full object-cover pointer-events-none" />
                 {img.isPrimary && (
-                  <div className="absolute top-2 left-2 bg-[#C9A96E] text-[#14141A] text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded inline-flex items-center gap-1">
+                  <div className="absolute top-2 left-2 bg-[#C9A96E] text-[#14141A] text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded inline-flex items-center gap-1 pointer-events-none">
                     <Star className="h-3 w-3 fill-current" /> Ana
                   </div>
                 )}
+
+                {/* Drag handle indicator */}
+                <div className="absolute top-1.5 right-1.5 bg-black/60 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <GripVertical className="h-3 w-3" />
+                </div>
 
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
                   {!img.isPrimary && (
@@ -330,7 +386,7 @@ export const ImageManager = React.forwardRef<ImageManagerHandle, Props>(function
                   </button>
                 </div>
 
-                <p className="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                <p className="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded pointer-events-none">
                   #{idx + 1}
                 </p>
               </div>
