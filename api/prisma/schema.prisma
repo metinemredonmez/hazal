@@ -306,6 +306,46 @@ model BlogPost {
   @@index([status, publishedAt])
 }
 
+enum EmailDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum EmailStatus {
+  UNREAD
+  READ
+  DELETED
+}
+
+model EmailMessage {
+  id           String          @id @default(uuid())
+  direction    EmailDirection
+  status       EmailStatus     @default(UNREAD)
+  // IMAP unique-id within a folder — used for dedup on fetch
+  imapUid      String?
+  imapFolder   String          @default("INBOX")
+  messageId    String?         // RFC 822 Message-ID
+  inReplyTo    String?
+  threadKey    String?         // normalized subject+participants for grouping
+
+  fromAddress  String
+  fromName     String?
+  toAddresses  String          // comma-separated
+  ccAddresses  String?
+  subject      String          @default("")
+  bodyText     String          @default("")
+  bodyHtml     String          @default("")
+  hasAttachment Boolean        @default(false)
+
+  receivedAt   DateTime        @default(now())
+  fetchedAt    DateTime        @default(now())
+  createdAt    DateTime        @default(now())
+
+  @@unique([imapFolder, imapUid])
+  @@index([direction, status, receivedAt])
+  @@index([threadKey, receivedAt])
+}
+
 model ReportRun {
   id           String   @id @default(uuid())
   type         String   // "monthly"

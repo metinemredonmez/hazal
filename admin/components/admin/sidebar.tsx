@@ -17,6 +17,7 @@ import {
   BellRing,
   Mail,
   Newspaper,
+  AtSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/store";
@@ -29,6 +30,7 @@ const NAV: Array<{ label: string; href: string; icon: React.ComponentType<{ clas
   { label: "Talepler", href: "/inquiries", icon: Inbox },
   { label: "Randevular", href: "/appointments", icon: CalendarDays },
   { label: "Sohbet", href: "/chat", icon: MessagesSquare },
+  { label: "Mail", href: "/mail", icon: AtSign },
   { label: "AI Yardımcı", href: "/ai", icon: Sparkles },
   { label: "Push", href: "/push", icon: BellRing },
   { label: "Bülten", href: "/newsletter", icon: Mail },
