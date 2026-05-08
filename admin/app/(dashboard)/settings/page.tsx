@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Save, Globe, ArrowRight } from "lucide-react";
+import { Loader2, Save, Globe, ArrowRight, Upload, ImageIcon, X as XIcon } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,31 @@ export default function SettingsPage() {
   const [settings, setSettings] = React.useState<SiteSettings | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
+  const [uploadingMedia, setUploadingMedia] = React.useState<"hero" | "logo" | null>(null);
+  const heroFileInputRef = React.useRef<HTMLInputElement>(null);
+  const logoFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  async function uploadAndSet(file: File, target: "hero" | "logo") {
+    setUploadingMedia(target);
+    try {
+      const fd = new FormData();
+      fd.append("files", file);
+      const res = await api<Array<{ url: string }>>("/api/admin/uploads", {
+        method: "POST",
+        body: fd,
+      });
+      const url = res[0]?.url;
+      if (!url) throw new Error("Upload başarısız");
+      if (target === "hero") update("heroMediaUrl", url);
+      else update("logoUrl", url);
+      toast.success(target === "hero" ? "Hero medya yüklendi" : "Logo yüklendi");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Upload başarısız";
+      toast.error(message);
+    } finally {
+      setUploadingMedia(null);
+    }
+  }
 
   React.useEffect(() => {
     api<SiteSettings>("/api/admin/settings")
@@ -107,11 +132,52 @@ export default function SettingsPage() {
               />
             </Field>
             <Field label="Logo URL" hint="Yüklediğin logonun URL'i. Boş bırakılırsa metin logo kullanılır.">
-              <Input
-                value={settings.logoUrl ?? ""}
-                onChange={(e) => update("logoUrl", e.target.value)}
-                placeholder="https://hazalmuti.com/uploads/logo.png"
-              />
+              <div className="flex gap-2">
+                <Input
+                  value={settings.logoUrl ?? ""}
+                  onChange={(e) => update("logoUrl", e.target.value)}
+                  placeholder="https://hazalmuti.com/uploads/logo.png"
+                />
+                <input
+                  ref={logoFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) uploadAndSet(f, "logo");
+                    e.target.value = "";
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => logoFileInputRef.current?.click()}
+                  disabled={uploadingMedia === "logo"}
+                  className="shrink-0 gap-1.5"
+                >
+                  {uploadingMedia === "logo" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Upload className="h-3.5 w-3.5" />
+                  )}
+                  Yükle
+                </Button>
+              </div>
+              {settings.logoUrl && (
+                <div className="mt-2 inline-flex items-center gap-2 px-2 py-1 bg-muted rounded text-[11px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={settings.logoUrl} alt="logo" className="h-6 w-auto object-contain" />
+                  <button
+                    onClick={() => update("logoUrl", "")}
+                    className="text-muted-foreground hover:text-destructive"
+                    type="button"
+                  >
+                    <XIcon className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
             </Field>
             <div className="grid grid-cols-2 gap-2">
               <Field label="Birincil renk" hint="HEX kodu">
@@ -276,12 +342,76 @@ export default function SettingsPage() {
               />
             </Field>
             <div className="md:col-span-2">
-              <Field label="Hero medya URL (foto/video)" hint="Anasayfada arka plan. JPG/PNG/MP4. Yatay 16:9 önerilir (1920×1080+).">
-                <Input
-                  value={settings.heroMediaUrl ?? ""}
-                  onChange={(e) => update("heroMediaUrl", e.target.value)}
-                  placeholder="https://hazalmuti.com/uploads/hero-bosphorus.jpg"
-                />
+              <Field label="Hero medya (foto/video)" hint="Anasayfada arka plan. JPG/PNG/MP4. Yatay 16:9 önerilir (1920×1080+). Maks 10 MB.">
+                <div className="flex gap-2">
+                  <Input
+                    value={settings.heroMediaUrl ?? ""}
+                    onChange={(e) => update("heroMediaUrl", e.target.value)}
+                    placeholder="https://hazalmuti.com/uploads/hero-bosphorus.jpg"
+                  />
+                  <input
+                    ref={heroFileInputRef}
+                    type="file"
+                    accept="image/*,video/mp4,video/webm"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) uploadAndSet(f, "hero");
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => heroFileInputRef.current?.click()}
+                    disabled={uploadingMedia === "hero"}
+                    className="shrink-0 gap-1.5"
+                  >
+                    {uploadingMedia === "hero" ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="h-3.5 w-3.5" />
+                    )}
+                    Yükle
+                  </Button>
+                </div>
+                {settings.heroMediaUrl && (
+                  <div className="mt-2 relative inline-block">
+                    {settings.heroMediaUrl.match(/\.(mp4|webm|mov)$/i) ? (
+                      <video
+                        src={settings.heroMediaUrl}
+                        className="h-32 w-auto rounded border border-border object-cover"
+                        muted
+                        loop
+                        autoPlay
+                        playsInline
+                      />
+                    ) : (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={settings.heroMediaUrl}
+                          alt="hero preview"
+                          className="h-32 w-auto rounded border border-border object-cover"
+                        />
+                      </>
+                    )}
+                    <button
+                      onClick={() => update("heroMediaUrl", "")}
+                      className="absolute -top-2 -right-2 bg-white border border-border rounded-full p-1 shadow hover:bg-destructive hover:text-white"
+                      type="button"
+                      aria-label="Hero medyayı kaldır"
+                    >
+                      <XIcon className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground mt-1.5 inline-flex items-center gap-1">
+                  <ImageIcon className="h-3 w-3" />
+                  Yükle butonu ile foto/video seç → otomatik kaydedilir, "Tüm
+                  Değişiklikleri Kaydet"e basmayı unutma.
+                </p>
               </Field>
             </div>
           </CardContent>
