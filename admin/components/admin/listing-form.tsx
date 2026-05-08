@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, Star, Loader2, Mic, MicOff, Share2, Copy, Check, MessageSquare, Download } from "lucide-react";
+import { ArrowLeft, Sparkles, Star, Loader2, Mic, MicOff, Share2, Copy, Check, MessageSquare, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -376,6 +376,23 @@ export function ListingForm({ existing }: { existing?: Listing }) {
               title="Instagram, LinkedIn, WhatsApp post üret"
             >
               <Share2 className="h-3.5 w-3.5" /> Sosyal Medya Post
+            </Button>
+          )}
+          {existing && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                window.open(
+                  `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://hazalmuti.com"}/brochure/${existing.slug}`,
+                  "_blank",
+                )
+              }
+              className="gap-1.5"
+              title="A4 brosür sayfası — Cmd+P ile PDF kaydet"
+            >
+              <FileText className="h-3.5 w-3.5" /> PDF Brosür
             </Button>
           )}
           <div className="flex items-center gap-2">
