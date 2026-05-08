@@ -66,7 +66,7 @@ export function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
         overHero
-          ? "bg-transparent text-[#F5F2EC]"
+          ? "bg-gradient-to-b from-black/70 via-black/40 to-transparent backdrop-blur-sm text-[#F5F2EC]"
           : "bg-[#0E0E0E]/95 backdrop-blur text-[#F5F2EC] border-b border-white/10",
       )}
     >
