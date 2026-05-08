@@ -5,7 +5,7 @@ import OpenAI from 'openai';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../notifications/email.service';
 
-interface MonthlyData {
+export interface MonthlyData {
   period: string;
   newListings: number;
   publishedListings: number;

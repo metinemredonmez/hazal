@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 
@@ -15,10 +16,14 @@ export class SettingsService {
   }
 
   async update(dto: UpdateSettingsDto) {
+    // Prisma JSON column wants InputJsonValue; our typed PageContent shape
+    // needs an explicit cast (no index signature on the interface).
+    const data = dto as unknown as Prisma.SiteSettingsUpdateInput;
+    const createData = { id: SINGLETON_ID, ...dto } as unknown as Prisma.SiteSettingsCreateInput;
     return this.prisma.siteSettings.upsert({
       where: { id: SINGLETON_ID },
-      create: { id: SINGLETON_ID, ...dto },
-      update: dto,
+      create: createData,
+      update: data,
     });
   }
 
