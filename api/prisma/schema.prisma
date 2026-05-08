@@ -274,6 +274,38 @@ model SiteSettings {
   updatedAt       DateTime @updatedAt
 }
 
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum BlogPostKind {
+  ARTICLE   // own writing
+  PRESS     // press coverage / media mention
+  VIDEO     // video tour or interview
+}
+
+model BlogPost {
+  id           String          @id @default(uuid())
+  slug         String          @unique
+  kind         BlogPostKind    @default(ARTICLE)
+  status       BlogPostStatus  @default(DRAFT)
+  titleTr      String
+  titleEn      String
+  excerptTr    String?
+  excerptEn    String?
+  bodyTr       String          @default("")
+  bodyEn       String          @default("")
+  coverImage   String?
+  externalUrl  String?         // for PRESS/VIDEO that link out
+  publishedAt  DateTime?
+  views        Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([status, publishedAt])
+}
+
 model NewsletterSubscriber {
   id          String   @id @default(uuid())
   email       String   @unique

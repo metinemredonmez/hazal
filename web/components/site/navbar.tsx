@@ -40,7 +40,7 @@ export function Navbar() {
       label: tx.nav.about,
       children: [
         { label: tx.nav.aboutBio, href: "/hakkimizda" },
-        { label: tx.nav.aboutPress, href: "/hakkimizda#press" },
+        { label: locale === "tr" ? "Medya" : "Media", href: "/medya" },
       ],
     },
     {

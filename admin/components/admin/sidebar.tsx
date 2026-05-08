@@ -16,6 +16,7 @@ import {
   CalendarDays,
   BellRing,
   Mail,
+  Newspaper,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/store";
@@ -31,6 +32,7 @@ const NAV: Array<{ label: string; href: string; icon: React.ComponentType<{ clas
   { label: "AI Yardımcı", href: "/ai", icon: Sparkles },
   { label: "Push", href: "/push", icon: BellRing },
   { label: "Bülten", href: "/newsletter", icon: Mail },
+  { label: "Blog & Medya", href: "/blog", icon: Newspaper },
   { label: "Ayarlar", href: "/settings", icon: Settings },
   { label: "Güvenlik", href: "/audit", icon: History },
 ];
