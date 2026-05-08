@@ -303,6 +303,101 @@ async function main() {
     created += 1;
   }
   console.log(`✓ Created ${created} demo listings (with images)`);
+
+  // 4) Demo appointments (only if none exist OR SEED_DEMO=force)
+  const existingApptCount = await prisma.appointment.count();
+  if (existingApptCount > 0 && !force) {
+    console.log(`ℹ Skipping demo appointments — ${existingApptCount} already exist`);
+  } else {
+    if (force) {
+      await prisma.appointment.deleteMany({});
+      console.log('⚠ Cleared existing appointments (SEED_DEMO=force)');
+    }
+
+    const listings = await prisma.listing.findMany({ take: 4, orderBy: { createdAt: 'desc' } });
+    const now = new Date();
+    const day = (offsetDays: number, hour: number, min = 0): Date => {
+      const d = new Date(now);
+      d.setDate(d.getDate() + offsetDays);
+      d.setHours(hour, min, 0, 0);
+      return d;
+    };
+
+    const DEMO_APPTS: Array<{
+      startsAt: Date;
+      durationMin: number;
+      name: string;
+      email: string;
+      phone: string;
+      listingId?: string;
+      status: 'SCHEDULED' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+      location?: string;
+      notes?: string;
+    }> = [
+      {
+        startsAt: day(1, 11, 0), // yarın 11:00
+        durationMin: 60,
+        name: 'Ayşe Yılmaz',
+        email: 'ayse.yilmaz@example.com',
+        phone: '+90 532 111 22 33',
+        listingId: listings[0]?.id,
+        status: 'CONFIRMED',
+        location: listings[0]?.district ?? 'Bebek, İstanbul',
+        notes: 'Müşteri Boğaz manzaralı seçenekleri görmek istiyor. Saat 11:00 dairede buluşma.',
+      },
+      {
+        startsAt: day(2, 14, 30), // 2 gün sonra 14:30
+        durationMin: 90,
+        name: 'Mehmet Demir',
+        email: 'mehmet@example.com',
+        phone: '+90 533 444 55 66',
+        listingId: listings[1]?.id,
+        status: 'SCHEDULED',
+        location: listings[1]?.district ?? 'Yalıkavak, Bodrum',
+        notes: 'Yatırım amaçlı bakıyor. Eşi de katılacak.',
+      },
+      {
+        startsAt: day(3, 16, 0), // 3 gün sonra 16:00
+        durationMin: 60,
+        name: 'Selin Aydın',
+        email: 'selin.aydin@example.com',
+        phone: '+90 535 777 88 99',
+        listingId: listings[2]?.id,
+        status: 'SCHEDULED',
+        location: listings[2]?.district ?? 'Cihangir, İstanbul',
+        notes: 'Tarihi yapı + restorasyon detayları öğrenmek istiyor.',
+      },
+      {
+        startsAt: day(7, 10, 0), // 1 hafta sonra
+        durationMin: 60,
+        name: 'James Thompson',
+        email: 'james@example.com',
+        phone: '+44 7700 900123',
+        listingId: listings[3]?.id,
+        status: 'SCHEDULED',
+        location: listings[3]?.district ?? 'Etiler, İstanbul',
+        notes: 'İngiliz yatırımcı. EN sunum gerekecek.',
+      },
+      {
+        startsAt: day(-2, 15, 0), // 2 gün önce — geçmiş
+        durationMin: 60,
+        name: 'Fatma Kaya',
+        email: 'fatma@example.com',
+        phone: '+90 536 333 44 55',
+        listingId: listings[0]?.id,
+        status: 'COMPLETED',
+        location: listings[0]?.district ?? 'Bebek',
+        notes: 'Görüşme tamamlandı, müşteri 2 hafta düşünmek istiyor.',
+      },
+    ];
+
+    let apptCreated = 0;
+    for (const a of DEMO_APPTS) {
+      await prisma.appointment.create({ data: a });
+      apptCreated += 1;
+    }
+    console.log(`✓ Created ${apptCreated} demo appointments`);
+  }
 }
 
 main()
