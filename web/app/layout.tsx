@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { OneSignalProvider } from "@/components/onesignal-provider";
 
 const sans = Inter({
   variable: "--font-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="tr" className={`${sans.variable} ${display.variable}`}>
       <body className="antialiased min-h-screen bg-background text-foreground">
         <Providers>{children}</Providers>
+        <OneSignalProvider />
       </body>
     </html>
   );

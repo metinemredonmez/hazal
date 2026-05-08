@@ -10,6 +10,7 @@ import { UploadsModule } from './uploads/uploads.module';
 import { AiModule } from './ai/ai.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { PushModule } from './push/push.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
     AiModule,
     NotificationsModule,
     AppointmentsModule,
+    PushModule,
   ],
 })
 export class AppModule {}
