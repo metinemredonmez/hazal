@@ -2,11 +2,37 @@
 
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, Sparkles, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useLocale, t, CATEGORY_LABEL } from "@/lib/i18n";
 import type { Listing, Paginated } from "@/lib/types";
 import { ListingCard, ListingCardSkeleton } from "@/components/site/listing-card";
+
+interface ParsedSearch {
+  type?: "SALE" | "RENT";
+  category?: string;
+  city?: string;
+  district?: string;
+  minBedrooms?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  minArea?: number;
+  maxArea?: number;
+  q?: string;
+}
+
+const SMART_SEARCH_EXAMPLES_TR = [
+  "3+1 bebek deniz manzaralı 5M altı satılık",
+  "yalıkavak villa havuzlu",
+  "cihangir 2+1 kiralık",
+  "etiler tarihi yapı",
+];
+const SMART_SEARCH_EXAMPLES_EN = [
+  "3+1 bebek seaview under 5M for sale",
+  "yalıkavak villa with pool",
+  "cihangir 2+1 for rent",
+  "etiler historic building",
+];
 
 function ListingsContent() {
   const router = useRouter();
@@ -25,10 +51,58 @@ function ListingsContent() {
   const [loading, setLoading] = React.useState(true);
   const [filtersOpen, setFiltersOpen] = React.useState(false);
   const [qInput, setQInput] = React.useState(q);
+  const [smartInput, setSmartInput] = React.useState("");
+  const [smartLoading, setSmartLoading] = React.useState(false);
+  const [smartHint, setSmartHint] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setQInput(q);
   }, [q]);
+
+  async function smartSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const query = smartInput.trim();
+    if (!query) return;
+    setSmartLoading(true);
+    setSmartHint(null);
+    try {
+      const parsed = await api<ParsedSearch>("/api/ai/parse-search", {
+        method: "POST",
+        body: { query },
+        auth: false,
+      });
+      const sp = new URLSearchParams();
+      if (parsed.type) sp.set("type", parsed.type);
+      if (parsed.category) sp.set("category", parsed.category);
+      if (parsed.city) sp.set("city", parsed.city);
+      if (parsed.district) sp.set("city", parsed.district);
+      if (parsed.minBedrooms) sp.set("minBedrooms", String(parsed.minBedrooms));
+      if (parsed.minPrice) sp.set("minPrice", String(parsed.minPrice));
+      if (parsed.maxPrice) sp.set("maxPrice", String(parsed.maxPrice));
+      if (parsed.q) sp.set("q", parsed.q);
+      const summaryParts = [
+        parsed.type === "SALE" ? "satılık" : parsed.type === "RENT" ? "kiralık" : null,
+        parsed.category,
+        parsed.district || parsed.city,
+        parsed.minBedrooms ? `${parsed.minBedrooms}+1` : null,
+        parsed.maxPrice ? `<${(parsed.maxPrice / 1_000_000).toFixed(1)}M` : null,
+        parsed.q,
+      ].filter(Boolean);
+      setSmartHint(
+        summaryParts.length > 0
+          ? `${locale === "tr" ? "Filtreler uygulandı" : "Filters applied"}: ${summaryParts.join(" · ")}`
+          : locale === "tr"
+            ? "Genel arama olarak uygulandı"
+            : "Applied as general search",
+      );
+      router.replace(`/ilanlar${sp.toString() ? "?" + sp.toString() : ""}`);
+      setSmartInput("");
+    } catch {
+      setSmartHint(locale === "tr" ? "Akıllı arama hatası, normal arama dene" : "AI search failed, use regular search");
+    } finally {
+      setSmartLoading(false);
+    }
+  }
 
   React.useEffect(() => {
     setLoading(true);
@@ -85,6 +159,58 @@ function ListingsContent() {
         <h1 className="font-display font-light text-4xl lg:text-6xl text-[#14141A]">
           {heading}
         </h1>
+      </div>
+
+      {/* Smart search */}
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-10 mb-6">
+        <form onSubmit={smartSearch} className="relative">
+          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#C9A96E]" />
+          <input
+            type="text"
+            value={smartInput}
+            onChange={(e) => setSmartInput(e.target.value)}
+            placeholder={
+              locale === "tr"
+                ? "Akıllı arama: '3+1 bebek deniz manzaralı 5M altı satılık'"
+                : "Smart search: '3+1 bebek seaview under 5M for sale'"
+            }
+            className="w-full pl-11 pr-32 h-14 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E] shadow-sm"
+            disabled={smartLoading}
+          />
+          <button
+            type="submit"
+            disabled={smartLoading || !smartInput.trim()}
+            className="absolute right-2 top-2 bottom-2 inline-flex items-center gap-2 px-4 text-xs tracking-[0.2em] uppercase bg-[#14141A] text-white hover:bg-[#C9A96E] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {smartLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
+            {locale === "tr" ? "AI Ara" : "AI Search"}
+          </button>
+        </form>
+        <div className="flex items-center justify-between mt-2 px-1">
+          <p className="text-[11px] text-[#6E6E73]">
+            {smartHint ?? (locale === "tr" ? "Örnek: " : "Try: ")}
+            {!smartHint &&
+              (locale === "tr" ? SMART_SEARCH_EXAMPLES_TR : SMART_SEARCH_EXAMPLES_EN)
+                .slice(0, 2)
+                .map((ex, i, arr) => (
+                  <button
+                    key={ex}
+                    type="button"
+                    onClick={() => {
+                      setSmartInput(ex);
+                    }}
+                    className="text-[#C9A96E] hover:underline"
+                  >
+                    {ex}
+                    {i < arr.length - 1 && <span className="text-[#6E6E73]"> · </span>}
+                  </button>
+                ))}
+          </p>
+        </div>
       </div>
 
       {/* Filter bar */}

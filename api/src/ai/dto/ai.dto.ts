@@ -27,6 +27,12 @@ export class GenerateDescriptionDto {
   @IsOptional() @IsIn(['premium', 'modern', 'family', 'investment', 'minimal']) tone?: string;
 }
 
+export class ParseSearchDto {
+  @IsString()
+  @MaxLength(500)
+  query: string;
+}
+
 export class TranslateDto {
   @IsString()
   @MaxLength(5000)

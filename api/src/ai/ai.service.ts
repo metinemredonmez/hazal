@@ -10,6 +10,7 @@ import {
   WhatsappTemplateDto,
   AnalyzeInquiryDto,
   StructureBulletsDto,
+  ParseSearchDto,
 } from './dto/ai.dto';
 import { Readable } from 'stream';
 import type { Express } from 'express';
@@ -392,5 +393,88 @@ Return at most 12 bullets, in Turkish.`;
 
   isConfigured() {
     return { enabled: !!this.client, model: this.client ? this.model : null };
+  }
+
+  /**
+   * Parse a natural-language real-estate search query (TR or EN) into
+   * structured filters that map directly onto the public /api/listings query
+   * params. Used by the visitor-facing smart search bar on /ilanlar.
+   */
+  async parseSearch(dto: ParseSearchDto): Promise<{
+    type?: 'SALE' | 'RENT';
+    category?: string;
+    city?: string;
+    district?: string;
+    minBedrooms?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    minArea?: number;
+    maxArea?: number;
+    q?: string;
+  }> {
+    if (!this.client) {
+      // Best-effort: just return the query as a generic text filter
+      return { q: dto.query };
+    }
+    const client = this.client;
+
+    const systemPrompt = `You convert a Turkish or English natural-language real-estate search into a JSON filter object.
+
+Field reference:
+- type: "SALE" (satılık, satış, sale, buy, alım) or "RENT" (kiralık, kira, rent, lease)
+- category: APARTMENT (daire), VILLA (villa), HOUSE (müstakil ev, house), LAND (arsa, land), OFFICE (ofis, office), COMMERCIAL (dükkan, commercial), OTHER
+- city: free text Turkish city name (İstanbul, Bodrum, Antalya, ...)
+- district: free text Turkish district (Bebek, Etiler, Cihangir, Yalıkavak, ...)
+- minBedrooms: integer (e.g., "3+1" → 3, "4+1" → 4)
+- minPrice / maxPrice: numbers in Turkish Lira (TRY). Convert "5M" → 5000000, "5 milyon" → 5000000, "$2M" → 2000000 (treated as TRY for filtering simplicity).
+- minArea / maxArea: square meters
+- q: free text fallback for descriptive features ("deniz manzaralı", "havuzlu", "yenilenmiş", "boğaz manzaralı")
+
+Return STRICT JSON only with the inferred fields. Omit fields not mentioned. Never invent values.
+
+Examples:
+"3+1 bebek deniz manzaralı 5M altı satılık daire" → {"type":"SALE","category":"APARTMENT","district":"Bebek","minBedrooms":3,"maxPrice":5000000,"q":"deniz manzaralı"}
+"yalıkavak villa kiralık" → {"type":"RENT","category":"VILLA","district":"Yalıkavak"}
+"cihangir 2+1" → {"district":"Cihangir","minBedrooms":2}
+"havuzlu villa bodrum" → {"category":"VILLA","city":"Bodrum","q":"havuzlu"}
+"boğaz manzaralı" → {"q":"boğaz manzaralı"}`;
+
+    let completion;
+    try {
+      completion = await client.chat.completions.create({
+        model: this.model,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: dto.query },
+        ],
+        temperature: 0.1,
+      });
+    } catch (err: any) {
+      this.logger.warn(`parseSearch fallback (OpenAI failed): ${err?.message ?? err}`);
+      return { q: dto.query };
+    }
+
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(completion.choices[0]?.message?.content ?? '{}');
+    } catch {
+      return { q: dto.query };
+    }
+
+    const out: Record<string, unknown> = {};
+    if (parsed.type === 'SALE' || parsed.type === 'RENT') out.type = parsed.type;
+    const validCategories = ['APARTMENT', 'VILLA', 'HOUSE', 'LAND', 'OFFICE', 'COMMERCIAL', 'OTHER'];
+    if (typeof parsed.category === 'string' && validCategories.includes(parsed.category)) {
+      out.category = parsed.category;
+    }
+    if (typeof parsed.city === 'string' && parsed.city.length > 0) out.city = parsed.city;
+    if (typeof parsed.district === 'string' && parsed.district.length > 0) out.district = parsed.district;
+    for (const key of ['minBedrooms', 'minPrice', 'maxPrice', 'minArea', 'maxArea'] as const) {
+      const v = parsed[key];
+      if (typeof v === 'number' && Number.isFinite(v) && v > 0) out[key] = v;
+    }
+    if (typeof parsed.q === 'string' && parsed.q.length > 0) out.q = parsed.q;
+    return out;
   }
 }
