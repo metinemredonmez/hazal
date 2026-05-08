@@ -23,8 +23,8 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      setError(locale === "tr" ? "Lütfen zorunlu alanları doldurun" : "Please fill required fields");
+    if (!name.trim() || !email.trim() || !phone.trim() || !message.trim()) {
+      setError(locale === "tr" ? "Lütfen tüm alanları doldurun (Ad, e-posta, telefon, mesaj zorunlu)" : "Please fill all fields (name, email, phone, message are required)");
       return;
     }
     setSending(true);
@@ -35,7 +35,7 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
         body: {
           name: name.trim(),
           email: email.trim(),
-          phone: phone.trim() || undefined,
+          phone: phone.trim(),
           message: message.trim(),
           listingId: listingId,
         },
@@ -109,12 +109,15 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
 
       <div>
         <label className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1.5 block">
-          {tx.inquiry.phone}
+          {tx.inquiry.phone} *
         </label>
         <input
+          type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          placeholder="+90 5XX XXX XX XX"
           className="w-full h-11 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+          required
         />
       </div>
 
