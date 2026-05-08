@@ -44,23 +44,22 @@ export class EmailService {
 
   async send(opts: SendMailOptions): Promise<void> {
     if (!this.transporter) {
-      this.logger.log(
-        `[mail-stub] To: ${opts.to} | Subject: ${opts.subject}\n${opts.text ?? opts.html?.substring(0, 200)}`,
+      this.logger.warn(
+        `[mail-stub] SMTP not configured — email NOT sent. To: ${opts.to} | Subject: ${opts.subject}`,
       );
-      return;
+      // Throw so callers know the email was not actually delivered.
+      // Previously we returned silently, which made notifyNewInquiry /
+      // monthly report incorrectly mark emailSentAt.
+      throw new Error('SMTP not configured');
     }
-    try {
-      const info = await this.transporter.sendMail({
-        from: this.from,
-        to: opts.to,
-        subject: opts.subject,
-        text: opts.text,
-        html: opts.html,
-        replyTo: opts.replyTo,
-      });
-      this.logger.log(`✉️  Sent to ${opts.to}: ${info.messageId}`);
-    } catch (err) {
-      this.logger.error(`Failed to send email to ${opts.to}: ${(err as Error).message}`);
-    }
+    const info = await this.transporter.sendMail({
+      from: this.from,
+      to: opts.to,
+      subject: opts.subject,
+      text: opts.text,
+      html: opts.html,
+      replyTo: opts.replyTo,
+    });
+    this.logger.log(`✉️  Sent to ${opts.to}: ${info.messageId}`);
   }
 }

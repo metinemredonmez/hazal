@@ -20,12 +20,15 @@ export class ReportsController {
    *       https://api.hazalmuti.com/api/cron/monthly-report
    */
   @Post('cron/monthly-report')
-  async runMonthlyCron(@Headers('x-cron-secret') secret: string) {
+  async runMonthlyCron(
+    @Headers('x-cron-secret') secret: string,
+    @Query('force') force?: string,
+  ) {
     const expected = this.config.get<string>('CRON_SECRET');
     if (!expected || secret !== expected) {
       throw new UnauthorizedException('Invalid or missing x-cron-secret header');
     }
-    return this.reports.generateMonthly();
+    return this.reports.generateMonthly({ force: force === 'true' });
   }
 
   /** Admin-triggered manual run (e.g., test from UI). */
