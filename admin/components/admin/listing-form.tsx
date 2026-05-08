@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, Star, Loader2, Mic, MicOff, Share2, Copy, Check, MessageSquare } from "lucide-react";
+import { ArrowLeft, Sparkles, Star, Loader2, Mic, MicOff, Share2, Copy, Check, MessageSquare, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -274,6 +274,25 @@ export function ListingForm({ existing }: { existing?: Listing }) {
       sonnerToast.success("Kopyalandı");
     } catch {
       sonnerToast.error("Kopyalanamadı");
+    }
+  }
+
+  async function downloadImage(url: string, filename: string) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("İndirme başarısız");
+      const blob = await res.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objUrl);
+      sonnerToast.success("Foto indirildi");
+    } catch (err: unknown) {
+      sonnerToast.error(err instanceof Error ? err.message : "İndirilemedi");
     }
   }
 
@@ -638,6 +657,41 @@ export function ListingForm({ existing }: { existing?: Listing }) {
             </div>
           ) : socialPosts ? (
             <div className="space-y-4">
+              {(() => {
+                const cover =
+                  existing?.images.find((i) => i.isPrimary)?.url ?? existing?.images[0]?.url;
+                if (!cover) return null;
+                const ext = (cover.split(".").pop() ?? "jpg").split("?")[0].slice(0, 5);
+                const filename = `${existing?.slug ?? "ilan"}-kapak.${ext}`;
+                return (
+                  <div className="rounded-md border border-border p-3">
+                    <div className="flex items-start gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={cover}
+                        alt=""
+                        className="h-24 w-32 object-cover rounded border border-border shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">Kapak fotoğrafı</p>
+                        <p className="text-[10px] text-muted-foreground mb-2">
+                          Instagram/LinkedIn'e bu fotoyu yükle, metni paste et.
+                        </p>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => downloadImage(cover, filename)}
+                          className="gap-1.5"
+                        >
+                          <Download className="h-3 w-3" /> Fotoğrafı indir
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {([
                 { key: "instagram" as const, label: "Instagram", desc: "Caption + hashtag" },
                 { key: "linkedin" as const, label: "LinkedIn", desc: "Profesyonel duyuru" },

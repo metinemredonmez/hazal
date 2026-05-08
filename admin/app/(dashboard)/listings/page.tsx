@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X } from "lucide-react";
 import { toast } from "sonner";
 import { Topbar } from "@/components/admin/topbar";
@@ -338,10 +339,16 @@ function ListingRow({
   onDelete: () => void;
   onDuplicate: () => void;
 }) {
+  const router = useRouter();
   const cover = listing.images.find((i) => i.isPrimary)?.url ?? listing.images[0]?.url;
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
   return (
-    <TableRow data-state={selected ? "selected" : undefined}>
-      <TableCell>
+    <TableRow
+      data-state={selected ? "selected" : undefined}
+      onClick={() => router.push(`/listings/${listing.id}`)}
+      className="cursor-pointer hover:bg-muted/40 transition-colors"
+    >
+      <TableCell onClick={stop}>
         <input
           type="checkbox"
           className="cursor-pointer"
@@ -389,17 +396,33 @@ function ListingRow({
         </span>
       </TableCell>
       <TableCell className="text-xs text-muted-foreground">{formatDate(listing.createdAt)}</TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right" onClick={stop}>
         <div className="flex justify-end gap-1">
           <Button asChild size="icon" variant="ghost" title="Düzenle">
             <Link href={`/listings/${listing.id}`}>
               <Edit3 className="h-4 w-4" />
             </Link>
           </Button>
-          <Button size="icon" variant="ghost" onClick={onDuplicate} title="Klonla">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate();
+            }}
+            title="Klonla"
+          >
             <Copy className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={onDelete} title="Sil">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            title="Sil"
+          >
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
         </div>
