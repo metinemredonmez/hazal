@@ -392,7 +392,7 @@ function ListingRow({
       <TableCell className="text-right">
         <div className="flex justify-end gap-1">
           <Button asChild size="icon" variant="ghost" title="Düzenle">
-            <Link href={`/admin/listings/${listing.id}`}>
+            <Link href={`/listings/${listing.id}`}>
               <Edit3 className="h-4 w-4" />
             </Link>
           </Button>

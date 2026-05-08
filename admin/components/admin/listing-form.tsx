@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, ImagePlus, Sparkles, Trash2, Star, Loader2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,9 +22,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { api, uploadFiles } from "@/lib/api";
+import { api } from "@/lib/api";
 import type { Listing } from "@/lib/types";
 import Link from "next/link";
+import { ImageManager, type ImageManagerHandle } from "@/components/admin/image-manager";
 
 type FormState = {
   titleTr: string;
@@ -97,12 +98,10 @@ export function ListingForm({ existing }: { existing?: Listing }) {
         }
       : empty,
   );
-  const [images, setImages] = React.useState(existing?.images ?? []);
   const [submitting, setSubmitting] = React.useState(false);
   const [aiBullets, setAiBullets] = React.useState("");
   const [aiLoading, setAiLoading] = React.useState(false);
-  const [uploading, setUploading] = React.useState(false);
-  const fileInput = React.useRef<HTMLInputElement>(null);
+  const imageManagerRef = React.useRef<ImageManagerHandle>(null);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -146,8 +145,19 @@ export function ListingForm({ existing }: { existing?: Listing }) {
           method: "POST",
           body: payload,
         });
-        toast.success("İlan oluşturuldu");
-        router.replace(`/admin/listings/${created.id}`);
+        // Upload pending photos if any
+        if (imageManagerRef.current?.hasPending) {
+          try {
+            const uploaded = await imageManagerRef.current.uploadPending(created.id);
+            toast.success(`İlan oluşturuldu · ${uploaded.length} foto yüklendi`);
+          } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Foto yüklenemedi";
+            toast.error(`İlan oluşturuldu ama foto yüklenemedi: ${message}`);
+          }
+        } else {
+          toast.success("İlan oluşturuldu");
+        }
+        router.replace(`/listings/${created.id}`);
         return;
       }
     } catch (err: unknown) {
@@ -202,38 +212,6 @@ export function ListingForm({ existing }: { existing?: Listing }) {
       toast.error(message);
     } finally {
       setAiLoading(false);
-    }
-  }
-
-  async function handleUpload(files: FileList | null) {
-    if (!files || !existing) return;
-    setUploading(true);
-    try {
-      const result = await uploadFiles(
-        `/api/admin/uploads/listings/${existing.id}/images`,
-        Array.from(files),
-      );
-      const refreshed = await api<Listing>(`/api/admin/listings/${existing.id}`);
-      setImages(refreshed.images);
-      toast.success(`${result.length} foto yüklendi`);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Yükleme başarısız";
-      toast.error(message);
-    } finally {
-      setUploading(false);
-      if (fileInput.current) fileInput.current.value = "";
-    }
-  }
-
-  async function handleDeleteImage(imageId: string) {
-    if (!existing) return;
-    try {
-      await api(`/api/admin/listings/${existing.id}/images/${imageId}`, { method: "DELETE" });
-      setImages(images.filter((i) => i.id !== imageId));
-      toast.success("Foto silindi");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Silinemedi";
-      toast.error(message);
     }
   }
 
@@ -340,58 +318,11 @@ export function ListingForm({ existing }: { existing?: Listing }) {
               <CardTitle>Fotoğraflar</CardTitle>
             </CardHeader>
             <CardContent>
-              {existing ? (
-                <>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {images.map((img) => (
-                      <div
-                        key={img.id}
-                        className="relative aspect-[4/3] rounded-md border border-border overflow-hidden group"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={img.url} alt="" className="h-full w-full object-cover" />
-                        {img.isPrimary && (
-                          <div className="absolute top-2 left-2 bg-[#C9A96E] text-[#14141A] text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded">
-                            Ana
-                          </div>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteImage(img.id)}
-                          className="absolute top-2 right-2 bg-black/60 hover:bg-destructive text-white p-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => fileInput.current?.click()}
-                      disabled={uploading}
-                      className="aspect-[4/3] rounded-md border border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-[#C9A96E] hover:text-foreground transition-colors disabled:opacity-50"
-                    >
-                      {uploading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <ImagePlus className="h-5 w-5" />
-                      )}
-                      <span className="text-xs">Foto ekle</span>
-                    </button>
-                  </div>
-                  <input
-                    ref={fileInput}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => handleUpload(e.target.files)}
-                  />
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  İlanı kaydettikten sonra fotoğraf ekleyebilirsin.
-                </p>
-              )}
+              <ImageManager
+                ref={imageManagerRef}
+                listingId={existing?.id}
+                initialImages={existing?.images ?? []}
+              />
             </CardContent>
           </Card>
         </div>

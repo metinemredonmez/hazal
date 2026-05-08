@@ -90,4 +90,9 @@ export class ListingsAdminController {
   reorderImages(@Param('id') id: string, @Body() dto: ReorderImagesDto) {
     return this.listings.reorderImages(id, dto.imageIds);
   }
+
+  @Patch(':id/images/:imageId/primary')
+  setPrimary(@Param('id') id: string, @Param('imageId') imageId: string) {
+    return this.listings.setPrimaryImage(id, imageId);
+  }
 }

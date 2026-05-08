@@ -243,6 +243,24 @@ export class ListingsService {
     return { ok: true };
   }
 
+  async setPrimaryImage(listingId: string, imageId: string) {
+    const image = await this.prisma.listingImage.findUnique({ where: { id: imageId } });
+    if (!image || image.listingId !== listingId) {
+      throw new NotFoundException('Image not found');
+    }
+    await this.prisma.$transaction([
+      this.prisma.listingImage.updateMany({
+        where: { listingId },
+        data: { isPrimary: false },
+      }),
+      this.prisma.listingImage.update({
+        where: { id: imageId },
+        data: { isPrimary: true },
+      }),
+    ]);
+    return { ok: true };
+  }
+
   async reorderImages(listingId: string, imageIds: string[]) {
     const images = await this.prisma.listingImage.findMany({ where: { listingId } });
     const idSet = new Set(images.map((i) => i.id));

@@ -133,7 +133,7 @@ export default function DashboardPage() {
                 stats.topViewed.map((l, i) => (
                   <Link
                     key={l.id}
-                    href={`/admin/listings/${l.id}`}
+                    href={`/listings/${l.id}`}
                     className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/50 transition-colors"
                   >
                     <span className="font-display text-sm font-medium text-[#C9A96E] w-4">
