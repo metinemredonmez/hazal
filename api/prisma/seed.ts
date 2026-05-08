@@ -21,6 +21,11 @@ interface DemoListing {
   district?: string;
   status: ListingStatus;
   featured?: boolean;
+  imageSeeds?: string[];
+}
+
+function seedToImageUrl(seed: string): string {
+  return `https://picsum.photos/seed/${encodeURIComponent(seed)}/2400/1600`;
 }
 
 const DEMO_LISTINGS: DemoListing[] = [
@@ -42,6 +47,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     district: 'Beşiktaş / Bebek',
     status: ListingStatus.ACTIVE,
     featured: true,
+    imageSeeds: ['bebek-bosphorus-1', 'bebek-bosphorus-2', 'bebek-bosphorus-3', 'bebek-bosphorus-4'],
   },
   {
     titleTr: 'Yalıkavak Modern Lüks Villa',
@@ -61,6 +67,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     district: 'Bodrum / Yalıkavak',
     status: ListingStatus.ACTIVE,
     featured: true,
+    imageSeeds: ['yalikavak-villa-1', 'yalikavak-villa-2', 'yalikavak-villa-3', 'yalikavak-villa-4'],
   },
   {
     titleTr: 'Cihangir Tarihi Apartman Dairesi',
@@ -80,6 +87,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     district: 'Beyoğlu / Cihangir',
     status: ListingStatus.ACTIVE,
     featured: true,
+    imageSeeds: ['cihangir-heritage-1', 'cihangir-heritage-2', 'cihangir-heritage-3', 'cihangir-heritage-4'],
   },
   {
     titleTr: 'Alaçatı Taş Ev — Bahçeli',
@@ -99,6 +107,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     district: 'Çeşme / Alaçatı',
     status: ListingStatus.ACTIVE,
     featured: true,
+    imageSeeds: ['alacati-stone-1', 'alacati-stone-2', 'alacati-stone-3', 'alacati-stone-4'],
   },
   {
     titleTr: 'Etiler 3+1 Modern Daire',
@@ -117,6 +126,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     city: 'İstanbul',
     district: 'Beşiktaş / Etiler',
     status: ListingStatus.ACTIVE,
+    imageSeeds: ['etiler-modern-1', 'etiler-modern-2', 'etiler-modern-3', 'etiler-modern-4'],
   },
   {
     titleTr: 'Tarabya Boğaz Manzaralı Triplex',
@@ -135,6 +145,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     city: 'İstanbul',
     district: 'Sarıyer / Tarabya',
     status: ListingStatus.ACTIVE,
+    imageSeeds: ['tarabya-triplex-1', 'tarabya-triplex-2', 'tarabya-triplex-3', 'tarabya-triplex-4'],
   },
   {
     titleTr: 'Göcek Marina Lüks Apart',
@@ -153,6 +164,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     city: 'Muğla',
     district: 'Fethiye / Göcek',
     status: ListingStatus.ACTIVE,
+    imageSeeds: ['gocek-marina-1', 'gocek-marina-2', 'gocek-marina-3', 'gocek-marina-4'],
   },
   {
     titleTr: 'Zekeriyaköy Müstakil Villa — Bahçeli',
@@ -171,6 +183,7 @@ const DEMO_LISTINGS: DemoListing[] = [
     city: 'İstanbul',
     district: 'Sarıyer / Zekeriyaköy',
     status: ListingStatus.ACTIVE,
+    imageSeeds: ['zekeriyakoy-villa-1', 'zekeriyakoy-villa-2', 'zekeriyakoy-villa-3', 'zekeriyakoy-villa-4'],
   },
 ];
 
@@ -236,10 +249,22 @@ async function main() {
   let created = 0;
   for (const demo of DEMO_LISTINGS) {
     const slug = await generateUniqueSlug(demo.titleEn);
-    await prisma.listing.create({ data: { ...demo, slug } });
+    const { imageSeeds, ...rest } = demo;
+    const images = (imageSeeds ?? []).map((seed, idx) => ({
+      url: seedToImageUrl(seed),
+      order: idx,
+      isPrimary: idx === 0,
+    }));
+    await prisma.listing.create({
+      data: {
+        ...rest,
+        slug,
+        images: images.length > 0 ? { create: images } : undefined,
+      },
+    });
     created += 1;
   }
-  console.log(`✓ Created ${created} demo listings`);
+  console.log(`✓ Created ${created} demo listings (with images)`);
 }
 
 main()
