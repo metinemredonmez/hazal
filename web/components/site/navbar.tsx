@@ -256,10 +256,10 @@ function MobileMenu({
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         )}
       />
-      {/* Drawer — sağdan kayar, %85 width, modern */}
+      {/* Drawer — mobilde tam ekran, tabletten itibaren %85 sağdan */}
       <aside
         className={cn(
-          "fixed top-0 right-0 bottom-0 z-50 w-[88%] max-w-sm bg-[#0E0E0E] text-[#F5F2EC] shadow-[0_0_60px_rgba(0,0,0,0.6)] transition-transform duration-400 ease-out lg:hidden flex flex-col",
+          "fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[88%] sm:max-w-sm bg-[#0E0E0E] text-[#F5F2EC] shadow-[0_0_60px_rgba(0,0,0,0.6)] transition-transform duration-400 ease-out lg:hidden flex flex-col",
           open ? "translate-x-0" : "translate-x-full",
         )}
         aria-hidden={!open}
