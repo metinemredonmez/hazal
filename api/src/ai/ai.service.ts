@@ -12,6 +12,7 @@ import {
   StructureBulletsDto,
   ParseSearchDto,
   ConciergeChatDto,
+  AssistantChatDto,
 } from './dto/ai.dto';
 import { Readable } from 'stream';
 import type { Express } from 'express';
@@ -477,6 +478,322 @@ Examples:
     }
     if (typeof parsed.q === 'string' && parsed.q.length > 0) out.q = parsed.q;
     return out;
+  }
+
+  /**
+   * Admin AI Assistant — Hazal's internal copilot. Uses OpenAI function
+   * calling so the model can pull live data from the DB (listings,
+   * appointments, inquiries, stats) before answering.
+   */
+  async assistant(dto: AssistantChatDto): Promise<{ reply: string; usedTools: string[] }> {
+    if (!this.client) {
+      return {
+        reply: 'AI asistan şu an kapalı. OPENAI_API_KEY env değişkenini ayarla.',
+        usedTools: [],
+      };
+    }
+    const client = this.client;
+
+    const tools: Array<{
+      type: 'function';
+      function: {
+        name: string;
+        description: string;
+        parameters: Record<string, unknown>;
+      };
+    }> = [
+      {
+        type: 'function',
+        function: {
+          name: 'search_listings',
+          description: 'Hazal\'ın ilan portföyünde arama yapar (filtreli).',
+          parameters: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'Serbest metin arama (başlık, açıklama)' },
+              type: { type: 'string', enum: ['SALE', 'RENT'], description: 'Satılık veya kiralık' },
+              category: {
+                type: 'string',
+                enum: ['APARTMENT', 'VILLA', 'HOUSE', 'LAND', 'OFFICE', 'COMMERCIAL', 'OTHER'],
+              },
+              district: { type: 'string', description: 'Bebek, Etiler, Cihangir vs.' },
+              status: { type: 'string', enum: ['DRAFT', 'ACTIVE', 'SOLD', 'RENTED', 'PASSIVE'] },
+              minBedrooms: { type: 'number' },
+              maxPrice: { type: 'number', description: 'TRY cinsinden üst limit' },
+              limit: { type: 'number', description: 'Maksimum sonuç (varsayılan 10)' },
+            },
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'list_appointments',
+          description: 'Belirli tarih aralığındaki randevuları listeler.',
+          parameters: {
+            type: 'object',
+            properties: {
+              fromDate: { type: 'string', description: 'YYYY-MM-DD (başlangıç tarihi)' },
+              toDate: { type: 'string', description: 'YYYY-MM-DD (bitiş tarihi)' },
+              status: {
+                type: 'string',
+                enum: ['SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'],
+              },
+            },
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'list_inquiries',
+          description: 'Müşteri taleplerini listeler. Son N günü veya status filtresi.',
+          parameters: {
+            type: 'object',
+            properties: {
+              days: { type: 'number', description: 'Son kaç gün (varsayılan 30)' },
+              status: { type: 'string', enum: ['NEW', 'CONTACTED', 'HOT', 'CLOSED'] },
+              limit: { type: 'number' },
+            },
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'get_stats',
+          description: 'Genel portföy istatistikleri: aktif ilan, satılan, talep, görüntülenme.',
+          parameters: { type: 'object', properties: {} },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'get_listing_details',
+          description: 'Bir ilanın detayları (slug ile).',
+          parameters: {
+            type: 'object',
+            properties: { slug: { type: 'string' } },
+            required: ['slug'],
+          },
+        },
+      },
+    ];
+
+    const today = new Date();
+    const systemPrompt = `Sen Hazal Muti Real Estate'in özel AI asistanısın. Türkçe yanıt ver — kısa, net, profesyonel.
+
+Bugünün tarihi: ${today.toISOString().slice(0, 10)} (${today.toLocaleDateString('tr-TR', { weekday: 'long' })})
+
+Kim için çalışıyorsun:
+- Hazal Muti — İstanbul/Bodrum lüks gayrimenkul danışmanı
+- Müşterileri lüks daire/villa arayan üst gelir grubu
+
+Yapabileceklerin (tools):
+- İlan arama (search_listings)
+- Randevu listeleme (list_appointments)
+- Talep listeleme (list_inquiries)
+- Genel istatistikler (get_stats)
+- İlan detayı (get_listing_details)
+
+Cevap kuralları:
+- Bir konuya cevap vermek için tool çağırman gerekiyorsa **çağır**, asla uydurma.
+- Sayıları bold yap. Tarihleri "9 Mayıs Cuma 14:00" formatında ver.
+- Hazal'a "siz" yerine "sen" kullan (samimi).
+- Listelerde max 5 madde göster, daha fazlasını "Tümünü görmek için Talepler/Randevular sayfasını aç" diye yönlendir.
+- Müşteri bilgilerini koruma — örn telefon numarasını tam göster ama bağlamı abartmadan.
+- Eğer kullanıcı "bana yardımcı ol", "neye odaklanmalıyım?" gibi açık uçlu soru sorarsa: bugünkü randevuları + yeni HOT talepleri + dikkat gerektiren ilanları özetle.`;
+
+    const messages: Array<{ role: string; content: string | null; name?: string; tool_call_id?: string; tool_calls?: unknown[] }> = [
+      { role: 'system', content: systemPrompt },
+      ...dto.messages.map((m) => ({ role: m.role, content: m.content })),
+    ];
+
+    const usedTools: string[] = [];
+
+    // Tool-calling loop (max 4 rounds)
+    for (let i = 0; i < 4; i++) {
+      let completion;
+      try {
+        completion = await client.chat.completions.create({
+          model: this.model,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          messages: messages as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          tools: tools as any,
+          temperature: 0.4,
+          max_tokens: 800,
+        });
+      } catch (err: any) {
+        this.logger.warn(`assistant OpenAI error: ${err?.message ?? err}`);
+        return {
+          reply: 'Şu an sana yardımcı olamıyorum. Lütfen tekrar dene.',
+          usedTools,
+        };
+      }
+
+      const msg = completion.choices[0]?.message;
+      if (!msg) break;
+
+      const toolCalls = (msg as { tool_calls?: Array<{ id: string; function: { name: string; arguments: string } }> }).tool_calls;
+
+      if (!toolCalls || toolCalls.length === 0) {
+        // Final answer
+        return { reply: msg.content?.trim() ?? '', usedTools };
+      }
+
+      // Append assistant message with tool calls
+      messages.push({
+        role: 'assistant',
+        content: msg.content ?? null,
+        tool_calls: toolCalls,
+      });
+
+      // Execute each tool call
+      for (const call of toolCalls) {
+        usedTools.push(call.function.name);
+        let args: Record<string, unknown> = {};
+        try {
+          args = JSON.parse(call.function.arguments);
+        } catch {
+          // ignore
+        }
+        const result = await this.executeAssistantTool(call.function.name, args);
+        messages.push({
+          role: 'tool',
+          tool_call_id: call.id,
+          content: JSON.stringify(result),
+        });
+      }
+    }
+
+    return { reply: 'Cevap üretemedim, tekrar dene.', usedTools };
+  }
+
+  private async executeAssistantTool(name: string, args: Record<string, unknown>): Promise<unknown> {
+    try {
+      if (name === 'search_listings') {
+        const where: Record<string, unknown> = {};
+        if (args.type) where.type = args.type;
+        if (args.category) where.category = args.category;
+        if (args.status) where.status = args.status;
+        if (!args.status) where.status = 'ACTIVE'; // default to active
+        if (args.district) {
+          where.district = { contains: args.district as string, mode: 'insensitive' };
+        }
+        if (typeof args.minBedrooms === 'number') {
+          where.bedrooms = { gte: args.minBedrooms };
+        }
+        if (typeof args.maxPrice === 'number') {
+          where.price = { lte: args.maxPrice };
+        }
+        if (args.query) {
+          (where as Record<string, unknown>).OR = [
+            { titleTr: { contains: args.query as string, mode: 'insensitive' } },
+            { descriptionTr: { contains: args.query as string, mode: 'insensitive' } },
+          ];
+        }
+        const limit = typeof args.limit === 'number' ? Math.min(args.limit, 25) : 10;
+        const items = await this.prisma.listing.findMany({
+          where,
+          take: limit,
+          orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+          select: {
+            slug: true,
+            titleTr: true,
+            type: true,
+            category: true,
+            price: true,
+            currency: true,
+            bedrooms: true,
+            areaM2: true,
+            district: true,
+            city: true,
+            status: true,
+            views: true,
+          },
+        });
+        return { count: items.length, items };
+      }
+
+      if (name === 'list_appointments') {
+        const where: Record<string, unknown> = {};
+        if (args.fromDate || args.toDate) {
+          const range: Record<string, Date> = {};
+          if (args.fromDate) range.gte = new Date(args.fromDate as string);
+          if (args.toDate) {
+            const to = new Date(args.toDate as string);
+            to.setHours(23, 59, 59, 999);
+            range.lte = to;
+          }
+          where.startsAt = range;
+        }
+        if (args.status) where.status = args.status;
+        const items = await this.prisma.appointment.findMany({
+          where,
+          orderBy: { startsAt: 'asc' },
+          take: 50,
+          include: { listing: { select: { titleTr: true, district: true, slug: true } } },
+        });
+        return { count: items.length, items };
+      }
+
+      if (name === 'list_inquiries') {
+        const days = typeof args.days === 'number' ? args.days : 30;
+        const where: Record<string, unknown> = {
+          createdAt: { gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) },
+        };
+        if (args.status) where.status = args.status;
+        const limit = typeof args.limit === 'number' ? Math.min(args.limit, 50) : 20;
+        const items = await this.prisma.inquiry.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          include: { listing: { select: { titleTr: true, slug: true } } },
+        });
+        return { count: items.length, items };
+      }
+
+      if (name === 'get_stats') {
+        const [total, active, sold, rented, draft, totalInquiries, hotInquiries, upcomingAppts] =
+          await Promise.all([
+            this.prisma.listing.count(),
+            this.prisma.listing.count({ where: { status: 'ACTIVE' } }),
+            this.prisma.listing.count({ where: { status: 'SOLD' } }),
+            this.prisma.listing.count({ where: { status: 'RENTED' } }),
+            this.prisma.listing.count({ where: { status: 'DRAFT' } }),
+            this.prisma.inquiry.count({
+              where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+            }),
+            this.prisma.inquiry.count({ where: { status: 'HOT' } }),
+            this.prisma.appointment.count({
+              where: {
+                startsAt: { gte: new Date() },
+                status: { in: ['SCHEDULED', 'CONFIRMED'] },
+              },
+            }),
+          ]);
+        return {
+          listings: { total, active, sold, rented, draft },
+          inquiries: { last30days: totalInquiries, hot: hotInquiries },
+          appointments: { upcoming: upcomingAppts },
+        };
+      }
+
+      if (name === 'get_listing_details') {
+        const slug = args.slug as string;
+        const listing = await this.prisma.listing.findUnique({
+          where: { slug },
+          include: { images: { orderBy: { order: 'asc' }, take: 3 } },
+        });
+        return listing ?? { error: 'Listing not found' };
+      }
+
+      return { error: `Unknown tool: ${name}` };
+    } catch (err) {
+      this.logger.warn(`Tool ${name} error: ${(err as Error).message}`);
+      return { error: (err as Error).message };
+    }
   }
 
   /**

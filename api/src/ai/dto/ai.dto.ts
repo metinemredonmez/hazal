@@ -54,6 +54,13 @@ export class ConciergeChatDto {
   locale?: 'tr' | 'en';
 }
 
+export class AssistantChatDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  messages: ConciergeMessageDto[];
+}
+
 export class TranslateDto {
   @IsString()
   @MaxLength(5000)

@@ -11,6 +11,7 @@ import {
   WhatsappTemplateDto,
   AnalyzeInquiryDto,
   StructureBulletsDto,
+  AssistantChatDto,
 } from './dto/ai.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -24,6 +25,11 @@ export class AiController {
   @Get('status')
   status() {
     return this.ai.isConfigured();
+  }
+
+  @Post('assistant')
+  assistant(@Body() dto: AssistantChatDto) {
+    return this.ai.assistant(dto);
   }
 
   @Post('generate-description')
