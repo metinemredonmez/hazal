@@ -7,7 +7,6 @@ import {
   Upload,
   Search,
   Trash2,
-  Edit3,
   Download,
   ExternalLink,
   Loader2,
@@ -19,6 +18,7 @@ import {
   Receipt,
   FileImage,
   Files,
+  Eye,
 } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -109,7 +109,7 @@ export default function BelgelerPage() {
   const [search, setSearch] = React.useState("");
   const [filter, setFilter] = React.useState<Category | "ALL">("ALL");
   const [uploading, setUploading] = React.useState(false);
-  const [editing, setEditing] = React.useState<Document | null>(null);
+  const [previewing, setPreviewing] = React.useState<Document | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = React.useState<File | null>(null);
   const [templateOpen, setTemplateOpen] = React.useState(false);
@@ -289,7 +289,11 @@ export default function BelgelerPage() {
                 : `${API_URL}${d.fileUrl}`;
               const isImage = d.mimeType.startsWith("image/");
               return (
-                <Card key={d.id} className="hover:border-[#C9A96E] transition-colors group">
+                <Card
+                  key={d.id}
+                  onClick={() => setPreviewing(d)}
+                  className="hover:border-[#C9A96E] transition-colors group cursor-pointer"
+                >
                   <CardContent className="p-3 flex gap-3">
                     {isImage ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -335,12 +339,21 @@ export default function BelgelerPage() {
                           ))}
                         </div>
                       )}
-                      <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <button
+                          onClick={() => setPreviewing(d)}
+                          className="text-xs text-muted-foreground hover:text-[#C9A96E] inline-flex items-center gap-1"
+                        >
+                          <Eye className="h-3 w-3" /> Önizle
+                        </button>
                         <a
                           href={fullUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-xs text-muted-foreground hover:text-[#C9A96E] inline-flex items-center gap-1"
+                          className="text-xs text-muted-foreground hover:text-[#C9A96E] inline-flex items-center gap-1 ml-2"
                         >
                           <ExternalLink className="h-3 w-3" /> Aç
                         </a>
@@ -351,12 +364,6 @@ export default function BelgelerPage() {
                         >
                           <Download className="h-3 w-3" /> İndir
                         </a>
-                        <button
-                          onClick={() => setEditing(d)}
-                          className="text-xs text-muted-foreground hover:text-foreground ml-2"
-                        >
-                          <Edit3 className="h-3 w-3 inline" /> Düzenle
-                        </button>
                         <button
                           onClick={() => deleteDoc(d.id)}
                           className="text-xs text-muted-foreground hover:text-destructive ml-auto"
@@ -386,13 +393,17 @@ export default function BelgelerPage() {
         />
       )}
 
-      {editing && (
-        <EditDialog
-          doc={editing}
-          onClose={() => setEditing(null)}
+      {previewing && (
+        <PreviewDialog
+          doc={previewing}
+          onClose={() => setPreviewing(null)}
           onSaved={() => {
-            setEditing(null);
+            setPreviewing(null);
             refresh();
+          }}
+          onDelete={async () => {
+            await deleteDoc(previewing.id);
+            setPreviewing(null);
           }}
         />
       )}
@@ -691,14 +702,16 @@ function UploadDialog({
   );
 }
 
-function EditDialog({
+function PreviewDialog({
   doc,
   onClose,
   onSaved,
+  onDelete,
 }: {
   doc: Document;
   onClose: () => void;
   onSaved: () => void;
+  onDelete: () => void | Promise<void>;
 }) {
   const [title, setTitle] = React.useState(doc.title);
   const [category, setCategory] = React.useState<Category>(doc.category);
@@ -706,6 +719,23 @@ function EditDialog({
   const [customerName, setCustomerName] = React.useState(doc.customerName ?? "");
   const [tags, setTags] = React.useState((doc.tags ?? []).join(", "));
   const [saving, setSaving] = React.useState(false);
+
+  const fullUrl = doc.fileUrl.startsWith("http")
+    ? doc.fileUrl
+    : `${API_URL}${doc.fileUrl}`;
+  const mime = doc.mimeType || "";
+  const isImage = mime.startsWith("image/");
+  const isPdf = mime === "application/pdf" || /\.pdf$/i.test(doc.fileName);
+  const isHtml = mime === "text/html" || /\.html?$/i.test(doc.fileName);
+  const isOffice = /(officedocument|msword|excel|spreadsheet)/i.test(mime);
+  const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fullUrl)}`;
+
+  const dirty =
+    title !== doc.title ||
+    category !== doc.category ||
+    (description ?? "") !== (doc.description ?? "") ||
+    (customerName ?? "") !== (doc.customerName ?? "") ||
+    tags !== (doc.tags ?? []).join(", ");
 
   async function handleSave() {
     setSaving(true);
@@ -736,59 +766,182 @@ function EditDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Belgeyi Düzenle</DialogTitle>
+      <DialogContent className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col">
+        <DialogHeader className="px-4 py-3 border-b shrink-0">
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Eye className="h-4 w-4 text-[#C9A96E]" />
+            <span className="line-clamp-1">{doc.title}</span>
+            <Badge variant="default" className="text-[10px] ml-2">
+              {CATEGORY_META[doc.category].label}
+            </Badge>
+            <span className="text-[10px] text-muted-foreground ml-auto mr-6">
+              {formatSize(doc.fileSize)} · {doc.fileName}
+            </span>
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-3 py-2">
-          <div className="space-y-1">
-            <Label className="text-xs">Başlık</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] min-h-0">
+          {/* Preview */}
+          <div className="bg-muted/40 flex items-center justify-center overflow-auto">
+            {isImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={fullUrl}
+                alt={doc.title}
+                className="max-w-full max-h-full object-contain"
+              />
+            ) : isPdf || isHtml ? (
+              <iframe
+                src={fullUrl}
+                title={doc.title}
+                className="w-full h-full border-0 bg-white"
+              />
+            ) : isOffice ? (
+              <iframe
+                src={officeUrl}
+                title={doc.title}
+                className="w-full h-full border-0 bg-white"
+              />
+            ) : (
+              <div className="text-center p-8">
+                <FileText className="h-16 w-16 mx-auto opacity-30 mb-4 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  Bu dosya türü için inline önizleme yok.
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <a
+                    href={fullUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm inline-flex items-center gap-1 px-3 py-2 bg-white border rounded-md hover:bg-muted"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> Yeni sekmede aç
+                  </a>
+                  <a
+                    href={fullUrl}
+                    download={doc.fileName}
+                    className="text-sm inline-flex items-center gap-1 px-3 py-2 bg-white border rounded-md hover:bg-muted"
+                  >
+                    <Download className="h-3.5 w-3.5" /> İndir
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Kategori</Label>
-            <Select value={category} onValueChange={(v) => setCategory(v as Category)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(CATEGORY_META) as Category[]).map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {CATEGORY_META[c].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Müşteri</Label>
-            <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Etiketler</Label>
-            <Input
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="virgülle ayır"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Açıklama</Label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-            />
+
+          {/* Edit sidebar */}
+          <div className="border-t lg:border-t-0 lg:border-l border-border bg-white overflow-y-auto">
+            <div className="p-4 space-y-3">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+                  Bilgileri Düzenle
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Başlık</Label>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Kategori</Label>
+                <Select value={category} onValueChange={(v) => setCategory(v as Category)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(CATEGORY_META) as Category[]).map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {CATEGORY_META[c].label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Müşteri</Label>
+                <Input
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Ahmet Yılmaz"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Etiketler</Label>
+                <Input
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                  placeholder="virgülle ayır"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Açıklama</Label>
+                <Textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={4}
+                />
+              </div>
+
+              {doc.listing && (
+                <div className="text-xs text-[#C9A96E] p-2 bg-[#C9A96E]/5 rounded border border-[#C9A96E]/20">
+                  🏠 İlan: {doc.listing.titleTr}
+                </div>
+              )}
+              {doc.inquiry && (
+                <div className="text-xs text-muted-foreground p-2 bg-muted rounded">
+                  ✉️ Talep: {doc.inquiry.name} · {doc.inquiry.email}
+                </div>
+              )}
+
+              <div className="text-[10px] text-muted-foreground pt-2 border-t">
+                Yükleme: {new Date(doc.createdAt).toLocaleString("tr-TR")}
+              </div>
+            </div>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            İptal
-          </Button>
-          <Button onClick={handleSave} disabled={saving} className="bg-[#14141A] text-white gap-2">
-            {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-            Kaydet
-          </Button>
+
+        <DialogFooter className="px-4 py-3 border-t shrink-0 flex-row !justify-between gap-2">
+          <div className="flex gap-2">
+            <a
+              href={fullUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs inline-flex items-center gap-1 px-3 py-2 border rounded-md hover:bg-muted"
+            >
+              <ExternalLink className="h-3 w-3" /> Aç
+            </a>
+            <a
+              href={fullUrl}
+              download={doc.fileName}
+              className="text-xs inline-flex items-center gap-1 px-3 py-2 border rounded-md hover:bg-muted"
+            >
+              <Download className="h-3 w-3" /> İndir
+            </a>
+            <button
+              onClick={onDelete}
+              className="text-xs inline-flex items-center gap-1 px-3 py-2 border border-red-200 text-red-600 rounded-md hover:bg-red-50"
+            >
+              <Trash2 className="h-3 w-3" /> Sil
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose} size="sm">
+              Kapat
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving || !dirty}
+              size="sm"
+              className="bg-[#14141A] text-white gap-2"
+            >
+              {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {dirty ? "Değişiklikleri Kaydet" : "Kaydedildi"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
