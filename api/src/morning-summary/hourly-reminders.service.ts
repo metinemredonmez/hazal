@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { PushService } from '../push/push.service';
 
-interface ReminderResult {
+export interface ReminderResult {
   appointmentReminders: number;
   contractExpiry: number;
   staleInquiries: number;
