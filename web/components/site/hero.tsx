@@ -59,11 +59,11 @@ export function Hero() {
       </div>
 
       {/* Title bottom-left */}
-      <div className="absolute bottom-24 lg:bottom-32 left-6 lg:left-10 right-6 lg:right-10 z-10 max-w-5xl">
-        <h1 className="font-display font-light text-5xl sm:text-7xl lg:text-[8rem] leading-[0.95] tracking-tight whitespace-pre-line">
+      <div className="absolute bottom-24 lg:bottom-28 left-6 lg:left-10 right-6 lg:right-10 z-10 max-w-3xl">
+        <h1 className="font-display font-light text-3xl sm:text-4xl lg:text-5xl leading-[1.1] tracking-tight whitespace-pre-line">
           {heroTitle}
         </h1>
-        <p className="mt-6 text-base lg:text-lg text-[#F5F2EC]/80 max-w-xl">
+        <p className="mt-4 text-sm lg:text-base text-[#F5F2EC]/75 max-w-lg">
           {heroSub}
         </p>
       </div>
