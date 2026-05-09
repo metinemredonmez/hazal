@@ -144,11 +144,9 @@ export default function MailPage() {
           <div className="flex items-start gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
             <AlertCircle className="h-4 w-4 mt-0.5 text-amber-600 shrink-0" />
             <div>
-              <p className="font-medium text-amber-900">IMAP yapılandırılmamış</p>
+              <p className="font-medium text-amber-900">Gelen kutusu henüz aktif değil</p>
               <p className="text-amber-800 text-xs mt-1">
-                Gelen kutusu için API tarafında <code>IMAP_HOST</code>, <code>IMAP_PORT</code>,{" "}
-                <code>IMAP_USER</code>, <code>IMAP_PASS</code> env değişkenlerini ayarla. Şu an
-                yalnızca yeni mail gönderebilirsin.
+                Şu an yalnızca yeni mail gönderebilirsin. Gelen mailleri buradan görebilmek için sistem yöneticisi tarafından mail bağlantısı kurulduktan sonra "Yenile" butonu ile çekebileceksin.
               </p>
             </div>
           </div>

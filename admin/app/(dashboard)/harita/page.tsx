@@ -137,11 +137,8 @@ export default function HaritaPage() {
 
     let cancelled = false;
     (async () => {
-      // Dynamic import — keeps initial bundle small
-      // @ts-expect-error mapbox-gl dynamic import
       const mapboxgl = (await import("mapbox-gl")).default;
-      // @ts-expect-error css side-effect import
-      await import("mapbox-gl/dist/mapbox-gl.css");
+      await import("mapbox-gl/dist/mapbox-gl.css" as string);
       if (cancelled) return;
 
       mapboxgl.accessToken = mapboxToken;
@@ -164,7 +161,6 @@ export default function HaritaPage() {
     if (!mapRef.current) return;
     let cancelled = false;
     (async () => {
-      // @ts-expect-error mapbox-gl dynamic import
       const mapboxgl = (await import("mapbox-gl")).default;
       if (cancelled) return;
 

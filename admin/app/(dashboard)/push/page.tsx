@@ -139,10 +139,9 @@ export default function PushPage() {
           <div className="flex items-start gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
             <AlertCircle className="h-4 w-4 mt-0.5 text-amber-600 shrink-0" />
             <div>
-              <p className="font-medium text-amber-900">OneSignal yapılandırılmamış</p>
+              <p className="font-medium text-amber-900">Push bildirimi servisi aktif değil</p>
               <p className="text-amber-800 text-xs mt-1">
-                API tarafında <code>ONESIGNAL_APP_ID</code> ve{" "}
-                <code>ONESIGNAL_REST_API_KEY</code> environment değişkenlerini ayarla.
+                Web sitesi abonelerine bildirim gönderebilmek için push servisinin yapılandırılması gerekiyor. Sistem yöneticisi tarafından kurulduktan sonra kullanılabilir olacak.
               </p>
             </div>
           </div>

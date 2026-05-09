@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Sparkles, X, Send, Loader2, Bot } from "lucide-react";
+import { Sparkles, X, Send, Loader2, Bot, Mic, MicOff } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface Message {
