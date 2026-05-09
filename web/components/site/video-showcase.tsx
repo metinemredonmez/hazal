@@ -106,12 +106,12 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 lg:gap-3 max-w-3xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 lg:gap-4 max-w-4xl mx-auto">
           {videos.map((v) => (
             <button
               key={v.src}
               onClick={() => setActive(v)}
-              className="group relative aspect-[9/16] overflow-hidden bg-[#1A1A1F] rounded-sm"
+              className="group relative aspect-[4/5] overflow-hidden bg-[#1A1A1F] rounded-sm"
             >
               <video
                 src={withPreview(v.src)}
