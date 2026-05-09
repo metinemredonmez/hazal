@@ -128,17 +128,22 @@ export interface PageContent {
   home?: {
     heroEyebrow?: BilingualText;
     heroCtaLabel?: BilingualText;
+    heroMediaUrl?: string;
     featuredTitle?: BilingualText;
     featuredSubtitle?: BilingualText;
+    featuredImageUrl?: string;
     aboutHeading?: BilingualText;
     aboutCtaLabel?: BilingualText;
+    aboutImageUrl?: string;
     contactHeading?: BilingualText;
     contactSubtitle?: BilingualText;
     contactCtaLabel?: BilingualText;
+    contactImageUrl?: string;
   };
   about?: {
     heroEyebrow?: BilingualText;
     heroTitle?: BilingualText;
+    heroImageUrl?: string;
     intro?: BilingualText;
     bio1?: BilingualText;
     bio2?: BilingualText;
@@ -150,6 +155,7 @@ export interface PageContent {
   contact?: {
     heroEyebrow?: BilingualText;
     heroTitle?: BilingualText;
+    heroImageUrl?: string;
     intro?: BilingualText;
     workingHours?: BilingualText;
     addressLine?: BilingualText;

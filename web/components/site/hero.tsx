@@ -24,7 +24,8 @@ export function Hero() {
   const eyebrow = pick(home?.heroEyebrow, locale, tx.hero.eyebrow);
   const ctaLabel = pick(home?.heroCtaLabel, locale, tx.nav.explore);
 
-  const mediaUrl = settings?.heroMediaUrl ?? "/login-bg.jpg";
+  // Öncelik: pageContent.home.heroMediaUrl (CMS yeni alan) > settings.heroMediaUrl (eski) > placeholder
+  const mediaUrl = home?.heroMediaUrl ?? settings?.heroMediaUrl ?? "/login-bg.jpg";
   const isVideo = mediaUrl.match(/\.(mp4|webm|mov)$/i);
 
   return (

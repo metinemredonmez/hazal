@@ -27,7 +27,9 @@ export function AboutTeaser() {
     locale === "tr" ? "Her müşteri,\ntek bir hikâye." : "Every client,\na single story.",
   );
   const ctaLabel = pick(home?.aboutCtaLabel, locale, tx.sections.aboutCta);
-  const portrait = about?.portraitUrl ?? settings?.heroMediaUrl ?? "/login-bg.jpg";
+  // Öncelik: home.aboutImageUrl (CMS) > about.portraitUrl > heroMediaUrl > placeholder
+  const portrait =
+    home?.aboutImageUrl ?? about?.portraitUrl ?? settings?.heroMediaUrl ?? "/login-bg.jpg";
 
   return (
     <section className="bg-[#0E0E0E] text-[#F5F2EC] py-24 lg:py-32 px-6 lg:px-10">

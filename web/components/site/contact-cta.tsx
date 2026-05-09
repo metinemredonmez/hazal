@@ -19,10 +19,22 @@ export function ContactCTA() {
   );
   const subtitle = pick(home?.contactSubtitle, locale, tx.contact.sub);
   const ctaLabel = pick(home?.contactCtaLabel, locale, tx.sections.contactCta);
+  const contactImage = home?.contactImageUrl;
 
   return (
-    <section className="bg-[#FAF8F4] py-24 lg:py-32 px-6 lg:px-10 border-t border-[#E5E2DD]">
-      <div className="max-w-3xl mx-auto text-center">
+    <section
+      className="relative bg-[#FAF8F4] py-24 lg:py-32 px-6 lg:px-10 border-t border-[#E5E2DD] overflow-hidden"
+      style={
+        contactImage
+          ? {
+              backgroundImage: `linear-gradient(180deg, rgba(250,248,244,0.85) 0%, rgba(250,248,244,0.95) 100%), url(${contactImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : undefined
+      }
+    >
+      <div className="max-w-3xl mx-auto text-center relative">
         <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-5">
           {tx.contact.heading}
         </p>

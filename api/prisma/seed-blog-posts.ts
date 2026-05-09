@@ -526,7 +526,7 @@ Mansion sales appreciated **180%+** in USD over the past decade. Limited supply 
 
 Turkish contractor and industrialist families dominate. Foreign interest exists but the historic status means long timelines and specialized advisory.`,
     coverImage:
-      'https://images.unsplash.com/photo-1517942197970-21f5c08e1c84?w=1600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 35,
   },
 
@@ -545,6 +545,8 @@ Turkish contractor and industrialist families dominate. Foreign interest exists 
     bodyEn:
       'Forbes Turkey featured İstanbul luxury housing on its March 2026 cover. The 18-24% USD price growth in mansions and premium apartments along the Bosphorus over the past 12 months was analyzed with data from Hazal Muti Real Estate.',
     externalUrl: 'https://www.forbes.com.tr',
+    coverImage:
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 18,
   },
   {
@@ -561,6 +563,8 @@ Turkish contractor and industrialist families dominate. Foreign interest exists 
     bodyEn:
       'Hürriyet Economy reported that historic-building per-square-meter prices in Bebek crossed the 18,000 USD threshold.',
     externalUrl: 'https://www.hurriyet.com.tr',
+    coverImage:
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 27,
   },
   {
@@ -577,6 +581,8 @@ Turkish contractor and industrialist families dominate. Foreign interest exists 
     bodyEn:
       'Mansion Global (WSJ) brought a 65M USD sale of a 19th-century mansion in Tarabya to international luxury readers. The mansion went on sale after restoration.',
     externalUrl: 'https://www.mansionglobal.com',
+    coverImage:
+      'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 41,
   },
 
@@ -608,12 +614,7 @@ async function main(reset = false) {
   }
 
   const existing = await prisma.blogPost.count();
-  if (existing > 0 && !reset) {
-    console.log(
-      `✓ ${existing} blog post zaten var. Sıfırdan başlamak için --reset kullan.`,
-    );
-    return;
-  }
+  console.log(`ℹ ${existing} mevcut blog post; upsert ile güncelleniyor...`);
 
   for (const p of POSTS) {
     const publishedAt = new Date(Date.now() - p.daysAgo * 24 * 60 * 60 * 1000);
@@ -641,6 +642,8 @@ async function main(reset = false) {
         excerptEn: p.excerptEn,
         bodyTr: p.bodyTr,
         bodyEn: p.bodyEn,
+        coverImage: p.coverImage,
+        externalUrl: p.externalUrl,
       },
     });
     const icon = p.kind === 'ARTICLE' ? '📝' : p.kind === 'PRESS' ? '📰' : '🎬';

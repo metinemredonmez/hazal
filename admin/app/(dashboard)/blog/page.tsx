@@ -160,13 +160,21 @@ export default function BlogPage() {
                       <img
                         src={p.coverImage}
                         alt=""
-                        className="w-16 h-16 rounded object-cover shrink-0"
+                        className="w-16 h-16 rounded object-cover shrink-0 bg-muted"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          img.style.display = "none";
+                          const fallback = img.nextElementSibling as HTMLElement | null;
+                          if (fallback) fallback.style.display = "flex";
+                        }}
                       />
-                    ) : (
-                      <div className="w-16 h-16 rounded bg-muted flex items-center justify-center shrink-0">
-                        <Icon className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    )}
+                    ) : null}
+                    <div
+                      className="w-16 h-16 rounded bg-muted flex items-center justify-center shrink-0"
+                      style={{ display: p.coverImage ? "none" : "flex" }}
+                    >
+                      <Icon className="h-5 w-5 text-muted-foreground" />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <Badge variant={p.status === "PUBLISHED" ? "success" : "default"}>

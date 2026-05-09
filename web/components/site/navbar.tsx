@@ -33,6 +33,17 @@ export function Navbar() {
     setOpenDropdown(null);
   }, [pathname]);
 
+  // Body scroll lock when mobile menu open
+  React.useEffect(() => {
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [mobileOpen]);
+
   const overHero = !scrolled && (pathname === "/" || pathname.startsWith("/ilanlar/"));
 
   const leftNav: NavItem[] = [
@@ -126,23 +137,34 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Right (mobile) */}
-          <div className="lg:hidden flex items-center justify-end gap-3">
+          {/* Right (mobile) — sade: sadece dil */}
+          <div className="lg:hidden flex items-center justify-end gap-2">
             <button
               onClick={() => setLocale(locale === "tr" ? "en" : "tr")}
-              className="text-[10px] tracking-[0.3em] uppercase"
+              className="text-[10px] tracking-[0.3em] uppercase px-2 py-1.5 hover:text-[#C9A96E]"
+              aria-label="Switch language"
             >
               {locale === "tr" ? "EN" : "TR"}
             </button>
-            <Link href="/iletisim" className="text-[10px] tracking-[0.3em] uppercase">
-              {tx.nav.contact}
+            <Link
+              href="/ilanlar"
+              aria-label="Search"
+              className="p-2 hover:text-[#C9A96E]"
+            >
+              <Search className="h-4 w-4" />
             </Link>
           </div>
         </div>
       </div>
 
       {/* Mobile drawer */}
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} items={leftNav} />
+      <MobileMenu
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        items={leftNav}
+        locale={locale}
+        onSwitchLocale={() => setLocale(locale === "tr" ? "en" : "tr")}
+      />
     </header>
   );
 }
@@ -210,60 +232,117 @@ function MobileMenu({
   open,
   onClose,
   items,
+  locale,
+  onSwitchLocale,
 }: {
   open: boolean;
   onClose: () => void;
   items: NavItem[];
+  locale: "tr" | "en";
+  onSwitchLocale: () => void;
 }) {
   return (
-    <div
-      className={cn(
-        "fixed inset-0 z-50 bg-[#0E0E0E] text-[#F5F2EC] transition-transform duration-500 lg:hidden",
-        open ? "translate-x-0" : "-translate-x-full",
-      )}
-    >
-      <div className="flex justify-end p-6">
-        <button onClick={onClose} aria-label="Close" className="p-2 -mr-2">
-          <X className="h-6 w-6" />
-        </button>
-      </div>
-      <nav className="flex flex-col items-center gap-6 mt-8 px-8">
-        {items.map((item) =>
-          item.children ? (
-            <div key={item.label} className="text-center w-full">
-              <p className="font-display text-2xl tracking-wider mb-3">{item.label}</p>
-              <div className="flex flex-col gap-2">
-                {item.children.map((c) => (
-                  <Link
-                    key={c.href}
-                    href={c.href}
-                    onClick={onClose}
-                    className="text-xs tracking-[0.25em] uppercase text-[#F5F2EC]/70 hover:text-[#C9A96E]"
-                  >
-                    {c.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <Link
-              key={item.label}
-              href={item.href ?? "#"}
-              onClick={onClose}
-              className="font-display text-2xl tracking-wider"
-            >
-              {item.label}
-            </Link>
-          ),
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        aria-hidden
+        className={cn(
+          "fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
+          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         )}
-        <Link
-          href="/iletisim"
-          onClick={onClose}
-          className="mt-6 text-xs tracking-[0.3em] uppercase border border-[#C9A96E] text-[#C9A96E] px-8 py-3"
-        >
-          İletişim · Contact
-        </Link>
-      </nav>
-    </div>
+      />
+      {/* Drawer — sağdan kayar, %85 width, modern */}
+      <aside
+        className={cn(
+          "fixed top-0 right-0 bottom-0 z-50 w-[88%] max-w-sm bg-[#0E0E0E] text-[#F5F2EC] shadow-[0_0_60px_rgba(0,0,0,0.6)] transition-transform duration-400 ease-out lg:hidden flex flex-col",
+          open ? "translate-x-0" : "translate-x-full",
+        )}
+        aria-hidden={!open}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+          <Link
+            href="/"
+            onClick={onClose}
+            className="font-display text-lg tracking-[0.18em] uppercase"
+          >
+            HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+          </Link>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="p-2 -mr-2 text-[#F5F2EC]/70 hover:text-[#C9A96E] transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Nav links */}
+        <nav className="flex-1 overflow-y-auto px-6 py-8">
+          <ul className="space-y-5">
+            {items.map((item) => (
+              <li key={item.label}>
+                {item.children ? (
+                  <div>
+                    <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+                      {item.label}
+                    </p>
+                    <ul className="space-y-1.5 pl-1">
+                      {item.children.map((c) => (
+                        <li key={c.href}>
+                          <Link
+                            href={c.href}
+                            onClick={onClose}
+                            className="block py-1.5 font-display text-xl tracking-wide text-[#F5F2EC] hover:text-[#C9A96E] transition-colors"
+                          >
+                            {c.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href ?? "#"}
+                    onClick={onClose}
+                    className="block font-display text-2xl tracking-wide hover:text-[#C9A96E] transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          {/* CTA + dil */}
+          <div className="mt-10 pt-8 border-t border-white/10 space-y-4">
+            <Link
+              href="/iletisim"
+              onClick={onClose}
+              className="flex items-center justify-center text-[11px] tracking-[0.4em] uppercase bg-[#C9A96E] text-[#0E0E0E] px-6 py-3.5 hover:bg-[#b8965e] transition-colors"
+            >
+              {locale === "tr" ? "İletişime Geç" : "Get in Touch"}
+            </Link>
+            <button
+              onClick={() => {
+                onSwitchLocale();
+                onClose();
+              }}
+              className="block w-full text-center text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC]/60 hover:text-[#C9A96E] py-2"
+            >
+              {locale === "tr" ? "Switch to English" : "Türkçe'ye Geç"}
+            </button>
+          </div>
+        </nav>
+
+        {/* Footer */}
+        <div className="px-6 py-5 border-t border-white/10 text-center">
+          <p className="text-[9px] tracking-[0.4em] uppercase text-[#F5F2EC]/40">
+            İstanbul · Bodrum
+          </p>
+        </div>
+      </aside>
+    </>
   );
 }

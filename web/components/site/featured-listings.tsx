@@ -25,10 +25,22 @@ export function FeaturedListings() {
 
   const subtitle = pick(home?.featuredSubtitle, locale, tx.sections.featuredSub);
   const title = pick(home?.featuredTitle, locale, tx.sections.featured);
+  const featuredImage = home?.featuredImageUrl;
 
   return (
-    <section className="bg-[#FAF8F4] py-24 lg:py-32 px-6 lg:px-10">
-      <div className="max-w-[1600px] mx-auto">
+    <section
+      className="relative bg-[#FAF8F4] py-24 lg:py-32 px-6 lg:px-10 overflow-hidden"
+      style={
+        featuredImage
+          ? {
+              backgroundImage: `linear-gradient(180deg, rgba(250,248,244,0.92) 0%, rgba(250,248,244,1) 60%), url(${featuredImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center top",
+            }
+          : undefined
+      }
+    >
+      <div className="max-w-[1600px] mx-auto relative">
         <div className="flex items-end justify-between mb-12 lg:mb-16">
           <div>
             <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
