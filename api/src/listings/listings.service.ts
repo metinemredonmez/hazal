@@ -403,6 +403,244 @@ export class ListingsService {
     };
   }
 
+  // ───────────────────── Bulk import (CSV) ─────────────────────
+
+  static readonly BULK_TEMPLATE_HEADERS = [
+    'titleTr',
+    'titleEn',
+    'descriptionTr',
+    'descriptionEn',
+    'price',
+    'currency',
+    'type',
+    'category',
+    'bedrooms',
+    'bathrooms',
+    'areaM2',
+    'yearBuilt',
+    'address',
+    'city',
+    'district',
+    'lat',
+    'lng',
+    'status',
+    'featured',
+    'imageUrls',
+  ];
+
+  bulkImportTemplate(): string {
+    const headers = ListingsService.BULK_TEMPLATE_HEADERS.join(',');
+    const example = [
+      '"Bebek Boğaz Manzaralı 3+1"',
+      '"Bebek Bosphorus 3+1 Apartment"',
+      '"Bebek\'te boğaz manzaralı, ferah ve aydınlık 3+1 daire."',
+      '"Spacious 3+1 apartment in Bebek with Bosphorus view."',
+      '15000000',
+      'TRY',
+      'SALE',
+      'APARTMENT',
+      '3',
+      '2',
+      '180',
+      '2018',
+      '"Bebek Cad. No:12"',
+      'İstanbul',
+      'Bebek',
+      '41.0775',
+      '29.0436',
+      'ACTIVE',
+      'true',
+      '"https://i.imgur.com/aaa.jpg;https://i.imgur.com/bbb.jpg"',
+    ].join(',');
+    return `${headers}\n${example}\n`;
+  }
+
+  /** Minimal RFC4180 CSV parser. Supports quoted fields with embedded commas/newlines/escaped quotes. */
+  private parseCsv(text: string): string[][] {
+    const rows: string[][] = [];
+    let row: string[] = [];
+    let field = '';
+    let inQuotes = false;
+    let i = 0;
+    const src = text.replace(/\r\n/g, '\n');
+    while (i < src.length) {
+      const ch = src[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (src[i + 1] === '"') {
+            field += '"';
+            i += 2;
+            continue;
+          }
+          inQuotes = false;
+          i += 1;
+          continue;
+        }
+        field += ch;
+        i += 1;
+        continue;
+      }
+      if (ch === '"') {
+        inQuotes = true;
+        i += 1;
+        continue;
+      }
+      if (ch === ',') {
+        row.push(field);
+        field = '';
+        i += 1;
+        continue;
+      }
+      if (ch === '\n') {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+        i += 1;
+        continue;
+      }
+      field += ch;
+      i += 1;
+    }
+    if (field.length > 0 || row.length > 0) {
+      row.push(field);
+      rows.push(row);
+    }
+    return rows.filter((r) => r.length > 1 || (r.length === 1 && r[0].trim() !== ''));
+  }
+
+  async bulkImport(csvText: string) {
+    if (!csvText || !csvText.trim()) {
+      throw new BadRequestException('CSV is empty');
+    }
+
+    const rows = this.parseCsv(csvText.trim());
+    if (rows.length < 2) {
+      throw new BadRequestException('CSV requires header row + at least one data row');
+    }
+
+    const headers = rows[0].map((h) => h.trim());
+    const dataRows = rows.slice(1);
+
+    const results: Array<{
+      row: number;
+      ok: boolean;
+      id?: string;
+      slug?: string;
+      titleTr?: string;
+      error?: string;
+    }> = [];
+    let created = 0;
+    let failed = 0;
+
+    for (let r = 0; r < dataRows.length; r++) {
+      const rowIdx = r + 2; // human-friendly (header is row 1)
+      const cols = dataRows[r];
+      const obj: Record<string, string> = {};
+      headers.forEach((h, idx) => {
+        obj[h] = (cols[idx] ?? '').trim();
+      });
+
+      try {
+        const titleTr = obj.titleTr;
+        const titleEn = obj.titleEn || obj.titleTr;
+        if (!titleTr) throw new Error('titleTr zorunlu');
+        if (!obj.price) throw new Error('price zorunlu');
+
+        const priceNum = Number(obj.price);
+        if (!Number.isFinite(priceNum) || priceNum < 0) {
+          throw new Error('price geçersiz sayı');
+        }
+
+        const currency = (obj.currency || 'TRY').toUpperCase();
+        if (!['TRY', 'USD', 'EUR'].includes(currency)) {
+          throw new Error(`currency geçersiz: ${currency}`);
+        }
+
+        const type = (obj.type || 'SALE').toUpperCase();
+        if (!['SALE', 'RENT'].includes(type)) {
+          throw new Error(`type geçersiz: ${type} (SALE veya RENT)`);
+        }
+
+        const category = (obj.category || 'APARTMENT').toUpperCase();
+
+        const status = (obj.status || 'DRAFT').toUpperCase();
+        const featured = obj.featured?.toLowerCase() === 'true' || obj.featured === '1';
+
+        const imageUrls = (obj.imageUrls || '')
+          .split(/[;\n]/)
+          .map((u) => u.trim())
+          .filter((u) => /^https?:\/\//i.test(u));
+
+        const data: Prisma.ListingCreateInput = {
+          titleTr,
+          titleEn,
+          descriptionTr: obj.descriptionTr || titleTr,
+          descriptionEn: obj.descriptionEn || titleEn,
+          slug: await this.generateUniqueSlug(titleEn || titleTr),
+          price: new Prisma.Decimal(priceNum),
+          currency: currency as any,
+          type: type as any,
+          category: category as any,
+          status: status as any,
+          featured,
+        };
+
+        if (obj.bedrooms) data.bedrooms = parseInt(obj.bedrooms, 10);
+        if (obj.bathrooms) data.bathrooms = parseInt(obj.bathrooms, 10);
+        if (obj.areaM2) data.areaM2 = new Prisma.Decimal(Number(obj.areaM2));
+        if (obj.yearBuilt) data.yearBuilt = parseInt(obj.yearBuilt, 10);
+        if (obj.address) data.address = obj.address;
+        if (obj.city) data.city = obj.city;
+        if (obj.district) data.district = obj.district;
+        if (obj.lat) data.lat = Number(obj.lat);
+        if (obj.lng) data.lng = Number(obj.lng);
+
+        if (imageUrls.length > 0) {
+          data.images = {
+            create: imageUrls.map((url, idx) => ({
+              url,
+              order: idx,
+              isPrimary: idx === 0,
+            })),
+          };
+        }
+
+        const listing = await this.prisma.listing.create({
+          data,
+          include: { images: true },
+        });
+
+        if (listing.status === ListingStatus.ACTIVE) {
+          void this.autoPushOnPublish(listing);
+        }
+
+        created += 1;
+        results.push({
+          row: rowIdx,
+          ok: true,
+          id: listing.id,
+          slug: listing.slug,
+          titleTr: listing.titleTr,
+        });
+      } catch (err) {
+        failed += 1;
+        results.push({
+          row: rowIdx,
+          ok: false,
+          error: (err as Error).message,
+        });
+      }
+    }
+
+    return {
+      total: dataRows.length,
+      created,
+      failed,
+      results,
+    };
+  }
+
   async stats() {
     const [total, active, draft, sold, rented, featured, totalViews] = await Promise.all([
       this.prisma.listing.count(),

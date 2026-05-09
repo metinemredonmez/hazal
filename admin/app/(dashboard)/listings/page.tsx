@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X, Share2, MapPin, Navigation } from "lucide-react";
+import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X, Share2, MapPin, Navigation, Upload, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Topbar } from "@/components/admin/topbar";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,7 @@ export default function ListingsPage() {
   const [bulkAction, setBulkAction] = React.useState<string>("");
   const [confirmBulkDelete, setConfirmBulkDelete] = React.useState(false);
   const [shareListing, setShareListing] = React.useState<Listing | null>(null);
+  const [bulkImportOpen, setBulkImportOpen] = React.useState(false);
 
   const fetchListings = React.useCallback(() => {
     setLoading(true);
@@ -195,11 +196,20 @@ export default function ListingsPage() {
               </SelectContent>
             </Select>
           </div>
-          <Button asChild className="bg-[#14141A] hover:bg-black text-white gap-2 h-10">
-            <Link href="/listings/new">
-              <Plus className="h-4 w-4" /> Yeni İlan
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="gap-2 h-10"
+              onClick={() => setBulkImportOpen(true)}
+            >
+              <Upload className="h-4 w-4" /> Toplu Yükle
+            </Button>
+            <Button asChild className="bg-[#14141A] hover:bg-black text-white gap-2 h-10">
+              <Link href="/listings/new">
+                <Plus className="h-4 w-4" /> Yeni İlan
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {selected.size > 0 && (
@@ -331,7 +341,244 @@ export default function ListingsPage() {
         onOpenChange={(o) => !o && setShareListing(null)}
         listing={shareListing}
       />
+
+      <BulkImportDialog
+        open={bulkImportOpen}
+        onOpenChange={setBulkImportOpen}
+        onImported={() => {
+          setBulkImportOpen(false);
+          fetchListings();
+        }}
+      />
     </>
+  );
+}
+
+interface BulkImportResult {
+  total: number;
+  created: number;
+  failed: number;
+  results: Array<{
+    row: number;
+    ok: boolean;
+    id?: string;
+    slug?: string;
+    titleTr?: string;
+    error?: string;
+  }>;
+}
+
+interface BulkTemplateResponse {
+  filename: string;
+  contentType: string;
+  content: string;
+  headers: string[];
+}
+
+function BulkImportDialog({
+  open,
+  onOpenChange,
+  onImported,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onImported: () => void;
+}) {
+  const [csv, setCsv] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+  const [result, setResult] = React.useState<BulkImportResult | null>(null);
+
+  React.useEffect(() => {
+    if (!open) {
+      setCsv("");
+      setResult(null);
+    }
+  }, [open]);
+
+  const downloadTemplate = async () => {
+    try {
+      const res = await api<BulkTemplateResponse>(
+        `/api/admin/listings/bulk/template`,
+      );
+      const blob = new Blob([res.content], { type: res.contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Şablon indirilemedi");
+    }
+  };
+
+  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    setCsv(text);
+  };
+
+  const submit = async () => {
+    if (!csv.trim()) {
+      toast.error("CSV boş");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await api<BulkImportResult>(`/api/admin/listings/bulk/import`, {
+        method: "POST",
+        body: { csv },
+      });
+      setResult(res);
+      if (res.failed === 0) {
+        toast.success(`${res.created} ilan oluşturuldu`);
+      } else {
+        toast.warning(`${res.created} oluşturuldu · ${res.failed} hatalı`);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "İçe aktarım başarısız");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const previewRowCount = csv.trim()
+    ? Math.max(0, csv.trim().split(/\r?\n/).length - 1)
+    : 0;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Toplu İlan Yükle</DialogTitle>
+          <DialogDescription>
+            CSV dosyası ile toplu ilan oluşturun. Görsel URL&apos;leri
+            <code className="mx-1 px-1 bg-muted rounded text-[11px]">imageUrls</code>
+            sütununda noktalı virgülle ayrılır.
+          </DialogDescription>
+        </DialogHeader>
+
+        {!result ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={downloadTemplate}
+                className="gap-2"
+              >
+                <Download className="h-3.5 w-3.5" /> Şablon İndir (CSV)
+              </Button>
+              <label className="inline-flex items-center gap-2 text-xs cursor-pointer border rounded-md px-3 py-2 hover:bg-muted">
+                <Upload className="h-3.5 w-3.5" /> Dosya seç
+                <input
+                  type="file"
+                  accept=".csv,text/csv"
+                  onChange={onFile}
+                  className="hidden"
+                />
+              </label>
+              {previewRowCount > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {previewRowCount} satır
+                </span>
+              )}
+            </div>
+
+            <textarea
+              value={csv}
+              onChange={(e) => setCsv(e.target.value)}
+              placeholder="Şablonu indirip doldurun, ya da CSV içeriğini buraya yapıştırın…"
+              rows={10}
+              className="w-full font-mono text-[11px] border rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/30"
+            />
+
+            <p className="text-[11px] text-muted-foreground">
+              Zorunlu sütunlar: <code>titleTr</code>, <code>price</code>. Diğerleri opsiyonel.
+              Örnek görsel URL&apos;leri: <code>https://...jpg;https://...jpg</code>
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="border rounded-md p-3">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Toplam</p>
+                <p className="text-2xl font-medium">{result.total}</p>
+              </div>
+              <div className="border rounded-md p-3 bg-emerald-50 border-emerald-200">
+                <p className="text-[11px] text-emerald-700 uppercase tracking-wider">Oluşturuldu</p>
+                <p className="text-2xl font-medium text-emerald-700">{result.created}</p>
+              </div>
+              <div className="border rounded-md p-3 bg-red-50 border-red-200">
+                <p className="text-[11px] text-red-700 uppercase tracking-wider">Hatalı</p>
+                <p className="text-2xl font-medium text-red-700">{result.failed}</p>
+              </div>
+            </div>
+
+            <div className="max-h-64 overflow-y-auto border rounded-md">
+              <table className="w-full text-xs">
+                <thead className="bg-muted sticky top-0">
+                  <tr>
+                    <th className="px-2 py-1.5 text-left">Satır</th>
+                    <th className="px-2 py-1.5 text-left">Durum</th>
+                    <th className="px-2 py-1.5 text-left">Detay</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.results.map((r) => (
+                    <tr key={r.row} className="border-t">
+                      <td className="px-2 py-1.5 font-mono">{r.row}</td>
+                      <td className="px-2 py-1.5">
+                        {r.ok ? (
+                          <span className="text-emerald-600">✓</span>
+                        ) : (
+                          <span className="text-red-600">✗</span>
+                        )}
+                      </td>
+                      <td className="px-2 py-1.5">
+                        {r.ok ? r.titleTr : <span className="text-red-600">{r.error}</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          {!result ? (
+            <>
+              <Button variant="ghost" onClick={() => onOpenChange(false)}>
+                İptal
+              </Button>
+              <Button
+                onClick={submit}
+                disabled={submitting || !csv.trim()}
+                className="bg-[#14141A] hover:bg-black text-white gap-2"
+              >
+                {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                İçe Aktar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" onClick={() => setResult(null)}>
+                Yeni Yükleme
+              </Button>
+              <Button
+                onClick={onImported}
+                className="bg-[#14141A] hover:bg-black text-white"
+              >
+                Kapat
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

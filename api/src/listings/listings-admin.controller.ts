@@ -63,6 +63,21 @@ export class ListingsAdminController {
     return this.listings.duplicate(id);
   }
 
+  @Get('bulk/template')
+  bulkTemplate() {
+    return {
+      filename: 'listings-template.csv',
+      contentType: 'text/csv; charset=utf-8',
+      content: this.listings.bulkImportTemplate(),
+      headers: ListingsService.BULK_TEMPLATE_HEADERS,
+    };
+  }
+
+  @Post('bulk/import')
+  bulkImport(@Body() body: { csv: string }) {
+    return this.listings.bulkImport(body?.csv ?? '');
+  }
+
   @Post('bulk/update')
   bulkUpdate(@Body() body: { ids: string[]; status?: string; featured?: boolean }) {
     return this.listings.bulkUpdate(body.ids, {
