@@ -18,6 +18,7 @@ import {
   Mail,
   Newspaper,
   AtSign,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/store";
@@ -35,6 +36,7 @@ const NAV: Array<{ label: string; href: string; icon: React.ComponentType<{ clas
   { label: "Push", href: "/push", icon: BellRing },
   { label: "Bülten", href: "/newsletter", icon: Mail },
   { label: "Blog & Medya", href: "/blog", icon: Newspaper },
+  { label: "Belgeler", href: "/belgeler", icon: FolderOpen },
   { label: "Ayarlar", href: "/settings", icon: Settings },
   { label: "Güvenlik", href: "/audit", icon: History },
 ];

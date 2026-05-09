@@ -39,6 +39,9 @@ async function bootstrap() {
   const uploadDir = config.get<string>('UPLOAD_DIR') ?? './uploads';
   app.use('/uploads', express.static(join(process.cwd(), uploadDir)));
 
+  const documentsDir = config.get<string>('DOCUMENTS_DIR') ?? './documents';
+  app.use('/documents', express.static(join(process.cwd(), documentsDir)));
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Hazal Muti Real Estate API')
     .setDescription('Backend API for the Hazal Muti real estate site.')

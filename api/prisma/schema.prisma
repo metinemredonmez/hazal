@@ -131,6 +131,7 @@ model Appointment {
   status      AppointmentStatus @default(SCHEDULED)
   location    String?
   notes       String?
+  documents   Document[]
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
@@ -171,6 +172,7 @@ model Listing {
   images        ListingImage[]
   inquiries     Inquiry[]
   appointments  Appointment[]
+  documents     Document[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
@@ -204,6 +206,7 @@ model Inquiry {
   listingId    String?
   listing      Listing?      @relation(fields: [listingId], references: [id], onDelete: SetNull)
   appointments Appointment[]
+  documents    Document[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -272,6 +275,46 @@ model SiteSettings {
   // Email templates: { newInquiryAdmin: { subjectTr/En, bodyTr/En }, inquiryAutoReply: {...}, ... }
   emailTemplates  Json?
   updatedAt       DateTime @updatedAt
+}
+
+enum DocumentCategory {
+  CONTRACT       // Sözleşme
+  IDENTITY       // Kimlik / pasaport
+  DEED           // Tapu
+  BLUEPRINT      // Mimari plan / ruhsat
+  PHOTO          // Ek foto (ilan dışı)
+  INVOICE        // Fatura
+  BROCHURE       // Brosür
+  OTHER
+}
+
+model Document {
+  id           String           @id @default(uuid())
+  title        String
+  category     DocumentCategory
+  fileUrl      String
+  fileName     String
+  fileSize     Int
+  mimeType     String
+  description  String?
+
+  // Bağlantılar — hepsi opsiyonel
+  listingId    String?
+  listing      Listing?         @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  inquiryId    String?
+  inquiry      Inquiry?         @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+  appointmentId String?
+  appointment  Appointment?     @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  customerName String?
+
+  tags         String[]         @default([])
+  version      Int              @default(1)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([category, createdAt])
+  @@index([listingId])
+  @@index([inquiryId])
 }
 
 enum BlogPostStatus {

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Bed, Bath, Maximize2, MapPin, Calendar, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Bed, Bath, Maximize2, MapPin, Calendar, Eye, ChevronLeft, ChevronRight, Box, Play, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { useLocale, t, CATEGORY_LABEL } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
@@ -24,6 +24,8 @@ export default function ListingDetailView({
   const [loading, setLoading] = React.useState(!initialListing);
   const [activeImg, setActiveImg] = React.useState(0);
   const [lightbox, setLightbox] = React.useState(false);
+  const [tourOpen, setTourOpen] = React.useState(false);
+  const [videoOpen, setVideoOpen] = React.useState(false);
 
   React.useEffect(() => {
     // If we already have server-rendered data, skip refetch
@@ -193,28 +195,28 @@ export default function ListingDetailView({
               </div>
             )}
 
-            {/* Tour / video */}
+            {/* Tour / video — açılır lightbox */}
             {(listing.tourUrl || listing.videoUrl) && (
               <div className="flex flex-wrap gap-3 mb-10">
                 {listing.tourUrl && (
-                  <a
-                    href={listing.tourUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border border-[#14141A] px-5 py-3 hover:bg-[#14141A] hover:text-white"
+                  <button
+                    type="button"
+                    onClick={() => setTourOpen(true)}
+                    className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase bg-[#C9A96E] text-[#14141A] hover:bg-[#14141A] hover:text-white px-5 py-3 transition-colors group"
                   >
+                    <Box className="h-4 w-4" />
                     {tx.listing.virtualTour}
-                  </a>
+                  </button>
                 )}
                 {listing.videoUrl && (
-                  <a
-                    href={listing.videoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border border-[#14141A] px-5 py-3 hover:bg-[#14141A] hover:text-white"
+                  <button
+                    type="button"
+                    onClick={() => setVideoOpen(true)}
+                    className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border border-[#14141A] px-5 py-3 hover:bg-[#14141A] hover:text-white transition-colors"
                   >
+                    <Play className="h-4 w-4" />
                     {tx.listing.video}
-                  </a>
+                  </button>
                 )}
               </div>
             )}
@@ -296,6 +298,73 @@ export default function ListingDetailView({
               </button>
             </>
           )}
+        </div>
+      )}
+
+      {/* Virtual tour lightbox */}
+      {tourOpen && listing.tourUrl && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center p-4"
+          onClick={() => setTourOpen(false)}
+        >
+          <button
+            className="absolute top-6 right-6 text-white text-sm tracking-[0.3em] uppercase z-10 inline-flex items-center gap-2 hover:text-[#C9A96E]"
+            onClick={() => setTourOpen(false)}
+          >
+            <X className="h-5 w-5" /> Kapat
+          </button>
+          <div
+            className="w-full max-w-7xl aspect-video bg-black rounded overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <iframe
+              src={listing.tourUrl}
+              className="w-full h-full border-0"
+              allow="fullscreen; xr-spatial-tracking; gyroscope; accelerometer"
+              allowFullScreen
+              title="Virtual tour"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Video lightbox */}
+      {videoOpen && listing.videoUrl && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center p-4"
+          onClick={() => setVideoOpen(false)}
+        >
+          <button
+            className="absolute top-6 right-6 text-white text-sm tracking-[0.3em] uppercase z-10 inline-flex items-center gap-2 hover:text-[#C9A96E]"
+            onClick={() => setVideoOpen(false)}
+          >
+            <X className="h-5 w-5" /> Kapat
+          </button>
+          <div
+            className="w-full max-w-7xl aspect-video bg-black rounded overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/youtube\.com|youtu\.be|vimeo\.com/i.test(listing.videoUrl) ? (
+              <iframe
+                src={
+                  listing.videoUrl
+                    .replace("youtu.be/", "youtube.com/embed/")
+                    .replace("watch?v=", "embed/")
+                }
+                className="w-full h-full border-0"
+                allow="autoplay; encrypted-media; fullscreen"
+                allowFullScreen
+                title="Video"
+              />
+            ) : (
+              <video
+                src={listing.videoUrl}
+                controls
+                autoPlay
+                className="w-full h-full object-contain bg-black"
+              />
+            )}
+          </div>
         </div>
       )}
     </div>
