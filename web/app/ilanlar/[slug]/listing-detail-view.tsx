@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Bed, Bath, Maximize2, MapPin, Calendar, Eye, ChevronLeft, ChevronRight, Box, Play, X } from "lucide-react";
+import { ArrowLeft, Bed, Bath, Maximize2, MapPin, Calendar, Eye, ChevronLeft, ChevronRight, Box, Play, X, FileDown } from "lucide-react";
 import { api } from "@/lib/api";
 import { useLocale, t, CATEGORY_LABEL } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
@@ -250,8 +250,17 @@ export default function ListingDetailView({
 
           {/* Sticky inquiry */}
           <aside className="lg:col-span-5 xl:col-span-4">
-            <div className="lg:sticky lg:top-28">
+            <div className="lg:sticky lg:top-28 space-y-3">
               <InquiryForm listingId={listing.id} variant="page" />
+              <Link
+                href={`/brochure/${listing.slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 w-full bg-white border border-[#E5E2DD] hover:border-[#C9A96E] hover:text-[#C9A96E] text-[#14141A] px-5 py-3 text-xs tracking-[0.3em] uppercase transition-colors"
+              >
+                <FileDown className="h-3.5 w-3.5" />
+                {locale === "tr" ? "Broşürü İndir (PDF)" : "Download Brochure (PDF)"}
+              </Link>
             </div>
           </aside>
         </div>
