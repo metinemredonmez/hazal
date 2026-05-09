@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X, Share2 } from "lucide-react";
+import { Plus, Eye, Star, Edit3, Trash2, ImageOff, Copy, X, Share2, MapPin, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { Topbar } from "@/components/admin/topbar";
 import { Button } from "@/components/ui/button";
@@ -414,6 +414,32 @@ function ListingRow({
               <Edit3 className="h-4 w-4" />
             </Link>
           </Button>
+          {listing.lat != null && listing.lng != null ? (
+            <Button
+              asChild
+              size="icon"
+              variant="ghost"
+              title="Yol tarifi (Google Maps)"
+            >
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${listing.lat},${listing.lng}`}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Navigation className="h-4 w-4 text-emerald-600" />
+              </a>
+            </Button>
+          ) : (
+            <Button
+              size="icon"
+              variant="ghost"
+              title="Konum yok — Düzenle ekranında lat/lng ekle"
+              disabled
+            >
+              <MapPin className="h-4 w-4 text-muted-foreground/40" />
+            </Button>
+          )}
           <Button
             size="icon"
             variant="ghost"
