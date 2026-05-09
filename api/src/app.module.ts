@@ -17,6 +17,8 @@ import { ReportsModule } from './reports/reports.module';
 import { MailModule } from './mail/mail.module';
 import { DocumentsModule } from './documents/documents.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
+import { CustomersModule } from './customers/customers.module';
+import { ContactsModule } from './contacts/contacts.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { CalendarEventsModule } from './calendar-events/calendar-events.module';
     MailModule,
     DocumentsModule,
     CalendarEventsModule,
+    CustomersModule,
+    ContactsModule,
   ],
 })
 export class AppModule {}

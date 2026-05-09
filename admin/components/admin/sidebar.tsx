@@ -20,6 +20,8 @@ import {
   AtSign,
   FolderOpen,
   Map as MapIcon,
+  Users,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/store";
@@ -30,8 +32,10 @@ const NAV: Array<{ label: string; href: string; icon: React.ComponentType<{ clas
   { label: "Panel", href: "/", icon: LayoutDashboard },
   { label: "İlanlar", href: "/listings", icon: Building2 },
   { label: "Talepler", href: "/inquiries", icon: Inbox },
+  { label: "Müşteriler", href: "/musteriler", icon: Users },
   { label: "Randevular", href: "/appointments", icon: CalendarDays },
   { label: "Harita", href: "/harita", icon: MapIcon },
+  { label: "Rehber", href: "/rehber", icon: BookOpen },
   { label: "Sohbet", href: "/chat", icon: MessagesSquare },
   { label: "Mail", href: "/mail", icon: AtSign },
   { label: "AI Yardımcı", href: "/ai", icon: Sparkles },

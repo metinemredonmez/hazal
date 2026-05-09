@@ -132,12 +132,15 @@ model Appointment {
   location    String?
   notes       String?
   documents   Document[]
+  customerId  String?
+  customer    Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
   @@index([startsAt])
   @@index([status])
   @@index([listingId])
+  @@index([customerId])
 }
 
 model Listing {
@@ -209,11 +212,14 @@ model Inquiry {
   appointments Appointment[]
   documents    Document[]
   calendarEvents CalendarEvent[]
+  customerId   String?
+  customer     Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
   @@index([status])
   @@index([listingId])
+  @@index([customerId])
 }
 
 model ChatSession {
@@ -277,6 +283,80 @@ model SiteSettings {
   // Email templates: { newInquiryAdmin: { subjectTr/En, bodyTr/En }, inquiryAutoReply: {...}, ... }
   emailTemplates  Json?
   updatedAt       DateTime @updatedAt
+}
+
+enum CustomerStatus {
+  LEAD
+  ACTIVE
+  CLIENT
+  INACTIVE
+  LOST
+}
+
+enum CustomerSource {
+  WEB
+  REFERRAL
+  SOCIAL
+  PHONE
+  WALK_IN
+  PARTNER
+  OTHER
+}
+
+model Customer {
+  id              String          @id @default(uuid())
+  name            String
+  email           String?
+  phone           String?
+  altPhone        String?
+  whatsapp        String?
+  status          CustomerStatus  @default(LEAD)
+  source          CustomerSource  @default(WEB)
+
+  budget          Decimal?        @db.Decimal(14, 2)
+  budgetCurrency  Currency?
+  preferences     String?
+  birthday        DateTime?       @db.Date
+
+  interestedIn    String[]        @default([])
+  districts       String[]        @default([])
+
+  preferredContact String?
+
+  score           Int             @default(0)
+  scoreNote       String?
+
+  tags            String[]        @default([])
+  notes           String?
+
+  inquiries       Inquiry[]
+  appointments    Appointment[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([status])
+  @@index([email])
+  @@index([phone])
+}
+
+model Contact {
+  id          String   @id @default(uuid())
+  name        String
+  phone       String?
+  altPhone    String?
+  email       String?
+  company     String?
+  role        String?
+  category    String?
+  notes       String?
+  tags        String[] @default([])
+  favorite    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([favorite])
 }
 
 enum CalendarEventType {

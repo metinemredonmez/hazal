@@ -28,8 +28,12 @@ export function AIAssistantWidget() {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState("");
   const [sending, setSending] = React.useState(false);
+  const [recording, setRecording] = React.useState(false);
+  const [transcribing, setTranscribing] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const audioChunksRef = React.useRef<Blob[]>([]);
 
   // Welcome message on first open
   React.useEffect(() => {
@@ -111,6 +115,51 @@ export function AIAssistantWidget() {
   function reset() {
     setMessages([]);
     setInput("");
+  }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      audioChunksRef.current = [];
+      mr.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      mr.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        if (blob.size === 0) return;
+        setTranscribing(true);
+        try {
+          const fd = new FormData();
+          fd.append("audio", blob, "voice.webm");
+          const res = await api<{ text: string }>("/api/admin/ai/transcribe", {
+            method: "POST",
+            body: fd,
+          });
+          if (res.text?.trim()) {
+            setInput((prev) => (prev ? `${prev} ${res.text.trim()}` : res.text.trim()));
+            inputRef.current?.focus();
+          }
+        } catch {
+          // ignore transcribe errors
+        } finally {
+          setTranscribing(false);
+        }
+      };
+      mr.start();
+      mediaRecorderRef.current = mr;
+      setRecording(true);
+    } catch {
+      alert("Mikrofon erişimi reddedildi.");
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      mediaRecorderRef.current.stop();
+    }
+    setRecording(false);
   }
 
   return (
@@ -255,14 +304,43 @@ export function AIAssistantWidget() {
                   send();
                 }
               }}
-              placeholder="Sor: 'bu hafta randevu var mı?', 'Bebek 3+1 listele'..."
+              placeholder={
+                recording
+                  ? "🔴 Konuşuyor... (durdurmak için mikrofon)"
+                  : transcribing
+                    ? "Sesi metne çeviriyorum..."
+                    : "Sor: 'bu hafta randevu var mı?' — veya mikrofona bas"
+              }
               rows={1}
               className="flex-1 px-3 py-2 text-sm border border-border focus:border-[#C9A96E] focus:outline-none resize-none rounded max-h-32"
-              disabled={sending}
+              disabled={sending || recording || transcribing}
             />
             <button
+              type="button"
+              onClick={recording ? stopRecording : startRecording}
+              disabled={sending || transcribing}
+              className={
+                "p-2.5 rounded transition-colors shrink-0 " +
+                (recording
+                  ? "bg-red-500 text-white animate-pulse"
+                  : transcribing
+                    ? "bg-amber-500 text-white"
+                    : "bg-muted hover:bg-[#C9A96E] hover:text-white text-foreground")
+              }
+              aria-label={recording ? "Kaydı durdur" : "Sesli sor"}
+              title={recording ? "Durdur ve gönder" : "Sesli sor"}
+            >
+              {transcribing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : recording ? (
+                <MicOff className="h-4 w-4" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+            </button>
+            <button
               type="submit"
-              disabled={sending || !input.trim()}
+              disabled={sending || !input.trim() || recording}
               className="bg-[#14141A] hover:bg-[#C9A96E] text-white p-2.5 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               aria-label="Gönder"
             >
