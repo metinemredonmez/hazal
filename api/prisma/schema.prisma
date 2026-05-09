@@ -173,6 +173,7 @@ model Listing {
   inquiries     Inquiry[]
   appointments  Appointment[]
   documents     Document[]
+  calendarEvents CalendarEvent[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
@@ -207,6 +208,7 @@ model Inquiry {
   listing      Listing?      @relation(fields: [listingId], references: [id], onDelete: SetNull)
   appointments Appointment[]
   documents    Document[]
+  calendarEvents CalendarEvent[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -275,6 +277,63 @@ model SiteSettings {
   // Email templates: { newInquiryAdmin: { subjectTr/En, bodyTr/En }, inquiryAutoReply: {...}, ... }
   emailTemplates  Json?
   updatedAt       DateTime @updatedAt
+}
+
+enum CalendarEventType {
+  OPEN_HOUSE        // Açık ev
+  LISTING_EXPIRY    // İlan süresi dolacak
+  CONTRACT_END      // Kira/satış sözleşmesi bitiş
+  PAYMENT_DUE       // Kira tahsilat tarihi
+  INSPECTION        // Ekspertiz / muayene
+  MARKETING_ACTION  // Pazarlama aksiyonu (post, kampanya)
+  PLANNED_VISIT     // Planlanan ziyaret (haritaya bağlı)
+  REMINDER          // Genel hatırlatma
+  OTHER
+}
+
+enum CalendarEventStatus {
+  PLANNED
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model CalendarEvent {
+  id           String              @id @default(uuid())
+  type         CalendarEventType
+  status       CalendarEventStatus @default(PLANNED)
+  title        String
+  description  String?
+  startsAt     DateTime
+  endsAt       DateTime?
+  allDay       Boolean             @default(false)
+  color        String?
+
+  // Konum
+  location     String?
+  lat          Float?
+  lng          Float?
+
+  // Bağlantılar — opsiyonel
+  listingId    String?
+  listing      Listing?            @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  inquiryId    String?
+  inquiry      Inquiry?            @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+  customerName String?
+
+  // Hatırlatma (gün önce)
+  remindBefore Int?                // dakika cinsinden
+
+  // Tekrarlanma (basit cron-ish)
+  recurrence   String?             // 'monthly' | 'weekly' | null
+
+  notes        String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([startsAt])
+  @@index([type, status])
+  @@index([listingId])
 }
 
 enum DocumentCategory {

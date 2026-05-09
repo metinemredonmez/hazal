@@ -16,6 +16,7 @@ import { BlogModule } from './blog/blog.module';
 import { ReportsModule } from './reports/reports.module';
 import { MailModule } from './mail/mail.module';
 import { DocumentsModule } from './documents/documents.module';
+import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { DocumentsModule } from './documents/documents.module';
     ReportsModule,
     MailModule,
     DocumentsModule,
+    CalendarEventsModule,
   ],
 })
 export class AppModule {}
