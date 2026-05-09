@@ -73,6 +73,192 @@ class CustomersService {
     const total = await this.prisma.customer.count();
     return { total, byStatus: byStatus.map((r) => ({ status: r.status, count: r._count._all })) };
   }
+
+  /**
+   * Müşteri timeline'ı — tüm aktiviteleri birleşik tarih sırasıyla.
+   * Inquiry, Appointment, EmailMessage (to/from match), Document (customerName match),
+   * VisitedLocation (customerName match), ChatSession (visitorEmail match)
+   */
+  async timeline(id: string) {
+    const customer = await this.findById(id);
+    const email = customer.email?.toLowerCase();
+    const name = customer.name;
+
+    // Parallel fetch: emails (by address), documents+visits (by name), chats (by email)
+    const [emails, documents, visits, chats] = await Promise.all([
+      email
+        ? this.prisma.emailMessage.findMany({
+            where: {
+              OR: [
+                { fromAddress: { contains: email, mode: 'insensitive' } },
+                { toAddresses: { contains: email, mode: 'insensitive' } },
+              ],
+            },
+            orderBy: { receivedAt: 'desc' },
+            take: 50,
+            select: {
+              id: true,
+              direction: true,
+              subject: true,
+              fromAddress: true,
+              receivedAt: true,
+              hasAttachment: true,
+            },
+          })
+        : Promise.resolve([]),
+      this.prisma.document.findMany({
+        where: { customerName: { equals: name, mode: 'insensitive' } },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          category: true,
+          fileName: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.visitedLocation.findMany({
+        where: { customerName: { equals: name, mode: 'insensitive' } },
+        orderBy: { visitedAt: 'desc' },
+        select: {
+          id: true,
+          label: true,
+          notes: true,
+          lat: true,
+          lng: true,
+          visitedAt: true,
+        },
+      }),
+      email
+        ? this.prisma.chatSession.findMany({
+            where: { visitorEmail: { equals: email, mode: 'insensitive' } },
+            orderBy: { updatedAt: 'desc' },
+            include: {
+              messages: {
+                orderBy: { createdAt: 'desc' },
+                take: 1,
+                select: { content: true, createdAt: true, sender: true },
+              },
+            },
+            take: 20,
+          })
+        : Promise.resolve([]),
+    ]);
+
+    // Build merged timeline events
+    type Event = {
+      type: 'inquiry' | 'appointment' | 'email' | 'document' | 'visit' | 'chat';
+      at: Date;
+      title: string;
+      summary?: string;
+      icon?: string;
+      meta?: Record<string, unknown>;
+    };
+
+    const events: Event[] = [];
+
+    customer.inquiries.forEach((i) =>
+      events.push({
+        type: 'inquiry',
+        at: i.createdAt,
+        title: 'Talep',
+        summary: i.message ?? undefined,
+        meta: {
+          status: i.status,
+          listing: i.listing?.titleTr,
+          listingSlug: i.listing?.slug,
+        },
+      }),
+    );
+
+    customer.appointments.forEach((a) =>
+      events.push({
+        type: 'appointment',
+        at: a.startsAt,
+        title: `Randevu — ${a.status}`,
+        summary: a.notes ?? undefined,
+        meta: {
+          listing: a.listing?.titleTr,
+          listingSlug: a.listing?.slug,
+          duration: a.durationMin,
+          location: a.location,
+        },
+      }),
+    );
+
+    emails.forEach((e) =>
+      events.push({
+        type: 'email',
+        at: e.receivedAt,
+        title:
+          e.direction === 'INBOUND'
+            ? `📥 Gelen: ${e.subject}`
+            : `📤 Giden: ${e.subject}`,
+        summary: e.fromAddress,
+        meta: {
+          id: e.id,
+          attachment: e.hasAttachment,
+        },
+      }),
+    );
+
+    documents.forEach((d) =>
+      events.push({
+        type: 'document',
+        at: d.createdAt,
+        title: `📄 Belge: ${d.title}`,
+        summary: d.fileName,
+        meta: {
+          id: d.id,
+          category: d.category,
+        },
+      }),
+    );
+
+    visits.forEach((v) =>
+      events.push({
+        type: 'visit',
+        at: v.visitedAt,
+        title: `📍 Ziyaret: ${v.label ?? 'Konum'}`,
+        summary: v.notes ?? undefined,
+        meta: {
+          lat: v.lat,
+          lng: v.lng,
+        },
+      }),
+    );
+
+    chats.forEach((c) => {
+      const last = c.messages[0];
+      if (!last) return;
+      events.push({
+        type: 'chat',
+        at: c.updatedAt,
+        title: '💬 Sohbet',
+        summary: last.content,
+        meta: {
+          id: c.id,
+          channel: c.channel,
+        },
+      });
+    });
+
+    // Sort newest first
+    events.sort((a, b) => b.at.getTime() - a.at.getTime());
+
+    return {
+      customer,
+      counts: {
+        inquiries: customer.inquiries.length,
+        appointments: customer.appointments.length,
+        emails: emails.length,
+        documents: documents.length,
+        visits: visits.length,
+        chats: chats.length,
+      },
+      events,
+    };
+  }
 }
 
 class CreateCustomerDto {
@@ -130,6 +316,11 @@ class CustomersController {
   @Get(':id')
   getOne(@Param('id') id: string) {
     return this.customers.findById(id);
+  }
+
+  @Get(':id/timeline')
+  timeline(@Param('id') id: string) {
+    return this.customers.timeline(id);
   }
 
   @Post()

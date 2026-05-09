@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import {
   Plus,
@@ -224,12 +225,18 @@ export default function MusterilerPage() {
         ) : (
           <div className="space-y-1.5">
             {data.items.map((c) => (
-              <Card key={c.id} className="hover:border-[#C9A96E] transition-colors">
+              <Card key={c.id} className="hover:border-[#C9A96E] transition-colors group">
                 <CardContent className="p-3 flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
-                    <UserCircle className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/musteriler/${c.id}`}
+                    className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0 hover:bg-[#C9A96E]/20 transition-colors"
+                  >
+                    <UserCircle className="h-6 w-6 text-muted-foreground group-hover:text-[#C9A96E]" />
+                  </Link>
+                  <Link
+                    href={`/musteriler/${c.id}`}
+                    className="flex-1 min-w-0"
+                  >
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-medium">{c.name}</p>
                       <span
@@ -266,7 +273,7 @@ export default function MusterilerPage() {
                         💭 {c.preferences}
                       </p>
                     )}
-                  </div>
+                  </Link>
                   <div className="flex gap-1 shrink-0">
                     <Button
                       variant="ghost"
