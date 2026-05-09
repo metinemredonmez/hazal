@@ -19,6 +19,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 import { CustomersModule } from './customers/customers.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { MailTemplatesModule } from './mail-templates/mail-templates.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ContactsModule } from './contacts/contacts.module';
     CalendarEventsModule,
     CustomersModule,
     ContactsModule,
+    MailTemplatesModule,
   ],
 })
 export class AppModule {}

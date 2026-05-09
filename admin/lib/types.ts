@@ -156,11 +156,23 @@ export interface ListingStats {
   topViewed: Array<{ id: string; slug: string; titleTr: string; titleEn: string; views: number }>;
 }
 
+export type ChatChannel =
+  | "WEB"
+  | "WHATSAPP"
+  | "INSTAGRAM"
+  | "AI_CONCIERGE"
+  | "EMAIL"
+  | "PHONE"
+  | "OTHER";
+
 export interface ChatSessionSummary {
   id: string;
   visitorId: string;
   visitorName: string | null;
   visitorEmail: string | null;
+  visitorPhone?: string | null;
+  channel?: ChatChannel;
+  externalRef?: string | null;
   closed: boolean;
   createdAt: string;
   updatedAt: string;

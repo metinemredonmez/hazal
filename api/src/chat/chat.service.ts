@@ -49,9 +49,13 @@ export class ChatService {
     return session;
   }
 
-  async listSessions(opts: { closed?: boolean }) {
+  async listSessions(opts: { closed?: boolean; channel?: string }) {
+    const where: Record<string, unknown> = {};
+    if (opts.closed !== undefined) where.closed = opts.closed;
+    if (opts.channel) where.channel = opts.channel;
+
     const sessions = await this.prisma.chatSession.findMany({
-      where: opts.closed === undefined ? {} : { closed: opts.closed },
+      where,
       include: {
         messages: { orderBy: { createdAt: 'desc' }, take: 1 },
         _count: { select: { messages: { where: { read: false, sender: ChatSender.VISITOR } } } },
@@ -64,11 +68,25 @@ export class ChatService {
       visitorId: s.visitorId,
       visitorName: s.visitorName,
       visitorEmail: s.visitorEmail,
+      visitorPhone: s.visitorPhone,
+      channel: s.channel,
+      externalRef: s.externalRef,
       closed: s.closed,
       createdAt: s.createdAt,
       updatedAt: s.updatedAt,
       lastMessage: s.messages[0] ?? null,
       unreadCount: s._count.messages,
+    }));
+  }
+
+  async channelStats() {
+    const grouped = await this.prisma.chatSession.groupBy({
+      by: ['channel'],
+      _count: { _all: true },
+    });
+    return grouped.map((g) => ({
+      channel: g.channel,
+      count: g._count._all,
     }));
   }
 

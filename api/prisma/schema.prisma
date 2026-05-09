@@ -584,3 +584,29 @@ model NewsletterSubscriber {
 
   @@index([unsubscribed, createdAt])
 }
+
+enum MailTemplateCategory {
+  PROMOTION       // Yeni ilan, aylık bülten, kampanya
+  APPOINTMENT     // Randevu hatırlatma / onay
+  OFFER           // Fiyat teklifi
+  FOLLOWUP        // Müşteri takip (1 hafta sonra)
+  CONTRACT        // Sözleşme / onay
+  THANKYOU        // Teşekkür, doğum günü
+  OTHER
+}
+
+model MailTemplate {
+  id          String                @id @default(cuid())
+  name        String
+  category    MailTemplateCategory  @default(OTHER)
+  subject     String
+  bodyHtml    String                @db.Text
+  bodyText    String?               @db.Text
+  // Optional placeholder variables. Shape: [{ key, label, type, default }]
+  variables   Json?
+  isDefault   Boolean               @default(false)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@index([category])
+}

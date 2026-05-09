@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Sparkles, X, Send, Loader2, Bot, Mic, MicOff } from "lucide-react";
 import { api } from "@/lib/api";
+import { useUI } from "@/lib/store";
 
 interface Message {
   role: "user" | "assistant";
@@ -24,7 +25,10 @@ const QUICK_PROMPTS = [
 ];
 
 export function AIAssistantWidget() {
-  const [open, setOpen] = React.useState(false);
+  const open = useUI((s) => s.aiOpen);
+  const setOpen = useUI((s) => s.setAIOpen);
+  const seedPrompt = useUI((s) => s.aiSeedPrompt);
+  const clearSeed = useUI((s) => s.clearAISeed);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState("");
   const [sending, setSending] = React.useState(false);
@@ -34,6 +38,14 @@ export function AIAssistantWidget() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
   const audioChunksRef = React.useRef<Blob[]>([]);
+
+  // If a seed prompt was set via Topbar "Sor" button, populate input on open.
+  React.useEffect(() => {
+    if (open && seedPrompt) {
+      setInput(seedPrompt);
+      clearSeed();
+    }
+  }, [open, seedPrompt, clearSeed]);
 
   // Welcome message on first open
   React.useEffect(() => {

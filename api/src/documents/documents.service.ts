@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Prisma, DocumentCategory } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { EmailService } from '../notifications/email.service';
+import { ConfigService } from '@nestjs/config';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 export interface CreateDocumentInput {
   title: string;
@@ -19,7 +23,11 @@ export interface CreateDocumentInput {
 
 @Injectable()
 export class DocumentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly email: EmailService,
+    private readonly config: ConfigService,
+  ) {}
 
   async create(input: CreateDocumentInput) {
     return this.prisma.document.create({
@@ -173,5 +181,77 @@ export class DocumentsService {
     html = html.replace(/\{\{(\w+)\}\}/g, (_, key) => all[key] ?? '');
 
     return html;
+  }
+
+  /**
+   * Send a stored document as an email attachment.
+   */
+  async sendByEmail(
+    id: string,
+    opts: { to: string; subject?: string; message?: string },
+  ): Promise<{ ok: true }> {
+    const doc = await this.findById(id);
+    if (!doc) throw new NotFoundException('Document not found');
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(opts.to)) {
+      throw new BadRequestException('Geçersiz e-posta adresi');
+    }
+
+    // Read file from disk. fileUrl is e.g. "/documents/abc.pdf" (or "/uploads/...").
+    const baseDir = doc.fileUrl.startsWith('/uploads/')
+      ? this.config.get<string>('UPLOAD_DIR') ?? './uploads'
+      : this.config.get<string>('DOCUMENTS_DIR') ?? './documents';
+    const filename = doc.fileUrl.split('/').pop() ?? '';
+    const fullPath = join(process.cwd(), baseDir, filename);
+
+    let content: Buffer;
+    try {
+      content = await readFile(fullPath);
+    } catch {
+      throw new NotFoundException('Belge dosyası diskte bulunamadı');
+    }
+
+    const subject = opts.subject?.trim() || `Belge: ${doc.title}`;
+    const messageBody = opts.message?.trim() ?? '';
+    const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#FAF8F4;font-family:Inter,system-ui,sans-serif;color:#14141A;">
+  <div style="max-width:600px;margin:0 auto;background:#fff;padding:32px 28px;border:1px solid #E5E2DD;border-radius:8px;">
+    <p style="font-size:10px;letter-spacing:0.4em;color:#C9A96E;text-transform:uppercase;margin:0 0 16px;">Hazal Muti Real Estate</p>
+    <h1 style="font-size:18px;font-weight:500;margin:0 0 16px;">${this.escapeHtml(doc.title)}</h1>
+    ${
+      messageBody
+        ? `<p style="font-size:14px;line-height:1.6;color:#3a3a40;margin:0 0 16px;white-space:pre-line;">${this.escapeHtml(
+            messageBody,
+          )}</p>`
+        : ''
+    }
+    <p style="font-size:13px;color:#6E6E73;margin:24px 0 0;">📎 Ekteki belgeyi bulabilirsiniz: <strong>${this.escapeHtml(
+      doc.fileName,
+    )}</strong></p>
+  </div>
+</body></html>`;
+
+    await this.email.send({
+      to: opts.to,
+      subject,
+      html,
+      text: `${doc.title}\n\n${messageBody}\n\nEkteki belge: ${doc.fileName}`,
+      attachments: [
+        {
+          filename: doc.fileName,
+          content,
+          contentType: doc.mimeType || undefined,
+        },
+      ],
+    });
+
+    return { ok: true };
+  }
+
+  private escapeHtml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 }

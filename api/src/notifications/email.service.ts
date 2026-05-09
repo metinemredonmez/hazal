@@ -2,12 +2,20 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
+export interface MailAttachment {
+  filename: string;
+  content?: Buffer | string;
+  path?: string;
+  contentType?: string;
+}
+
 export interface SendMailOptions {
   to: string;
   subject: string;
   text?: string;
   html?: string;
   replyTo?: string;
+  attachments?: MailAttachment[];
 }
 
 @Injectable()
@@ -66,6 +74,7 @@ export class EmailService {
       text: opts.text,
       html: opts.html,
       replyTo: opts.replyTo,
+      attachments: opts.attachments,
     });
     this.logger.log(`✉️  Sent to ${opts.to}: ${info.messageId}`);
   }

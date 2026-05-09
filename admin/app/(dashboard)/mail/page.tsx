@@ -15,6 +15,8 @@ import {
   PenSquare,
   Paperclip,
   X,
+  FileText,
+  ChevronDown,
 } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Button } from "@/components/ui/button";
@@ -373,6 +375,16 @@ export default function MailPage() {
   );
 }
 
+interface MailTemplate {
+  id: string;
+  name: string;
+  category: string;
+  subject: string;
+  bodyHtml: string;
+  bodyText: string | null;
+  variables: Array<{ key: string; label: string; type?: string; default?: string }> | null;
+}
+
 function ComposeDialog({
   replyTo,
   onClose,
@@ -396,6 +408,7 @@ function ComposeDialog({
       : "",
   );
   const [sending, setSending] = React.useState(false);
+  const [templatePickerOpen, setTemplatePickerOpen] = React.useState(false);
 
   async function handleSend() {
     if (!to || !subject) {
@@ -421,7 +434,20 @@ function ComposeDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{replyTo ? "Cevapla" : "Yeni Mail"}</DialogTitle>
+          <div className="flex items-center justify-between gap-3">
+            <DialogTitle>{replyTo ? "Cevapla" : "Yeni Mail"}</DialogTitle>
+            {!replyTo && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setTemplatePickerOpen(true)}
+                className="gap-1.5 mr-6"
+              >
+                <FileText className="h-3 w-3" /> Şablon Seç
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
         </DialogHeader>
         <div className="space-y-3 py-2">
           <div className="space-y-1">
@@ -451,6 +477,187 @@ function ComposeDialog({
             {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             Gönder
           </Button>
+        </DialogFooter>
+      </DialogContent>
+
+      {templatePickerOpen && (
+        <MailTemplatePicker
+          onClose={() => setTemplatePickerOpen(false)}
+          onApply={(rendered) => {
+            setSubject(rendered.subject);
+            setBody(rendered.text);
+            setTemplatePickerOpen(false);
+            toast.success("Şablon uygulandı");
+          }}
+        />
+      )}
+    </Dialog>
+  );
+}
+
+const TEMPLATE_CATEGORIES: Record<string, { label: string; color: string }> = {
+  PROMOTION: { label: "Tanıtım", color: "bg-blue-100 text-blue-700" },
+  APPOINTMENT: { label: "Randevu", color: "bg-emerald-100 text-emerald-700" },
+  OFFER: { label: "Teklif", color: "bg-amber-100 text-amber-800" },
+  FOLLOWUP: { label: "Takip", color: "bg-violet-100 text-violet-700" },
+  CONTRACT: { label: "Sözleşme", color: "bg-slate-100 text-slate-700" },
+  THANKYOU: { label: "Teşekkür", color: "bg-pink-100 text-pink-700" },
+  OTHER: { label: "Diğer", color: "bg-gray-100 text-gray-700" },
+};
+
+function MailTemplatePicker({
+  onClose,
+  onApply,
+}: {
+  onClose: () => void;
+  onApply: (r: { subject: string; text: string; html: string }) => void;
+}) {
+  const [templates, setTemplates] = React.useState<MailTemplate[]>([]);
+  const [selected, setSelected] = React.useState<MailTemplate | null>(null);
+  const [values, setValues] = React.useState<Record<string, string>>({});
+  const [loading, setLoading] = React.useState(true);
+  const [rendering, setRendering] = React.useState(false);
+
+  React.useEffect(() => {
+    api<MailTemplate[]>("/api/admin/mail-templates")
+      .then(setTemplates)
+      .catch((err) => toast.error(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  function pick(t: MailTemplate) {
+    setSelected(t);
+    const initial: Record<string, string> = {};
+    t.variables?.forEach((v) => {
+      initial[v.key] = v.default ?? "";
+    });
+    setValues(initial);
+  }
+
+  async function apply() {
+    if (!selected) return;
+    setRendering(true);
+    try {
+      const r = await api<{ subject: string; text: string; html: string }>(
+        `/api/admin/mail-templates/${selected.id}/render`,
+        { method: "POST", body: { values } },
+      );
+      onApply(r);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Hata");
+    } finally {
+      setRendering(false);
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {selected ? `Doldur: ${selected.name}` : "📋 Mail Şablonu Seç"}
+          </DialogTitle>
+        </DialogHeader>
+
+        {!selected && (
+          <div className="space-y-2 py-2">
+            {loading ? (
+              <Skeleton className="h-32" />
+            ) : templates.length === 0 ? (
+              <div className="text-center py-8 text-sm text-muted-foreground">
+                <Mail className="h-10 w-10 mx-auto opacity-30 mb-3" />
+                <p>Henüz şablon yok.</p>
+                <p className="text-[11px] mt-2">
+                  Server'da <code className="bg-muted px-2 py-0.5 rounded">npx tsx prisma/seed-mail-templates.ts</code> çalıştır.
+                </p>
+              </div>
+            ) : (
+              templates.map((t) => {
+                const cat = TEMPLATE_CATEGORIES[t.category] ?? TEMPLATE_CATEGORIES.OTHER;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => pick(t)}
+                    className="w-full text-left p-3 border border-border hover:border-[#C9A96E] hover:bg-muted/30 rounded-md transition-colors"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className={`text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wider ${cat.color}`}
+                      >
+                        {cat.label}
+                      </span>
+                      <p className="text-sm font-medium">{t.name}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-1">{t.subject}</p>
+                    {t.variables && t.variables.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {t.variables.length} alan dolduracaksın
+                      </p>
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        )}
+
+        {selected && (
+          <div className="space-y-3 py-2">
+            <button
+              onClick={() => setSelected(null)}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              ← Şablon değiştir
+            </button>
+            {selected.variables && selected.variables.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {selected.variables.map((v) => (
+                  <div key={v.key} className="space-y-1">
+                    <Label className="text-xs">{v.label}</Label>
+                    {v.type === "date" ? (
+                      <Input
+                        type="date"
+                        value={values[v.key] ?? ""}
+                        onChange={(e) =>
+                          setValues((p) => ({ ...p, [v.key]: e.target.value }))
+                        }
+                      />
+                    ) : (
+                      <Input
+                        value={values[v.key] ?? ""}
+                        onChange={(e) =>
+                          setValues((p) => ({ ...p, [v.key]: e.target.value }))
+                        }
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Bu şablonun doldurulacak alanı yok. Direkt uygulayabilirsiniz.
+              </p>
+            )}
+            <p className="text-[11px] text-muted-foreground">
+              💡 İpucu: "Uygula" tıkla → Konu ve Mesaj otomatik dolar.
+            </p>
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            İptal
+          </Button>
+          {selected && (
+            <Button
+              onClick={apply}
+              disabled={rendering}
+              className="bg-[#14141A] text-white gap-2"
+            >
+              {rendering && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Uygula
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

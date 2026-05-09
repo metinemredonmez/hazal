@@ -9,12 +9,24 @@ interface UIState {
   mobileSidebarOpen: boolean;
   setMobileSidebarOpen: (v: boolean) => void;
   toggleMobileSidebar: () => void;
+  aiOpen: boolean;
+  aiSeedPrompt: string | null;
+  setAIOpen: (v: boolean) => void;
+  toggleAI: () => void;
+  askAI: (prompt: string) => void;
+  clearAISeed: () => void;
 }
 
 export const useUI = create<UIState>((set) => ({
   mobileSidebarOpen: false,
   setMobileSidebarOpen: (v) => set({ mobileSidebarOpen: v }),
   toggleMobileSidebar: () => set((s) => ({ mobileSidebarOpen: !s.mobileSidebarOpen })),
+  aiOpen: false,
+  aiSeedPrompt: null,
+  setAIOpen: (v) => set({ aiOpen: v }),
+  toggleAI: () => set((s) => ({ aiOpen: !s.aiOpen })),
+  askAI: (prompt) => set({ aiOpen: true, aiSeedPrompt: prompt }),
+  clearAISeed: () => set({ aiSeedPrompt: null }),
 }));
 
 interface AuthState {

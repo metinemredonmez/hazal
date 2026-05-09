@@ -19,6 +19,8 @@ import {
   FileImage,
   Files,
   Eye,
+  Mail as MailIcon,
+  MessageCircle,
 } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -722,6 +724,7 @@ function PreviewDialog({
   const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
   const [previewError, setPreviewError] = React.useState<string | null>(null);
   const [loadingPreview, setLoadingPreview] = React.useState(false);
+  const [mailOpen, setMailOpen] = React.useState(false);
 
   const fullUrl = doc.fileUrl.startsWith("http")
     ? doc.fileUrl
@@ -771,6 +774,13 @@ function PreviewDialog({
     (description ?? "") !== (doc.description ?? "") ||
     (customerName ?? "") !== (doc.customerName ?? "") ||
     tags !== (doc.tags ?? []).join(", ");
+
+  function openWhatsApp() {
+    // WhatsApp Web/App "share text" + link to download
+    const text = `${doc.title}\n\nBelgeyi şu linkten indirebilirsiniz:\n${fullUrl}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -972,7 +982,7 @@ function PreviewDialog({
         </div>
 
         <DialogFooter className="px-4 py-3 border-t shrink-0 flex-row !justify-between gap-2">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <a
               href={fullUrl}
               target="_blank"
@@ -988,6 +998,18 @@ function PreviewDialog({
             >
               <Download className="h-3 w-3" /> İndir
             </a>
+            <button
+              onClick={() => setMailOpen(true)}
+              className="text-xs inline-flex items-center gap-1 px-3 py-2 border border-violet-200 text-violet-700 rounded-md hover:bg-violet-50"
+            >
+              <MailIcon className="h-3 w-3" /> Mail at
+            </button>
+            <button
+              onClick={openWhatsApp}
+              className="text-xs inline-flex items-center gap-1 px-3 py-2 border border-emerald-200 text-emerald-700 rounded-md hover:bg-emerald-50"
+            >
+              <MessageCircle className="h-3 w-3" /> WhatsApp
+            </button>
             <button
               onClick={onDelete}
               className="text-xs inline-flex items-center gap-1 px-3 py-2 border border-red-200 text-red-600 rounded-md hover:bg-red-50"
@@ -1009,6 +1031,100 @@ function PreviewDialog({
               {dirty ? "Değişiklikleri Kaydet" : "Kaydedildi"}
             </Button>
           </div>
+        </DialogFooter>
+      </DialogContent>
+
+      {mailOpen && (
+        <SendByEmailDialog doc={doc} onClose={() => setMailOpen(false)} />
+      )}
+    </Dialog>
+  );
+}
+
+function SendByEmailDialog({
+  doc,
+  onClose,
+}: {
+  doc: Document;
+  onClose: () => void;
+}) {
+  const [to, setTo] = React.useState(doc.inquiry?.email ?? "");
+  const [subject, setSubject] = React.useState(`Belge: ${doc.title}`);
+  const [message, setMessage] = React.useState(
+    "Merhaba,\n\nTalebinize istinaden ekteki belgeyi tarafınıza iletiyorum.\n\nSaygılarımla,\nHazal Muti",
+  );
+  const [sending, setSending] = React.useState(false);
+
+  async function send() {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to.trim())) {
+      toast.error("Geçersiz e-posta");
+      return;
+    }
+    setSending(true);
+    try {
+      await api(`/api/admin/documents/${doc.id}/send-email`, {
+        method: "POST",
+        body: { to: to.trim(), subject, message },
+      });
+      toast.success("Mail gönderildi (ek dosya ile)");
+      onClose();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Gönderilemedi");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>📧 Belgeyi e-posta ile gönder</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <div className="text-xs p-2 bg-muted rounded flex items-center gap-2">
+            <FileText className="h-3.5 w-3.5 text-[#C9A96E] shrink-0" />
+            <span className="truncate">
+              <strong>{doc.title}</strong> · {doc.fileName}
+            </span>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Alıcı *</Label>
+            <Input
+              type="email"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              placeholder="ahmet@example.com"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Konu</Label>
+            <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Mesaj</Label>
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={6}
+            />
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            ⚠️ Mail eki olarak <strong>{doc.fileName}</strong> ({Math.ceil(doc.fileSize / 1024)} KB) iliştirilecek.
+          </p>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={sending}>
+            İptal
+          </Button>
+          <Button
+            onClick={send}
+            disabled={sending}
+            className="bg-[#14141A] text-white gap-2"
+          >
+            {sending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Gönder
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

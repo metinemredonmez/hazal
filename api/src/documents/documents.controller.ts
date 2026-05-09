@@ -82,6 +82,12 @@ class UpdateDocumentDto {
   @IsOptional() @IsArray() tags?: string[];
 }
 
+class SendDocumentEmailDto {
+  @IsString() to!: string;
+  @IsOptional() @IsString() @MaxLength(200) subject?: string;
+  @IsOptional() @IsString() @MaxLength(2000) message?: string;
+}
+
 @ApiTags('documents')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -171,6 +177,15 @@ export class DocumentsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateDocumentDto) {
     return this.documents.update(id, dto);
+  }
+
+  @Post(':id/send-email')
+  sendEmail(@Param('id') id: string, @Body() dto: SendDocumentEmailDto) {
+    return this.documents.sendByEmail(id, {
+      to: dto.to,
+      subject: dto.subject,
+      message: dto.message,
+    });
   }
 
   @Delete(':id')

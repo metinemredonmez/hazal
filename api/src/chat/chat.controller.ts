@@ -29,9 +29,9 @@ export class ChatController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('admin/chat/sessions')
-  list(@Query('closed') closed?: string) {
+  list(@Query('closed') closed?: string, @Query('channel') channel?: string) {
     const closedFilter = closed === 'true' ? true : closed === 'false' ? false : undefined;
-    return this.chat.listSessions({ closed: closedFilter });
+    return this.chat.listSessions({ closed: closedFilter, channel: channel || undefined });
   }
 
   @ApiBearerAuth()
@@ -39,6 +39,13 @@ export class ChatController {
   @Get('admin/chat/unread-count')
   unread() {
     return this.chat.unreadCount().then((count) => ({ count }));
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('admin/chat/channel-stats')
+  channelStats() {
+    return this.chat.channelStats();
   }
 
   @ApiBearerAuth()
