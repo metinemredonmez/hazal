@@ -4,11 +4,6 @@ import * as React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "https://api.hazalmuti.com").replace(
-  /\/$/,
-  "",
-);
-
 const SAMPLE_FILES = [
   "DSC_0214.jpg",
   "DSC_0241.jpg",
@@ -49,7 +44,9 @@ const SAMPLE_FILES = [
   "DSC_0303.jpg",
 ];
 
-const IMAGES = SAMPLE_FILES.map((f) => `${API_URL}/uploads/sample-apartments/${f}`);
+// Files served by Next.js from web/public/sample-apartments/
+// (symlink to /var/www/hazal/api/uploads/sample-apartments/)
+const IMAGES = SAMPLE_FILES.map((f) => `/sample-apartments/${f}`);
 
 export function SampleApartments() {
   const [locale] = useLocale();

@@ -6,11 +6,6 @@ import { useLocale } from "@/lib/i18n";
 import { useSettings } from "@/lib/use-settings";
 import { pageContent, pick } from "@/lib/page-content";
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "https://api.hazalmuti.com").replace(
-  /\/$/,
-  "",
-);
-
 interface VideoItem {
   src: string;
   poster?: string;
@@ -19,21 +14,23 @@ interface VideoItem {
   date?: string;
 }
 
+// Files served by Next.js from web/public/showcase/
+// (symlink to /var/www/hazal/api/uploads/showcase/)
 const DEFAULT_VIDEOS: VideoItem[] = [
   {
-    src: `${API_URL}/uploads/showcase/atilgan-royal-2025-12-24.mp4`,
+    src: "/showcase/atilgan-royal-2025-12-24.mp4",
     titleTr: "Atılgan Royal",
     titleEn: "Atılgan Royal",
     date: "24.12.2025",
   },
   {
-    src: `${API_URL}/uploads/showcase/atilgan-royal-oasis-mutlu-yillar-2025-12-30.mp4`,
+    src: "/showcase/atilgan-royal-oasis-mutlu-yillar-2025-12-30.mp4",
     titleTr: "Atılgan Royal & Oasis · Yılbaşı",
     titleEn: "Atılgan Royal & Oasis · New Year",
     date: "30.12.2025",
   },
   {
-    src: `${API_URL}/uploads/showcase/oasis-2026-02-24.mp4`,
+    src: "/showcase/oasis-2026-02-24.mp4",
     titleTr: "Oasis Sunum",
     titleEn: "Oasis Showcase",
     date: "24.02.2026",
