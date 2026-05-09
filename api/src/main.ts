@@ -19,33 +19,17 @@ async function bootstrap() {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  // Function-based CORS — echoes back matching origin in Access-Control-Allow-Origin.
-  // Allows: configured origins + any localhost (dev) + same-origin (no Origin header).
+  // Array-based CORS — cors paketi her isteği listeye karşı kontrol eder,
+  // matching origin'i Access-Control-Allow-Origin'da geri yansıtır.
+  // allowedHeaders explicit tanımlanır ki content-type/auth/etc preflight'tan geçsin.
   app.enableCors({
-    origin: (
-      requestOrigin: string | undefined,
-      callback: (err: Error | null, allow?: boolean) => void,
-    ) => {
-      if (!requestOrigin) {
-        // Server-to-server / curl without Origin
-        callback(null, true);
-        return;
-      }
-      if (corsOrigins.includes(requestOrigin)) {
-        callback(null, true);
-        return;
-      }
-      // Allow localhost on any port for local dev
-      if (/^https?:\/\/localhost(:\d+)?$/.test(requestOrigin)) {
-        callback(null, true);
-        return;
-      }
-      logger.warn(`🚫 CORS blocked origin: ${requestOrigin}`);
-      callback(new Error(`Not allowed by CORS: ${requestOrigin}`));
-    },
+    origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    exposedHeaders: ['Content-Disposition'],
+    optionsSuccessStatus: 204,
+    preflightContinue: false,
   });
 
   app.useGlobalPipes(
