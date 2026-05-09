@@ -64,6 +64,10 @@ export function Navbar() {
       label: tx.nav.media,
       href: "/medya",
     },
+    {
+      label: tx.nav.mediaGallery,
+      href: "/galeri",
+    },
   ];
 
   return (

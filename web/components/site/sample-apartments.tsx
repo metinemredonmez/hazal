@@ -77,21 +77,8 @@ export function SampleApartments() {
   }, [openIdx]);
 
   return (
-    <section className="bg-white py-16 lg:py-24 px-6 lg:px-10 border-t border-[#E5E2DD]">
-      <div className="max-w-[1600px] mx-auto">
-        <div className="mb-10">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
-            {locale === "tr" ? "Galeri" : "Gallery"}
-          </p>
-          <h2 className="font-display font-light text-3xl lg:text-5xl text-[#14141A]">
-            {locale === "tr" ? "Örnek daireler" : "Sample apartments"}
-          </h2>
-          <p className="mt-3 text-sm text-[#6E6E73] max-w-xl">
-            {locale === "tr"
-              ? "Portföyden seçili iç mekan ve detay fotoğrafları."
-              : "Selected interior and detail shots from the portfolio."}
-          </p>
-        </div>
+    <section className="bg-white pb-12 lg:pb-16 px-6 lg:px-10">
+      <div className="max-w-[1400px] mx-auto">
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-3">
           {IMAGES.map((src, i) => (

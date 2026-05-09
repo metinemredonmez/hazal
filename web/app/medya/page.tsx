@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink, Calendar } from "lucide-react";
-import { SampleApartments } from "@/components/site/sample-apartments";
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://hazalmuti.com").replace(/\/$/, "");
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "https://api.hazalmuti.com").replace(/\/$/, "");
@@ -83,8 +82,6 @@ export default async function MedyaPage() {
           </div>
         )}
       </div>
-
-      <SampleApartments />
     </div>
   );
 }
