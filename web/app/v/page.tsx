@@ -6,7 +6,7 @@ import {
   Mail,
   MessageCircle,
   Camera as Instagram,
-  Linkedin,
+  Briefcase as Linkedin,
   Globe,
   Download,
   MapPin,

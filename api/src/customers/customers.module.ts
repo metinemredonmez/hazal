@@ -85,7 +85,22 @@ class CustomersService {
     const name = customer.name;
 
     // Parallel fetch: emails (by address), documents+visits (by name), chats (by email)
-    const [emails, documents, visits, chats] = await Promise.all([
+    type EmailEvent = {
+      id: string;
+      direction: 'INBOUND' | 'OUTBOUND';
+      subject: string;
+      fromAddress: string;
+      receivedAt: Date;
+      hasAttachment: boolean;
+    };
+    type ChatEvent = {
+      id: string;
+      channel: string;
+      updatedAt: Date;
+      messages: Array<{ content: string; createdAt: Date; sender: string }>;
+    };
+
+    const [emails, documents, visits, chats] = (await Promise.all([
       email
         ? this.prisma.emailMessage.findMany({
             where: {
@@ -105,7 +120,7 @@ class CustomersService {
               hasAttachment: true,
             },
           })
-        : Promise.resolve([]),
+        : Promise.resolve([] as EmailEvent[]),
       this.prisma.document.findMany({
         where: { customerName: { equals: name, mode: 'insensitive' } },
         orderBy: { createdAt: 'desc' },
@@ -142,8 +157,8 @@ class CustomersService {
             },
             take: 20,
           })
-        : Promise.resolve([]),
-    ]);
+        : Promise.resolve([] as ChatEvent[]),
+    ])) as [EmailEvent[], unknown[], unknown[], ChatEvent[]];
 
     // Build merged timeline events
     type Event = {
