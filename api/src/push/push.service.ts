@@ -74,4 +74,50 @@ export class PushService {
     }
     return { id: json.id ?? null, recipients: json.recipients ?? 0 };
   }
+
+  /** Get current OneSignal app config (web settings, etc.) */
+  async getAppConfig(): Promise<Record<string, unknown>> {
+    const appId = this.config.get<string>('ONESIGNAL_APP_ID');
+    const apiKey = this.config.get<string>('ONESIGNAL_REST_API_KEY');
+    if (!appId || !apiKey) {
+      throw new ServiceUnavailableException('OneSignal not configured');
+    }
+    const res = await fetch(`https://api.onesignal.com/apps/${appId}`, {
+      headers: { Authorization: `Key ${apiKey}` },
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new ServiceUnavailableException(`OneSignal config fetch failed: ${txt}`);
+    }
+    return res.json();
+  }
+
+  /** Update OneSignal app config (web settings, etc.) */
+  async updateAppConfig(updates: {
+    name?: string;
+    site_name?: string;
+    chrome_web_origin?: string;
+    chrome_web_default_notification_icon?: string;
+    chrome_web_sub_domain?: string;
+    additional_data_is_root_payload?: boolean;
+  }): Promise<Record<string, unknown>> {
+    const appId = this.config.get<string>('ONESIGNAL_APP_ID');
+    const apiKey = this.config.get<string>('ONESIGNAL_REST_API_KEY');
+    if (!appId || !apiKey) {
+      throw new ServiceUnavailableException('OneSignal not configured');
+    }
+    const res = await fetch(`https://api.onesignal.com/apps/${appId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        Authorization: `Key ${apiKey}`,
+      },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new ServiceUnavailableException(`OneSignal config update failed: ${txt}`);
+    }
+    return res.json();
+  }
 }

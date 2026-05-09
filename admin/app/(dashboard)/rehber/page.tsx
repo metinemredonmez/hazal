@@ -62,7 +62,7 @@ export default function RehberPage() {
   const refresh = React.useCallback(async () => {
     setLoading(true);
     try {
-      const sp = new URLSearchParams({ pageSize: "200" });
+      const sp = new URLSearchParams({ pageSize: "100" });
       if (filter === "FAVORITES") sp.set("favorite", "true");
       else if (filter !== "ALL") sp.set("category", filter);
       if (search.trim()) sp.set("search", search.trim());

@@ -2,9 +2,16 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Send, BellRing, AlertCircle, Sparkles, Home, TrendingDown, Calendar, Newspaper } from "lucide-react";
+import { Send, BellRing, AlertCircle, Sparkles, Home, TrendingDown, Calendar, Newspaper, Settings as SettingsIcon, Save, Loader2 } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,11 +95,48 @@ export default function PushPage() {
     toast.success(`Şablon yüklendi: ${t.label}`);
   }
 
+  const [configOpen, setConfigOpen] = React.useState(false);
+  const [appConfig, setAppConfig] = React.useState<{
+    name?: string;
+    site_name?: string;
+    chrome_web_origin?: string;
+    chrome_web_default_notification_icon?: string;
+    chrome_web_sub_domain?: string;
+  }>({});
+  const [savingConfig, setSavingConfig] = React.useState(false);
+  const [loadingConfig, setLoadingConfig] = React.useState(false);
+
   React.useEffect(() => {
     api<PushStatus>("/api/admin/push/status")
       .then(setStatus)
       .catch(() => setStatus({ configured: false }));
   }, []);
+
+  async function loadConfig() {
+    setLoadingConfig(true);
+    try {
+      const cfg = await api<typeof appConfig>("/api/admin/push/config");
+      setAppConfig(cfg);
+      setConfigOpen(true);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Config yüklenemedi");
+    } finally {
+      setLoadingConfig(false);
+    }
+  }
+
+  async function saveConfig() {
+    setSavingConfig(true);
+    try {
+      await api("/api/admin/push/config", { method: "PATCH", body: appConfig });
+      toast.success("OneSignal yapılandırması güncellendi");
+      setConfigOpen(false);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Kaydedilemedi");
+    } finally {
+      setSavingConfig(false);
+    }
+  }
 
   async function handleSend() {
     if (!titleTr || !titleEn || !bodyTr || !bodyEn) {
@@ -133,6 +177,24 @@ export default function PushPage() {
       <Topbar
         title="Push Bildirimler"
         description="Web sitesi abonelerine toplu bildirim gönder"
+        actions={
+          status?.configured ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadConfig}
+              disabled={loadingConfig}
+              className="gap-1.5"
+            >
+              {loadingConfig ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <SettingsIcon className="h-3.5 w-3.5" />
+              )}
+              OneSignal Ayarları
+            </Button>
+          ) : null
+        }
       />
       <main className="flex-1 px-6 py-8 space-y-6 animate-fade-up">
         {status && !status.configured && (
@@ -296,6 +358,84 @@ export default function PushPage() {
           </CardContent>
         </Card>
       </main>
+
+      {/* OneSignal Web Config Dialog */}
+      <Dialog open={configOpen} onOpenChange={setConfigOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>OneSignal Web Yapılandırması</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="text-xs text-muted-foreground p-2 bg-amber-50 border border-amber-200 rounded">
+              💡 Bu ayarlar OneSignal hesabında güncellenir — sayfayı kaydet,
+              ziyaretçilerin gördüğü push abonelik prompt'u bu değerlerle çıkar.
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">App Adı (dashboard'da görünür)</Label>
+              <Input
+                value={appConfig.name ?? ""}
+                onChange={(e) =>
+                  setAppConfig((p) => ({ ...p, name: e.target.value }))
+                }
+                placeholder="Hazal Muti Real Estate"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Site Adı (push'ta görünür)</Label>
+              <Input
+                value={appConfig.site_name ?? ""}
+                onChange={(e) =>
+                  setAppConfig((p) => ({ ...p, site_name: e.target.value }))
+                }
+                placeholder="Hazal Muti"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Site URL'i</Label>
+              <Input
+                value={appConfig.chrome_web_origin ?? ""}
+                onChange={(e) =>
+                  setAppConfig((p) => ({
+                    ...p,
+                    chrome_web_origin: e.target.value,
+                  }))
+                }
+                placeholder="https://hazalmuti.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Bildirim İkonu URL'i (192×192 px)</Label>
+              <Input
+                value={appConfig.chrome_web_default_notification_icon ?? ""}
+                onChange={(e) =>
+                  setAppConfig((p) => ({
+                    ...p,
+                    chrome_web_default_notification_icon: e.target.value,
+                  }))
+                }
+                placeholder="https://hazalmuti.com/icon.png"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfigOpen(false)}>
+              İptal
+            </Button>
+            <Button
+              onClick={saveConfig}
+              disabled={savingConfig}
+              className="bg-[#14141A] text-white gap-2"
+            >
+              {savingConfig ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Save className="h-3.5 w-3.5" />
+              )}
+              Kaydet
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

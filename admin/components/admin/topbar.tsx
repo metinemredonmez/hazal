@@ -4,7 +4,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/store";
 import { NotificationCenter } from "./notification-center";
 
-export function Topbar({ title, description }: { title: string; description?: string }) {
+export function Topbar({
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  actions?: React.ReactNode;
+}) {
   const admin = useAuth((s) => s.admin);
 
   return (
@@ -20,6 +28,7 @@ export function Topbar({ title, description }: { title: string; description?: st
             </p>
           )}
         </div>
+        {actions}
         <NotificationCenter />
         <Avatar className="h-6 w-6 border border-border">
           <AvatarFallback className="text-[10px] bg-secondary">
