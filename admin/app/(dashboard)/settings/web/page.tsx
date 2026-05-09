@@ -210,7 +210,9 @@ export default function WebSettingsPage() {
         {section === "about" && (
           <AboutSection getBi={getBi} setBi={setBi} getStr={getStr} setStr={setStr} />
         )}
-        {section === "contact" && <ContactSection getBi={getBi} setBi={setBi} />}
+        {section === "contact" && (
+          <ContactSection getBi={getBi} setBi={setBi} getStr={getStr} setStr={setStr} />
+        )}
 
         <div className="flex justify-end sticky bottom-3 z-10 lg:pr-52">
           <Button
@@ -275,6 +277,12 @@ function HomeSection({ getBi, setBi, getStr, setStr }: SectionProps & { getStr: 
           <CardTitle className="text-xs">Öne Çıkan İlanlar bölümü</CardTitle>
         </CardHeader>
         <CardContent className="p-4 space-y-3">
+          <SectionImageField
+            label="Bölüm üstü görseli (opsiyonel)"
+            hint="Öne çıkan ilanlar başlığının arkasında banner olarak görünür. Yatay 16:9."
+            value={getStr(["home", "featuredImageUrl"])}
+            onChange={(v) => setStr(["home", "featuredImageUrl"], v)}
+          />
           <BiInput
             label="Bölüm Başlığı"
             tr={getBi(["home", "featuredTitle"]).tr}
@@ -302,6 +310,13 @@ function HomeSection({ getBi, setBi, getStr, setStr }: SectionProps & { getStr: 
           <CardTitle className="text-xs">Hakkımda Teaser bölümü</CardTitle>
         </CardHeader>
         <CardContent className="p-4 space-y-3">
+          <SectionImageField
+            label="Teaser görseli (opsiyonel)"
+            hint="Boş bırakılırsa /hakkimizda portresini kullanır. Dik 3:4 fotoğraf önerilir."
+            value={getStr(["home", "aboutImageUrl"])}
+            onChange={(v) => setStr(["home", "aboutImageUrl"], v)}
+            aspectClass="w-24 h-32"
+          />
           <BiInput
             label="Başlık"
             hint="Şu an: 'Her müşteri, tek bir hikâye.' / 'Every client, a single story.'"
@@ -330,6 +345,12 @@ function HomeSection({ getBi, setBi, getStr, setStr }: SectionProps & { getStr: 
           <CardTitle className="text-xs">İletişim CTA bölümü</CardTitle>
         </CardHeader>
         <CardContent className="p-4 space-y-3">
+          <SectionImageField
+            label="CTA arka plan görseli (opsiyonel)"
+            hint="İletişim çağrısı kartı arkaplanı. Yatay 16:9, koyu / blur uygulanacak."
+            value={getStr(["home", "contactImageUrl"])}
+            onChange={(v) => setStr(["home", "contactImageUrl"], v)}
+          />
           <BiInput
             label="Başlık"
             tr={getBi(["home", "contactHeading"]).tr}
@@ -386,6 +407,12 @@ function AboutSection({ getBi, setBi, getStr, setStr }: AboutSectionProps) {
             onTr={(v) => setBi(["about", "heroTitle"], "tr", v)}
             onEn={(v) => setBi(["about", "heroTitle"], "en", v)}
             placeholder={{ tr: "Hazal Muti", en: "Hazal Muti" }}
+          />
+          <SectionImageField
+            label="Hero arkaplan görseli (opsiyonel)"
+            hint="/hakkimizda hero bölümünde arkaplan olarak kullanılır. Yatay 16:9 (1920×1080+)."
+            value={getStr(["about", "heroImageUrl"])}
+            onChange={(v) => setStr(["about", "heroImageUrl"], v)}
           />
           <PortraitUploadField
             value={getStr(["about", "portraitUrl"])}
@@ -479,7 +506,15 @@ function AboutSection({ getBi, setBi, getStr, setStr }: AboutSectionProps) {
   );
 }
 
-function ContactSection({ getBi, setBi }: SectionProps) {
+function ContactSection({
+  getBi,
+  setBi,
+  getStr,
+  setStr,
+}: SectionProps & {
+  getStr: AboutSectionProps["getStr"];
+  setStr: AboutSectionProps["setStr"];
+}) {
   return (
     <div className="space-y-4">
       <Card>
@@ -502,6 +537,12 @@ function ContactSection({ getBi, setBi }: SectionProps) {
             onTr={(v) => setBi(["contact", "heroTitle"], "tr", v)}
             onEn={(v) => setBi(["contact", "heroTitle"], "en", v)}
             placeholder={{ tr: "Konuşalım", en: "Let's talk" }}
+          />
+          <SectionImageField
+            label="Hero arkaplan görseli (opsiyonel)"
+            hint="/iletisim sayfasının üst banner alanı."
+            value={getStr(["contact", "heroImageUrl"])}
+            onChange={(v) => setStr(["contact", "heroImageUrl"], v)}
           />
           <BiInput
             label="Tanıtım metni"
