@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
+import "mapbox-gl/dist/mapbox-gl.css";
 import {
   MapPin,
   Building2,
@@ -172,7 +173,6 @@ export default function HaritaPage() {
     let cancelled = false;
     (async () => {
       const mapboxgl = (await import("mapbox-gl")).default;
-      await import("mapbox-gl/dist/mapbox-gl.css" as string);
       if (cancelled) return;
 
       mapboxgl.accessToken = mapboxToken;
@@ -183,6 +183,16 @@ export default function HaritaPage() {
         zoom: 11,
       });
       mapRef.current = map;
+
+      // Container 0px ile başlamış olabilir (flex layout race) — load sonrası resize.
+      map.on("load", () => {
+        setTimeout(() => map.resize(), 50);
+      });
+      // Window resize yakalama
+      const onResize = () => map.resize();
+      window.addEventListener("resize", onResize);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (map as any).__cleanupResize = () => window.removeEventListener("resize", onResize);
     })();
 
     return () => {
