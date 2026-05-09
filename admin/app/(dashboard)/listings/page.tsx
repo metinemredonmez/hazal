@@ -615,14 +615,28 @@ function ListingRow({
         />
       </TableCell>
       <TableCell>
-        {cover ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={cover} alt="" className="h-14 w-14 rounded object-cover border border-border shrink-0" />
-        ) : (
-          <div className="h-14 w-14 rounded border border-dashed border-border flex items-center justify-center text-muted-foreground shrink-0">
+        <div className="relative h-14 w-14 shrink-0">
+          {cover && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={cover}
+              alt=""
+              className="h-14 w-14 rounded object-cover border border-border bg-muted"
+              onError={(e) => {
+                const img = e.currentTarget;
+                img.style.display = "none";
+                const fb = img.nextElementSibling as HTMLElement | null;
+                if (fb) fb.style.display = "flex";
+              }}
+            />
+          )}
+          <div
+            className="h-14 w-14 rounded border border-dashed border-border items-center justify-center text-muted-foreground"
+            style={{ display: cover ? "none" : "flex" }}
+          >
             <ImageOff className="h-4 w-4" />
           </div>
-        )}
+        </div>
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">

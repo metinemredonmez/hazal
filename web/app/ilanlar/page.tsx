@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { useLocale, t, CATEGORY_LABEL } from "@/lib/i18n";
 import type { Listing, Paginated } from "@/lib/types";
 import { ListingCard, ListingCardSkeleton } from "@/components/site/listing-card";
+import { SaveSearchButton } from "@/components/site/save-search-dialog";
 
 interface ParsedSearch {
   type?: "SALE" | "RENT";
@@ -299,7 +300,23 @@ function ListingsContent() {
             </div>
 
             {activeFilters > 0 && (
-              <div className="md:col-span-3 flex justify-end">
+              <div className="md:col-span-3 flex items-center justify-between gap-3 flex-wrap">
+                <SaveSearchButton
+                  criteria={{
+                    type: type || undefined,
+                    category: category || undefined,
+                    city: city || undefined,
+                    minPrice: params.get("minPrice")
+                      ? Number(params.get("minPrice"))
+                      : undefined,
+                    maxPrice: params.get("maxPrice")
+                      ? Number(params.get("maxPrice"))
+                      : undefined,
+                    minBedrooms: params.get("minBedrooms")
+                      ? Number(params.get("minBedrooms"))
+                      : undefined,
+                  }}
+                />
                 <button
                   onClick={clearAll}
                   className="inline-flex items-center gap-1 text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] hover:text-[#14141A]"

@@ -1193,11 +1193,11 @@ Cevap kuralları:
     }
     const client = this.client;
 
-    // Build a compact catalog the model can search through (max 30 listings)
+    // Build a compact catalog the model can search through (max 20 listings — daha az = daha az token = daha hizli)
     const catalog = await this.prisma.listing.findMany({
       where: { status: 'ACTIVE' },
       orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
-      take: 30,
+      take: 20,
       select: {
         slug: true,
         titleTr: true,
@@ -1207,7 +1207,6 @@ Cevap kuralları:
         price: true,
         currency: true,
         bedrooms: true,
-        bathrooms: true,
         areaM2: true,
         city: true,
         district: true,
@@ -1217,50 +1216,37 @@ Cevap kuralları:
     const catalogText = catalog
       .map(
         (l) =>
-          `[${l.slug}] ${locale === 'tr' ? l.titleTr : l.titleEn} · ${l.type} · ${l.category} · ${
+          `[${l.slug}] ${locale === 'tr' ? l.titleTr : l.titleEn}|${l.type}|${l.category}|${
             l.bedrooms ?? '?'
-          }+1 · ${l.areaM2 ?? '?'}m² · ${l.district ?? l.city ?? ''} · ${Number(l.price).toLocaleString('tr-TR')} ${l.currency}`,
+          }+1|${l.areaM2 ?? '?'}m²|${l.district ?? l.city ?? ''}|${Number(l.price).toLocaleString('tr-TR')}${l.currency}`,
       )
       .join('\n');
 
     const systemPrompt =
       locale === 'tr'
-        ? `Sen Hazal Muti'nin sanal gayrimenkul danışmanısın. İstanbul ve Bodrum'da lüks gayrimenkul portföyünü ziyaretçilere tanıtıyorsun.
+        ? `Sen Hazal Muti'nin sanal gayrimenkul danışmanısın. İstanbul ve Bodrum lüks portföyünü ziyaretçilere tanıtıyorsun.
 
-Aşağıda Hazal'ın güncel aktif portföyü var (her ilanın slug'ı [köşeli parantez] içinde):
-
+Aktif portföy (slug|baslik|tip|kategori|oda|m2|bolge|fiyat):
 ${catalogText}
 
 Kurallar:
-- Cevapların kısa, sıcak ve profesyonel olsun. Türkçe.
-- Ziyaretçinin ihtiyacını net olarak anla (bütçe, bölge, oda sayısı, kullanım amacı). Soru sor.
-- Uygun ilan(lar) varsa öner. Maksimum 3 öneri.
-- Öneri yaparken slug'ları her zaman [köşeli parantez] içinde belirt.
-- Eğer kullanıcı ciddiyse veya iletişim istiyorsa, ona "Hazal'a doğrudan ulaşman için iletişim formunu açabilirim" de.
-- Asla fiyat pazarlığı yapma, yalnızca portföydeki bilgileri ver.
-- Portföyde olmayan bir ilanı uydurma.
+- Türkçe, kısa (2-3 cümle), sıcak ve profesyonel.
+- Eksik bilgi varsa (bütçe/bölge/oda) tek soru sor.
+- En uygun 1-3 slug öner.
+- Portföyde olmayan ilanı uydurma.
+- Pazarlık yapma.
+- Yanıtı SADECE JSON olarak ver: {"reply":"...","recommend":["slug"],"suggestInquiry":boolean}`
+        : `You are Hazal Muti's AI real-estate concierge for luxury Istanbul/Bodrum properties.
 
-Yanıtının sonunda STRICT JSON satırı ekle:
-\`\`\`json
-{"recommend": ["slug1","slug2"], "suggestInquiry": true|false}
-\`\`\``
-        : `You are Hazal Muti's AI real-estate concierge for luxury properties in Istanbul and Bodrum.
-
-Active portfolio (each listing's slug in [brackets]):
-
+Active portfolio (slug|title|type|category|beds|m2|area|price):
 ${catalogText}
 
 Rules:
-- Keep replies short, warm, professional. English.
-- Understand the visitor's need (budget, area, bedrooms, intent). Ask follow-ups.
-- Recommend up to 3 listings. Always cite slugs in [brackets].
-- If they seem serious or want contact, offer "I can open the contact form to reach Hazal directly."
-- Never negotiate prices. Don't invent listings.
-
-End your reply with a STRICT JSON line:
-\`\`\`json
-{"recommend": ["slug1","slug2"], "suggestInquiry": true|false}
-\`\`\``;
+- English, short (2-3 sentences), warm, professional.
+- If budget/area/beds missing, ask one focused question.
+- Recommend 1-3 best slugs.
+- Don't invent listings. No price negotiation.
+- Reply ONLY JSON: {"reply":"...","recommend":["slug"],"suggestInquiry":boolean}`;
 
     let completion;
     try {
@@ -1270,8 +1256,9 @@ End your reply with a STRICT JSON line:
           { role: 'system', content: systemPrompt },
           ...dto.messages.map((m) => ({ role: m.role, content: m.content })),
         ],
-        temperature: 0.6,
-        max_tokens: 600,
+        temperature: 0.5,
+        max_tokens: 350,
+        response_format: { type: 'json_object' },
       });
     } catch (err: any) {
       this.logger.warn(`concierge OpenAI error: ${err?.message ?? err}`);
@@ -1287,27 +1274,22 @@ End your reply with a STRICT JSON line:
 
     const raw = completion.choices[0]?.message?.content?.trim() ?? '';
 
-    // Extract JSON tail
     let recommend: string[] = [];
     let suggestInquiry = false;
     let cleanReply = raw;
-    const jsonMatch = raw.match(/```json\s*([\s\S]*?)\s*```/);
-    if (jsonMatch) {
-      try {
-        const meta = JSON.parse(jsonMatch[1]);
-        if (Array.isArray(meta.recommend)) {
-          recommend = meta.recommend.filter((s: unknown): s is string => typeof s === 'string');
-        }
-        if (typeof meta.suggestInquiry === 'boolean') {
-          suggestInquiry = meta.suggestInquiry;
-        }
-      } catch {
-        // ignore
+    try {
+      const meta = JSON.parse(raw);
+      if (typeof meta.reply === 'string') cleanReply = meta.reply;
+      if (Array.isArray(meta.recommend)) {
+        recommend = meta.recommend.filter((s: unknown): s is string => typeof s === 'string');
       }
-      cleanReply = raw.replace(jsonMatch[0], '').trim();
+      if (typeof meta.suggestInquiry === 'boolean') {
+        suggestInquiry = meta.suggestInquiry;
+      }
+    } catch {
+      // raw model output without JSON wrap — still ship as reply
     }
 
-    // Validate slugs against catalog
     const validSlugs = new Set(catalog.map((l) => l.slug));
     const recommendedSlugs = recommend.filter((s) => validSlugs.has(s)).slice(0, 3);
 
