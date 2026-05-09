@@ -221,19 +221,21 @@ export default function HaritaPage() {
       ) => {
         const el = document.createElement("button");
         el.className = "mapbox-pin";
-        el.style.cssText = `width:32px;height:32px;border-radius:50% 50% 50% 0;background:${color};border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;transition:transform 0.15s;`;
+        el.style.cssText = `width:22px;height:22px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4),0 0 0 1px rgba(0,0,0,0.1);cursor:pointer;display:block;padding:0;transition:transform 0.15s;`;
         el.onmouseenter = () => {
-          el.style.transform = "rotate(-45deg) scale(1.15)";
+          el.style.transform = "scale(1.25)";
+          el.style.zIndex = "10";
         };
         el.onmouseleave = () => {
-          el.style.transform = "rotate(-45deg)";
+          el.style.transform = "scale(1)";
+          el.style.zIndex = "";
         };
         el.onclick = (e) => {
           e.stopPropagation();
           onClick();
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const marker = new (mapboxgl as any).Marker({ element: el })
+        const marker = new (mapboxgl as any).Marker({ element: el, anchor: "center" })
           .setLngLat([lng, lat])
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .addTo(mapRef.current as any);
