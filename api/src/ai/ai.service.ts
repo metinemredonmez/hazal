@@ -578,6 +578,143 @@ Examples:
           },
         },
       },
+      // ─── WRITE TOOLS ───
+      {
+        type: 'function',
+        function: {
+          name: 'create_appointment',
+          description:
+            'Yeni randevu oluşturur. Tarih ISO format YYYY-MM-DDTHH:mm (örn 2026-05-15T14:00).',
+          parameters: {
+            type: 'object',
+            properties: {
+              startsAt: { type: 'string', description: 'YYYY-MM-DDTHH:mm' },
+              durationMin: { type: 'number', description: 'Süre dakika (varsayılan 60)' },
+              name: { type: 'string', description: 'Müşteri adı' },
+              phone: { type: 'string' },
+              email: { type: 'string' },
+              listingSlug: { type: 'string', description: 'Hangi ilan için (opsiyonel)' },
+              location: { type: 'string', description: 'Buluşma yeri' },
+              notes: { type: 'string' },
+            },
+            required: ['startsAt', 'name'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'cancel_appointment',
+          description: 'Randevuyu iptal eder (status CANCELLED yapar).',
+          parameters: {
+            type: 'object',
+            properties: { appointmentId: { type: 'string' } },
+            required: ['appointmentId'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'update_inquiry_status',
+          description:
+            'Müşteri talebinin durumunu günceller. NEW / CONTACTED / HOT / CLOSED.',
+          parameters: {
+            type: 'object',
+            properties: {
+              inquiryId: { type: 'string' },
+              status: { type: 'string', enum: ['NEW', 'CONTACTED', 'HOT', 'CLOSED'] },
+              notes: { type: 'string', description: 'Opsiyonel not' },
+            },
+            required: ['inquiryId', 'status'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'publish_listing',
+          description: "İlanı yayına alır (DRAFT → ACTIVE). Slug ile.",
+          parameters: {
+            type: 'object',
+            properties: { slug: { type: 'string' } },
+            required: ['slug'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'set_featured',
+          description: 'İlanı öne çıkar / öne çıkarmayı kaldır.',
+          parameters: {
+            type: 'object',
+            properties: {
+              slug: { type: 'string' },
+              featured: { type: 'boolean' },
+            },
+            required: ['slug', 'featured'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'update_listing_price',
+          description: 'İlanın fiyatını günceller.',
+          parameters: {
+            type: 'object',
+            properties: {
+              slug: { type: 'string' },
+              price: { type: 'number' },
+              currency: { type: 'string', enum: ['TRY', 'USD', 'EUR'] },
+            },
+            required: ['slug', 'price'],
+          },
+        },
+      },
+      // ─── SMART ANALYSIS TOOLS ───
+      {
+        type: 'function',
+        function: {
+          name: 'get_today_focus',
+          description:
+            "Bugünün gündemi: yaklaşan randevular, yeni HOT talepler, dikkat gereken ilanlar (ör. 14+ gündür DRAFT'ta).",
+          parameters: { type: 'object', properties: {} },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'find_free_slots',
+          description:
+            'Belirli tarihte/aralıkta Hazal\'ın boş zaman dilimlerini bulur. Çalışma saatleri varsayılan 09:00-19:00. 1 saatlik slot\'lar.',
+          parameters: {
+            type: 'object',
+            properties: {
+              date: { type: 'string', description: 'YYYY-MM-DD' },
+              durationMin: { type: 'number', description: 'Slot süresi (varsayılan 60)' },
+            },
+            required: ['date'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'find_matches_for_inquiry',
+          description:
+            "Bir müşteri talebi için en uygun ilanları AI ile eşleştirir. Talebin metnini analiz edip aktif ilanlardan en yakın olanları bulur.",
+          parameters: {
+            type: 'object',
+            properties: {
+              inquiryId: { type: 'string' },
+              limit: { type: 'number', description: 'Maks öneri (varsayılan 3)' },
+            },
+            required: ['inquiryId'],
+          },
+        },
+      },
     ];
 
     const today = new Date();
@@ -590,11 +727,27 @@ Kim için çalışıyorsun:
 - Müşterileri lüks daire/villa arayan üst gelir grubu
 
 Yapabileceklerin (tools):
-- İlan arama (search_listings)
-- Randevu listeleme (list_appointments)
-- Talep listeleme (list_inquiries)
-- Genel istatistikler (get_stats)
-- İlan detayı (get_listing_details)
+Okuma:
+- search_listings, list_appointments, list_inquiries, get_stats, get_listing_details
+
+Yazma (aksiyon — ÖNCE NIYET TEYIDI ALMADAN ÇAĞIRMA):
+- create_appointment (yeni randevu)
+- cancel_appointment (randevu iptal)
+- update_inquiry_status (talep durumu değiştir)
+- publish_listing (ilan yayınla)
+- set_featured (öne çıkar/kaldır)
+- update_listing_price (fiyat güncelle)
+
+Yazma kuralları:
+- Aksiyon istendiğinde önce kullanıcıdan **net teyit** al ("Onaylıyor musun?" gibi).
+- Sadece "evet/onayla/yap" gibi açık onay gelirse tool'u çağır.
+- Belirsizlik varsa sor: "Hangi ilan?", "Saat kaç?" vb.
+- Aksiyon sonrası: "✅ Yapıldı" + sonuç özetini söyle.
+
+Akıllı analiz (proaktif):
+- get_today_focus: "Bugün ne yapayım", "neye odaklanmalıyım", "günün özeti" gibi açık uçlu sorularda direkt çağır.
+- find_free_slots: Randevu eklerken veya "yarın boşum mu" gibi sorularda.
+- find_matches_for_inquiry: Talep ID verilirse veya "şu müşteriye uygun ilan" istenirse.
 
 Cevap kuralları:
 - Bir konuya cevap vermek için tool çağırman gerekiyorsa **çağır**, asla uydurma.
@@ -787,6 +940,229 @@ Cevap kuralları:
           include: { images: { orderBy: { order: 'asc' }, take: 3 } },
         });
         return listing ?? { error: 'Listing not found' };
+      }
+
+      // ─── WRITE TOOLS ───
+      if (name === 'create_appointment') {
+        const startsAt = new Date(args.startsAt as string);
+        if (Number.isNaN(startsAt.getTime())) {
+          return { error: 'Geçersiz tarih formatı. YYYY-MM-DDTHH:mm bekleniyor.' };
+        }
+        let listingId: string | undefined;
+        if (args.listingSlug) {
+          const listing = await this.prisma.listing.findUnique({
+            where: { slug: args.listingSlug as string },
+            select: { id: true },
+          });
+          listingId = listing?.id;
+        }
+        const created = await this.prisma.appointment.create({
+          data: {
+            startsAt,
+            durationMin: typeof args.durationMin === 'number' ? args.durationMin : 60,
+            name: args.name as string,
+            email: (args.email as string) || null,
+            phone: (args.phone as string) || null,
+            listingId: listingId || null,
+            location: (args.location as string) || null,
+            notes: (args.notes as string) || null,
+            status: 'SCHEDULED',
+          },
+        });
+        return { ok: true, appointment: created };
+      }
+
+      if (name === 'cancel_appointment') {
+        const updated = await this.prisma.appointment.update({
+          where: { id: args.appointmentId as string },
+          data: { status: 'CANCELLED' },
+        });
+        return { ok: true, appointment: updated };
+      }
+
+      if (name === 'update_inquiry_status') {
+        const data: Record<string, unknown> = { status: args.status };
+        if (args.notes) data.notes = args.notes as string;
+        const updated = await this.prisma.inquiry.update({
+          where: { id: args.inquiryId as string },
+          data,
+        });
+        return { ok: true, inquiry: updated };
+      }
+
+      if (name === 'publish_listing') {
+        const updated = await this.prisma.listing.update({
+          where: { slug: args.slug as string },
+          data: { status: 'ACTIVE' },
+        });
+        return { ok: true, listing: updated };
+      }
+
+      if (name === 'set_featured') {
+        const updated = await this.prisma.listing.update({
+          where: { slug: args.slug as string },
+          data: { featured: args.featured as boolean },
+        });
+        return { ok: true, listing: updated };
+      }
+
+      if (name === 'update_listing_price') {
+        const data: Record<string, unknown> = { price: args.price };
+        if (args.currency) data.currency = args.currency;
+        const updated = await this.prisma.listing.update({
+          where: { slug: args.slug as string },
+          data,
+        });
+        return { ok: true, listing: updated };
+      }
+
+      // ─── SMART TOOLS ───
+      if (name === 'get_today_focus') {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+        const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+
+        const [todayAppts, hotInquiries, newInquiries, oldDrafts, upcomingTomorrow] =
+          await Promise.all([
+            this.prisma.appointment.findMany({
+              where: {
+                startsAt: { gte: startOfDay, lte: endOfDay },
+                status: { in: ['SCHEDULED', 'CONFIRMED'] },
+              },
+              orderBy: { startsAt: 'asc' },
+              include: { listing: { select: { titleTr: true, district: true, slug: true } } },
+            }),
+            this.prisma.inquiry.findMany({
+              where: { status: 'HOT' },
+              orderBy: { createdAt: 'desc' },
+              take: 5,
+            }),
+            this.prisma.inquiry.count({
+              where: {
+                status: 'NEW',
+                createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+              },
+            }),
+            this.prisma.listing.findMany({
+              where: { status: 'DRAFT', createdAt: { lte: fourteenDaysAgo } },
+              select: { slug: true, titleTr: true, createdAt: true },
+              take: 5,
+            }),
+            this.prisma.appointment.count({
+              where: {
+                startsAt: {
+                  gte: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000),
+                  lte: new Date(startOfDay.getTime() + 48 * 60 * 60 * 1000),
+                },
+                status: { in: ['SCHEDULED', 'CONFIRMED'] },
+              },
+            }),
+          ]);
+
+        return {
+          today: {
+            appointmentCount: todayAppts.length,
+            appointments: todayAppts,
+          },
+          tomorrow: {
+            appointmentCount: upcomingTomorrow,
+          },
+          hotInquiries: hotInquiries.length > 0 ? hotInquiries : null,
+          newInquiriesLast24h: newInquiries,
+          stuckDrafts: oldDrafts.length > 0 ? oldDrafts : null,
+        };
+      }
+
+      if (name === 'find_free_slots') {
+        const date = new Date(args.date as string);
+        const startHour = 9;
+        const endHour = 19;
+        const slotMin = typeof args.durationMin === 'number' ? args.durationMin : 60;
+
+        const dayStart = new Date(date);
+        dayStart.setHours(startHour, 0, 0, 0);
+        const dayEnd = new Date(date);
+        dayEnd.setHours(endHour, 0, 0, 0);
+
+        const busy = await this.prisma.appointment.findMany({
+          where: {
+            startsAt: { gte: dayStart, lt: dayEnd },
+            status: { in: ['SCHEDULED', 'CONFIRMED'] },
+          },
+          select: { startsAt: true, durationMin: true },
+        });
+
+        const slots: Array<{ start: string; end: string }> = [];
+        for (
+          let t = new Date(dayStart);
+          t.getTime() + slotMin * 60_000 <= dayEnd.getTime();
+          t = new Date(t.getTime() + slotMin * 60_000)
+        ) {
+          const slotEnd = new Date(t.getTime() + slotMin * 60_000);
+          const conflicts = busy.some((a) => {
+            const aEnd = new Date(a.startsAt.getTime() + a.durationMin * 60_000);
+            return t < aEnd && slotEnd > a.startsAt;
+          });
+          if (!conflicts) {
+            slots.push({
+              start: t.toISOString(),
+              end: slotEnd.toISOString(),
+            });
+          }
+        }
+        return {
+          date: args.date,
+          freeSlots: slots,
+          busyAppointments: busy.length,
+        };
+      }
+
+      if (name === 'find_matches_for_inquiry') {
+        const inquiry = await this.prisma.inquiry.findUnique({
+          where: { id: args.inquiryId as string },
+          include: { listing: true },
+        });
+        if (!inquiry) return { error: 'Talep bulunamadı' };
+
+        // Heuristic: extract keywords from message + use as q filter
+        const text = inquiry.message.toLowerCase();
+        const districts = ['bebek', 'etiler', 'cihangir', 'yalıkavak', 'bodrum', 'ulus', 'levent'];
+        const matchedDistrict = districts.find((d) => text.includes(d));
+        const isRent = /kiral[ıi]k|kira|rent/.test(text);
+        const isSale = /sat[ıi]l[ıi]k|sat[ıi][şs]|sale/.test(text);
+        const bedroomsMatch = text.match(/(\d)\s*\+\s*1/);
+        const minBedrooms = bedroomsMatch ? parseInt(bedroomsMatch[1], 10) : undefined;
+
+        const where: Record<string, unknown> = { status: 'ACTIVE' };
+        if (matchedDistrict) where.district = { contains: matchedDistrict, mode: 'insensitive' };
+        if (isRent && !isSale) where.type = 'RENT';
+        if (isSale && !isRent) where.type = 'SALE';
+        if (minBedrooms) where.bedrooms = { gte: minBedrooms };
+
+        const limit = typeof args.limit === 'number' ? args.limit : 3;
+        const matches = await this.prisma.listing.findMany({
+          where,
+          take: limit,
+          orderBy: [{ featured: 'desc' }, { views: 'desc' }],
+          select: {
+            slug: true,
+            titleTr: true,
+            type: true,
+            price: true,
+            currency: true,
+            bedrooms: true,
+            district: true,
+            areaM2: true,
+          },
+        });
+        return {
+          inquiry: { id: inquiry.id, name: inquiry.name, message: inquiry.message },
+          parsed: { district: matchedDistrict, isRent, isSale, minBedrooms },
+          matches,
+          count: matches.length,
+        };
       }
 
       return { error: `Unknown tool: ${name}` };

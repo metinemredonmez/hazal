@@ -370,9 +370,9 @@ function ListingRow({
       <TableCell>
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={cover} alt="" className="h-12 w-16 rounded object-cover border border-border" />
+          <img src={cover} alt="" className="h-14 w-14 rounded object-cover border border-border shrink-0" />
         ) : (
-          <div className="h-12 w-16 rounded border border-dashed border-border flex items-center justify-center text-muted-foreground">
+          <div className="h-14 w-14 rounded border border-dashed border-border flex items-center justify-center text-muted-foreground shrink-0">
             <ImageOff className="h-4 w-4" />
           </div>
         )}
