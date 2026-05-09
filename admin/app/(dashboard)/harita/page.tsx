@@ -222,23 +222,35 @@ export default function HaritaPage() {
         color: string,
         onClick: () => void,
       ) => {
+        // İç wrapper ile dış pozisyon (Mapbox transform) ve iç stil (bizim
+        // hover) ayrı katmanlarda. transform'a dokunmuyoruz, halo + size ile
+        // hover hissi veriyoruz — pin başka yere kaymaz.
+        const wrapper = document.createElement("div");
+        wrapper.style.cssText =
+          "width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;";
+
         const el = document.createElement("button");
-        el.className = "mapbox-pin";
-        el.style.cssText = `width:22px;height:22px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4),0 0 0 1px rgba(0,0,0,0.1);cursor:pointer;display:block;padding:0;transition:transform 0.15s;`;
-        el.onmouseenter = () => {
-          el.style.transform = "scale(1.25)";
-          el.style.zIndex = "10";
+        el.style.cssText = `width:18px;height:18px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4),0 0 0 1px rgba(0,0,0,0.15);cursor:pointer;padding:0;transition:width 0.15s,height 0.15s,box-shadow 0.15s;`;
+        wrapper.appendChild(el);
+
+        wrapper.onmouseenter = () => {
+          el.style.width = "22px";
+          el.style.height = "22px";
+          el.style.boxShadow = `0 4px 12px rgba(0,0,0,0.5),0 0 0 5px ${color}33`;
+          wrapper.style.zIndex = "10";
         };
-        el.onmouseleave = () => {
-          el.style.transform = "scale(1)";
-          el.style.zIndex = "";
+        wrapper.onmouseleave = () => {
+          el.style.width = "18px";
+          el.style.height = "18px";
+          el.style.boxShadow = `0 2px 6px rgba(0,0,0,0.4),0 0 0 1px rgba(0,0,0,0.15)`;
+          wrapper.style.zIndex = "";
         };
-        el.onclick = (e) => {
+        wrapper.onclick = (e) => {
           e.stopPropagation();
           onClick();
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const marker = new (mapboxgl as any).Marker({ element: el, anchor: "center" })
+        const marker = new (mapboxgl as any).Marker({ element: wrapper, anchor: "center" })
           .setLngLat([lng, lat])
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .addTo(mapRef.current as any);
