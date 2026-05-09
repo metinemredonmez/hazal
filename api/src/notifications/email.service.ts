@@ -87,26 +87,27 @@ export class EmailService {
     }
 
     if (this.provider === 'resend' && this.resend) {
-      const attachments = opts.attachments?.map((a) => ({
-        filename: a.filename,
-        content: a.content,
-        path: a.path,
-        contentType: a.contentType,
-      }));
-      const result = await this.resend.emails.send({
+      const payload: Record<string, unknown> = {
         from: this.from,
         to: opts.to,
         subject: opts.subject,
-        text: opts.text,
-        html: opts.html,
-        replyTo: opts.replyTo,
-        attachments: attachments as Array<{
-          filename: string;
-          content?: Buffer | string;
-          path?: string;
-          contentType?: string;
-        }>,
-      });
+      };
+      if (opts.html) payload.html = opts.html;
+      if (opts.text) payload.text = opts.text;
+      if (opts.replyTo) payload.replyTo = opts.replyTo;
+      if (opts.attachments && opts.attachments.length > 0) {
+        payload.attachments = opts.attachments.map((a) => ({
+          filename: a.filename,
+          content: a.content,
+          path: a.path,
+          contentType: a.contentType,
+        }));
+      }
+      // Resend v6 type union requires either `react` or `html`/`text`. We pass
+      // html/text dynamically so cast to bypass the strict discriminated union.
+      const result = await this.resend.emails.send(
+        payload as Parameters<typeof this.resend.emails.send>[0],
+      );
       if (result.error) {
         throw new Error(`Resend error: ${result.error.message}`);
       }
