@@ -6,6 +6,7 @@ import {
   Mail,
   MessageCircle,
   Camera as Instagram,
+  Linkedin,
   Globe,
   Download,
   MapPin,
@@ -39,6 +40,7 @@ export default function DigitalCardPage() {
   const instagramUrl = instagramHandle
     ? `https://instagram.com/${instagramHandle}`
     : "";
+  const linkedinUrl = settings?.linkedin ?? "";
   const tagline = pick(
     about?.heroEyebrow,
     locale,
@@ -61,6 +63,7 @@ export default function DigitalCardPage() {
       email && `EMAIL:${email}`,
       `URL:https://hazalmuti.com`,
       instagramUrl && `URL;TYPE=Instagram:${instagramUrl}`,
+      linkedinUrl && `URL;TYPE=LinkedIn:${linkedinUrl}`,
       "ADR;TYPE=WORK:;;Bebek;İstanbul;;;Türkiye",
       "END:VCARD",
     ]
@@ -179,6 +182,22 @@ export default function DigitalCardPage() {
               <div className="flex-1 text-left">
                 <p className="text-xs uppercase tracking-wider opacity-80">Instagram</p>
                 <p className="text-sm font-medium">@{instagram}</p>
+              </div>
+              <ArrowUpRight className="h-4 w-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+            </a>
+          )}
+
+          {linkedinUrl && (
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-3 w-full bg-[#0a66c2] hover:bg-[#08549c] text-white px-5 py-4 rounded-xl transition-colors group"
+            >
+              <Linkedin className="h-5 w-5 shrink-0" />
+              <div className="flex-1 text-left">
+                <p className="text-xs uppercase tracking-wider opacity-80">LinkedIn</p>
+                <p className="text-sm font-medium">Hazal Muti</p>
               </div>
               <ArrowUpRight className="h-4 w-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
             </a>

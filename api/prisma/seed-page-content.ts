@@ -115,6 +115,7 @@ const SETTINGS_DEFAULTS = {
   aboutEn:
     "I am a real estate consultant at Coldwell Banker CB Plus. I support clients through sales and leasing in İstanbul and Bodrum.",
   instagram: 'https://www.instagram.com/cb.hazalmuti/',
+  linkedin: 'https://www.linkedin.com/in/hazal-muti-767143162/',
 };
 
 async function main(reset = false) {
@@ -164,6 +165,7 @@ async function main(reset = false) {
   if (!existing.aboutTr) settingsUpdate.aboutTr = SETTINGS_DEFAULTS.aboutTr;
   if (!existing.aboutEn) settingsUpdate.aboutEn = SETTINGS_DEFAULTS.aboutEn;
   if (!existing.instagram) settingsUpdate.instagram = SETTINGS_DEFAULTS.instagram;
+  if (!existing.linkedin) settingsUpdate.linkedin = SETTINGS_DEFAULTS.linkedin;
   // --reset modunda her alanı override et
   if (reset) {
     Object.assign(settingsUpdate, SETTINGS_DEFAULTS);
