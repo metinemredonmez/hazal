@@ -715,6 +715,66 @@ Examples:
           },
         },
       },
+      {
+        type: 'function',
+        function: {
+          name: 'duplicate_listing',
+          description: 'İlanı kopyalar (DRAFT olarak). "(Kopya)" suffix\'i eklenir.',
+          parameters: {
+            type: 'object',
+            properties: { slug: { type: 'string' } },
+            required: ['slug'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'add_note_to_inquiry',
+          description: 'Müşteri talebine not ekler (mevcut notlara append eder).',
+          parameters: {
+            type: 'object',
+            properties: {
+              inquiryId: { type: 'string' },
+              note: { type: 'string' },
+            },
+            required: ['inquiryId', 'note'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'analyze_listing_health',
+          description:
+            'Bir ilanın sağlık skorunu hesaplar: görüntülenme/gün, talep sayısı, gün sayısı, fiyat segmenti. Düşük performansa AI yorumu döner.',
+          parameters: {
+            type: 'object',
+            properties: { slug: { type: 'string' } },
+            required: ['slug'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'draft_whatsapp_message',
+          description:
+            'Müşteri için WhatsApp mesajı taslağı oluşturur. Kibarlık ve profesyonel ton, kısa.',
+          parameters: {
+            type: 'object',
+            properties: {
+              context: {
+                type: 'string',
+                description: 'Mesajın amacı / bağlamı (örn "yeni talep eden müşteriye randevu öner")',
+              },
+              customerName: { type: 'string' },
+              listingSlug: { type: 'string', description: 'Opsiyonel — ilan bağlamı' },
+            },
+            required: ['context'],
+          },
+        },
+      },
     ];
 
     const today = new Date();
@@ -737,6 +797,9 @@ Yazma (aksiyon — ÖNCE NIYET TEYIDI ALMADAN ÇAĞIRMA):
 - publish_listing (ilan yayınla)
 - set_featured (öne çıkar/kaldır)
 - update_listing_price (fiyat güncelle)
+- duplicate_listing (ilanı kopyala — DRAFT olur)
+- add_note_to_inquiry (talebe not ekle)
+- draft_whatsapp_message (WhatsApp mesaj taslağı yaz, gönderme)
 
 Yazma kuralları:
 - Aksiyon istendiğinde önce kullanıcıdan **net teyit** al ("Onaylıyor musun?" gibi).
@@ -748,6 +811,7 @@ Akıllı analiz (proaktif):
 - get_today_focus: "Bugün ne yapayım", "neye odaklanmalıyım", "günün özeti" gibi açık uçlu sorularda direkt çağır.
 - find_free_slots: Randevu eklerken veya "yarın boşum mu" gibi sorularda.
 - find_matches_for_inquiry: Talep ID verilirse veya "şu müşteriye uygun ilan" istenirse.
+- analyze_listing_health: "şu ilan iyi mi?", "neden ilgi görmüyor?" gibi sorularda.
 
 Cevap kuralları:
 - Bir konuya cevap vermek için tool çağırman gerekiyorsa **çağır**, asla uydurma.
@@ -1162,6 +1226,158 @@ Cevap kuralları:
           parsed: { district: matchedDistrict, isRent, isSale, minBedrooms },
           matches,
           count: matches.length,
+        };
+      }
+
+      if (name === 'duplicate_listing') {
+        const original = await this.prisma.listing.findUnique({
+          where: { slug: args.slug as string },
+          include: { images: { orderBy: { order: 'asc' } } },
+        });
+        if (!original) return { error: 'İlan bulunamadı' };
+        const baseSlug = `${original.slug}-kopya`;
+        let newSlug = baseSlug;
+        let counter = 2;
+        while (await this.prisma.listing.findUnique({ where: { slug: newSlug } })) {
+          newSlug = `${baseSlug}-${counter++}`;
+        }
+        const {
+          id: _id,
+          slug: _slug,
+          createdAt: _ca,
+          updatedAt: _ua,
+          views: _v,
+          images,
+          ...rest
+        } = original;
+        const created = await this.prisma.listing.create({
+          data: {
+            ...rest,
+            slug: newSlug,
+            titleTr: `${original.titleTr} (Kopya)`,
+            titleEn: `${original.titleEn} (Copy)`,
+            status: 'DRAFT',
+            featured: false,
+            views: 0,
+            images: {
+              create: images.map((img, idx) => ({
+                url: img.url,
+                order: idx,
+                isPrimary: img.isPrimary,
+              })),
+            },
+          },
+        });
+        return { ok: true, listing: { id: created.id, slug: created.slug, titleTr: created.titleTr } };
+      }
+
+      if (name === 'add_note_to_inquiry') {
+        const inquiry = await this.prisma.inquiry.findUnique({
+          where: { id: args.inquiryId as string },
+          select: { notes: true },
+        });
+        if (!inquiry) return { error: 'Talep bulunamadı' };
+        const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        const newLine = `[${stamp}] ${args.note as string}`;
+        const newNotes = inquiry.notes ? `${inquiry.notes}\n${newLine}` : newLine;
+        const updated = await this.prisma.inquiry.update({
+          where: { id: args.inquiryId as string },
+          data: { notes: newNotes },
+        });
+        return { ok: true, inquiry: { id: updated.id, notes: updated.notes } };
+      }
+
+      if (name === 'analyze_listing_health') {
+        const listing = await this.prisma.listing.findUnique({
+          where: { slug: args.slug as string },
+          include: {
+            _count: { select: { inquiries: true, appointments: true } },
+          },
+        });
+        if (!listing) return { error: 'İlan bulunamadı' };
+        const ageDays = Math.max(
+          1,
+          Math.floor((Date.now() - listing.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+        );
+        const viewsPerDay = listing.views / ageDays;
+        const inquiryRate = listing.views > 0 ? listing._count.inquiries / listing.views : 0;
+        // Score: 0-100
+        let score = 50;
+        if (viewsPerDay > 5) score += 20;
+        else if (viewsPerDay > 2) score += 10;
+        else if (viewsPerDay < 0.5 && ageDays > 7) score -= 25;
+        if (listing._count.inquiries === 0 && ageDays > 14) score -= 20;
+        if (listing._count.inquiries >= 3) score += 15;
+        if (listing.featured) score += 5;
+        if (listing.status !== 'ACTIVE') score -= 10;
+        score = Math.max(0, Math.min(100, score));
+
+        const issues: string[] = [];
+        if (viewsPerDay < 0.5 && ageDays > 7) {
+          issues.push('Düşük görüntülenme — fiyat veya görseller gözden geçirilmeli');
+        }
+        if (listing._count.inquiries === 0 && ageDays > 14) {
+          issues.push('14+ gündür talep yok — başlık/açıklama optimize edilebilir');
+        }
+        if (!listing.featured && score > 70) {
+          issues.push('İyi performans — öne çıkarmaya aday');
+        }
+        if (listing.status === 'DRAFT' && ageDays > 7) {
+          issues.push('Taslak halde 7+ gün — yayınlanmaya hazır mı?');
+        }
+
+        return {
+          ok: true,
+          slug: listing.slug,
+          titleTr: listing.titleTr,
+          score,
+          metrics: {
+            ageDays,
+            views: listing.views,
+            viewsPerDay: Number(viewsPerDay.toFixed(2)),
+            inquiries: listing._count.inquiries,
+            appointments: listing._count.appointments,
+            inquiryRate: Number((inquiryRate * 100).toFixed(2)),
+          },
+          status: listing.status,
+          featured: listing.featured,
+          issues,
+        };
+      }
+
+      if (name === 'draft_whatsapp_message') {
+        if (!this.client) return { error: 'AI servisi kapalı' };
+        const ctx = args.context as string;
+        const customerName = (args.customerName as string) ?? '';
+        let listingInfo = '';
+        if (args.listingSlug) {
+          const l = await this.prisma.listing.findUnique({
+            where: { slug: args.listingSlug as string },
+            select: { titleTr: true, district: true, price: true, currency: true },
+          });
+          if (l) {
+            listingInfo = `\nİlan: ${l.titleTr} · ${l.district ?? ''} · ${Number(l.price).toLocaleString('tr-TR')} ${l.currency}`;
+          }
+        }
+        const draft = await this.client.chat.completions.create({
+          model: this.model,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'WhatsApp icin kibar, profesyonel ve KISA mesaj yaz (max 3-4 cumle). Hazal Muti kimligiyle. Emoji minimal. Turkce.',
+            },
+            {
+              role: 'user',
+              content: `Baglam: ${ctx}\nMusteri: ${customerName}${listingInfo}\n\nMesaji yaz.`,
+            },
+          ],
+          temperature: 0.6,
+          max_tokens: 250,
+        });
+        return {
+          ok: true,
+          message: draft.choices[0]?.message?.content?.trim() ?? '',
         };
       }
 
