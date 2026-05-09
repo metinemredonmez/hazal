@@ -113,6 +113,25 @@ export class DocumentsController {
     return this.documents.stats();
   }
 
+  @Get('templates')
+  listTemplates() {
+    return this.documents.listTemplates();
+  }
+
+  @Get('templates/:id')
+  getTemplate(@Param('id') id: string) {
+    return this.documents.findTemplate(id);
+  }
+
+  @Post('templates/:id/render')
+  async renderTemplate(
+    @Param('id') id: string,
+    @Body() body: { values: Record<string, string> },
+  ) {
+    const html = await this.documents.renderTemplate(id, body.values ?? {});
+    return { html };
+  }
+
   @Get(':id')
   getOne(@Param('id') id: string) {
     return this.documents.findById(id);

@@ -112,6 +112,7 @@ export default function BelgelerPage() {
   const [editing, setEditing] = React.useState<Document | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = React.useState<File | null>(null);
+  const [templateOpen, setTemplateOpen] = React.useState(false);
 
   const refresh = React.useCallback(async () => {
     setLoading(true);
@@ -236,6 +237,14 @@ export default function BelgelerPage() {
               accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.doc,.docx,.xls,.xlsx"
               onChange={handleFileSelect}
             />
+            <Button
+              onClick={() => setTemplateOpen(true)}
+              variant="outline"
+              className="gap-2"
+            >
+              <ScrollText className="h-3.5 w-3.5" />
+              Şablondan Oluştur
+            </Button>
             <Button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
@@ -387,7 +396,181 @@ export default function BelgelerPage() {
           }}
         />
       )}
+
+      {templateOpen && <TemplatePickerDialog onClose={() => setTemplateOpen(false)} />}
     </>
+  );
+}
+
+interface DocTemplate {
+  id: string;
+  name: string;
+  category: Category;
+  description: string | null;
+  variables: Array<{ key: string; label: string; type: string; default?: string }>;
+}
+
+function TemplatePickerDialog({ onClose }: { onClose: () => void }) {
+  const [templates, setTemplates] = React.useState<DocTemplate[]>([]);
+  const [selected, setSelected] = React.useState<DocTemplate | null>(null);
+  const [values, setValues] = React.useState<Record<string, string>>({});
+  const [loading, setLoading] = React.useState(true);
+  const [rendering, setRendering] = React.useState(false);
+
+  React.useEffect(() => {
+    api<DocTemplate[]>("/api/admin/documents/templates")
+      .then((list) => setTemplates(list))
+      .catch(() => toast.error("Şablonlar yüklenemedi"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  function selectTemplate(t: DocTemplate) {
+    setSelected(t);
+    const initial: Record<string, string> = {};
+    t.variables?.forEach((v) => {
+      initial[v.key] = v.default ?? "";
+    });
+    setValues(initial);
+  }
+
+  async function generate() {
+    if (!selected) return;
+    setRendering(true);
+    try {
+      const { html } = await api<{ html: string }>(
+        `/api/admin/documents/templates/${selected.id}/render`,
+        { method: "POST", body: { values } },
+      );
+      // Open in new window for printing
+      const win = window.open("", "_blank");
+      if (!win) {
+        toast.error("Pop-up engellendi. Tarayıcı ayarlarından izin ver.");
+        return;
+      }
+      win.document.write(`<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>${selected.name}</title></head><body>${html}<script>setTimeout(()=>window.print(),500);</script></body></html>`);
+      win.document.close();
+      onClose();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Hata");
+    } finally {
+      setRendering(false);
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {selected ? `Doldur: ${selected.name}` : "Şablondan Belge Oluştur"}
+          </DialogTitle>
+        </DialogHeader>
+
+        {!selected && (
+          <div className="space-y-2 py-2">
+            {loading ? (
+              <Skeleton className="h-32" />
+            ) : templates.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                Henüz şablon yok. Server'da seed çalıştır:
+                <br />
+                <code className="text-xs bg-muted px-2 py-1 rounded mt-2 inline-block">
+                  npx tsx prisma/seed-document-templates.ts
+                </code>
+              </p>
+            ) : (
+              templates.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => selectTemplate(t)}
+                  className="w-full text-left p-3 border border-border hover:border-[#C9A96E] rounded-md transition-colors"
+                >
+                  <p className="text-sm font-medium">{t.name}</p>
+                  {t.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t.description}
+                    </p>
+                  )}
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {t.variables?.length ?? 0} alan dolduracaksın
+                  </p>
+                </button>
+              ))
+            )}
+          </div>
+        )}
+
+        {selected && (
+          <div className="space-y-2 py-2">
+            <button
+              onClick={() => setSelected(null)}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              ← Şablon değiştir
+            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {selected.variables?.map((v) => (
+                <div key={v.key} className="space-y-1">
+                  <Label className="text-xs">{v.label}</Label>
+                  {v.type === "date" ? (
+                    <Input
+                      type="date"
+                      value={values[v.key] ?? ""}
+                      onChange={(e) =>
+                        setValues((p) => ({ ...p, [v.key]: e.target.value }))
+                      }
+                    />
+                  ) : v.type === "number" || v.type === "currency" ? (
+                    <Input
+                      type="number"
+                      value={values[v.key] ?? ""}
+                      onChange={(e) =>
+                        setValues((p) => ({ ...p, [v.key]: e.target.value }))
+                      }
+                    />
+                  ) : v.type === "address" ? (
+                    <Textarea
+                      rows={2}
+                      value={values[v.key] ?? ""}
+                      onChange={(e) =>
+                        setValues((p) => ({ ...p, [v.key]: e.target.value }))
+                      }
+                    />
+                  ) : (
+                    <Input
+                      value={values[v.key] ?? ""}
+                      onChange={(e) =>
+                        setValues((p) => ({ ...p, [v.key]: e.target.value }))
+                      }
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-3">
+              💡 İpucu: "Oluştur ve Yazdır" butonuna basınca yeni sekmede belge
+              açılır, hemen yazdır veya Cmd+P → "PDF olarak kaydet" ile PDF al.
+            </p>
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            İptal
+          </Button>
+          {selected && (
+            <Button
+              onClick={generate}
+              disabled={rendering}
+              className="bg-[#14141A] text-white gap-2"
+            >
+              {rendering && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Oluştur ve Yazdır
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

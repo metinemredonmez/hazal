@@ -274,7 +274,7 @@ export default function PushPage() {
 
             <div className="flex items-center justify-between pt-2">
               <p className="text-xs text-muted-foreground">
-                Gönderim "Subscribed Users" segmentine yapılır.
+                📢 Bildirim, web sitenizden bildirim almayı kabul etmiş tüm ziyaretçilere gönderilir.
               </p>
               <Button
                 onClick={handleSend}

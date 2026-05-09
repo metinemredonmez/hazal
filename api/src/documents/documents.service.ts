@@ -125,4 +125,53 @@ export class DocumentsService {
       byCategory: byCategory.map((r) => ({ category: r.category, count: r._count._all })),
     };
   }
+
+  // ─── TEMPLATES ───
+  async listTemplates() {
+    return this.prisma.documentTemplate.findMany({
+      orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
+    });
+  }
+
+  async findTemplate(id: string) {
+    const t = await this.prisma.documentTemplate.findUnique({ where: { id } });
+    if (!t) throw new NotFoundException('Template not found');
+    return t;
+  }
+
+  async renderTemplate(id: string, values: Record<string, string>): Promise<string> {
+    const tpl = await this.findTemplate(id);
+    let html = tpl.htmlBody;
+
+    const all: Record<string, string> = {
+      ...values,
+      year: new Date().getFullYear().toString(),
+      date: new Date().toLocaleDateString('tr-TR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+    };
+
+    // Format currency-ish values
+    for (const [key, val] of Object.entries(all)) {
+      if (
+        typeof val === 'string' &&
+        /rent|price|deposit|amount|bedel|kira|tutar/i.test(key) &&
+        /^\d+(\.\d+)?$/.test(val)
+      ) {
+        all[key] = new Intl.NumberFormat('tr-TR').format(Number(val));
+      }
+    }
+
+    // Conditional blocks first
+    html = html.replace(/\{\{#if (\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (_, key, body) =>
+      all[key] ? body : '',
+    );
+
+    // Variable replacement
+    html = html.replace(/\{\{(\w+)\}\}/g, (_, key) => all[key] ?? '');
+
+    return html;
+  }
 }

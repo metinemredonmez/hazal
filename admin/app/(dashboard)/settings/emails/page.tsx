@@ -304,7 +304,7 @@ export default function EmailTemplatesPage() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end sticky bottom-3 z-10">
+        <div className="flex justify-end sticky bottom-3 z-10 lg:pr-52">
           <Button
             onClick={handleSave}
             disabled={saving}
