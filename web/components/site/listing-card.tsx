@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Bed, Bath, Maximize2 } from "lucide-react";
+import { Bed, Bath, Maximize2, Heart, GitCompare, Check } from "lucide-react";
 import { useLocale, t, CATEGORY_LABEL } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
+import { useFavorites, useCompare } from "@/lib/favorites";
 import type { Listing } from "@/lib/types";
 
 interface Props {
@@ -18,6 +19,26 @@ export function ListingCard({ listing, size = "default" }: Props) {
     listing.images.find((i) => i.isPrimary)?.url ?? listing.images[0]?.url ?? null;
   const title = locale === "tr" ? listing.titleTr : listing.titleEn;
   const cityLine = [listing.district, listing.city].filter(Boolean).join(", ");
+
+  const fav = useFavorites();
+  const cmp = useCompare();
+  const isFav = fav.has(listing.slug);
+  const isCmp = cmp.has(listing.slug);
+
+  function onFav(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    fav.toggle(listing.slug);
+  }
+  function onCmp(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isCmp && cmp.full) {
+      // soft-fail; UI hint via title attr (alert too disruptive)
+      return;
+    }
+    cmp.toggle(listing.slug);
+  }
 
   return (
     <Link

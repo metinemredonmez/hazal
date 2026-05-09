@@ -38,10 +38,7 @@ export function Navbar() {
   const leftNav: NavItem[] = [
     {
       label: tx.nav.about,
-      children: [
-        { label: tx.nav.aboutBio, href: "/hakkimizda" },
-        { label: locale === "tr" ? "Medya" : "Media", href: "/medya" },
-      ],
+      href: "/hakkimizda",
     },
     {
       label: tx.nav.listings,
@@ -54,10 +51,7 @@ export function Navbar() {
     },
     {
       label: tx.nav.media,
-      children: [
-        { label: tx.nav.mediaGallery, href: "/medya" },
-        { label: tx.nav.mediaVideos, href: "/medya#videos" },
-      ],
+      href: "/medya",
     },
   ];
 

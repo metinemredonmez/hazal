@@ -71,7 +71,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Links */}
+          {/* Links: İlanlar */}
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A96E] mb-4">
               {tx.nav.listings}
@@ -93,13 +93,40 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link
+                  href="/ilanlar?featured=true"
+                  className="hover:text-[#C9A96E]"
+                >
+                  {tx.nav.listingsFeatured}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Links: Sayfalar */}
+          <div>
+            <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A96E] mb-4">
+              {locale === "tr" ? "Sayfalar" : "Pages"}
+            </p>
+            <ul className="space-y-2 text-sm text-[#F5F2EC]/75">
+              <li>
                 <Link href="/hakkimizda" className="hover:text-[#C9A96E]">
                   {tx.nav.about}
                 </Link>
               </li>
               <li>
+                <Link href="/medya" className="hover:text-[#C9A96E]">
+                  {tx.nav.media}
+                </Link>
+              </li>
+              <li>
                 <Link href="/iletisim" className="hover:text-[#C9A96E]">
                   {tx.nav.contact}
+                </Link>
+              </li>
+              <li>
+                <Link href="/v" className="hover:text-[#C9A96E]">
+                  {locale === "tr" ? "Kartvizit" : "Card"}
                 </Link>
               </li>
             </ul>

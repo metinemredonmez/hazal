@@ -204,7 +204,9 @@ export default function WebSettingsPage() {
           })}
         </div>
 
-        {section === "home" && <HomeSection getBi={getBi} setBi={setBi} />}
+        {section === "home" && (
+          <HomeSection getBi={getBi} setBi={setBi} getStr={getStr} setStr={setStr} />
+        )}
         {section === "about" && (
           <AboutSection getBi={getBi} setBi={setBi} getStr={getStr} setStr={setStr} />
         )}
@@ -235,7 +237,7 @@ interface AboutSectionProps extends SectionProps {
   setStr: (path: string[], value: string) => void;
 }
 
-function HomeSection({ getBi, setBi }: SectionProps) {
+function HomeSection({ getBi, setBi, getStr, setStr }: SectionProps & { getStr: AboutSectionProps["getStr"]; setStr: AboutSectionProps["setStr"] }) {
   return (
     <div className="space-y-4">
       <Card>
@@ -243,6 +245,10 @@ function HomeSection({ getBi, setBi }: SectionProps) {
           <CardTitle className="text-xs">Hero (üst bölüm)</CardTitle>
         </CardHeader>
         <CardContent className="p-4 space-y-3">
+          <HeroMediaUploadField
+            value={getStr(["home", "heroMediaUrl"])}
+            onChange={(v) => setStr(["home", "heroMediaUrl"], v)}
+          />
           <BiInput
             label="Eyebrow (başlık üstündeki küçük yazı)"
             hint="Örn: 'Curated portfolio · Istanbul'"
@@ -648,6 +654,130 @@ function BiInput({
             rows={multiline ? 4 : undefined}
             placeholder={placeholder?.en}
           />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HeroMediaUploadField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [uploading, setUploading] = React.useState(false);
+  const fileRef = React.useRef<HTMLInputElement>(null);
+  const isVideo = /\.(mp4|mov|webm)$/i.test(value);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ok =
+      file.type.startsWith("image/") || file.type.startsWith("video/");
+    if (!ok) {
+      toast.error("Sadece görsel veya video yükle");
+      return;
+    }
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error("Dosya 30 MB'dan büyük olamaz");
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("files", file);
+      const res = await api<Array<{ url: string }>>("/api/admin/uploads", {
+        method: "POST",
+        body: fd,
+      });
+      const url = res[0]?.url;
+      if (!url) throw new Error("Upload başarısız");
+      onChange(url);
+      toast.success("Anasayfa medya yüklendi");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Upload başarısız");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        Anasayfa Hero Medya (1920×1080+ önerilir)
+      </Label>
+
+      <div className="flex gap-3 items-start">
+        <div className="w-32 h-20 rounded-md bg-muted border border-border overflow-hidden shrink-0 flex items-center justify-center">
+          {value ? (
+            isVideo ? (
+              <video
+                src={value}
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={value}
+                alt="Hero"
+                className="w-full h-full object-cover"
+              />
+            )
+          ) : (
+            <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+          )}
+        </div>
+
+        <div className="flex-1 space-y-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,video/*"
+            className="hidden"
+            onChange={handleFile}
+          />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="gap-1.5"
+            >
+              {uploading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Upload className="h-3.5 w-3.5" />
+              )}
+              {value ? "Değiştir" : "Yükle"}
+            </Button>
+            {value && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onChange("")}
+                className="gap-1.5"
+              >
+                <X className="h-3.5 w-3.5" /> Kaldır
+              </Button>
+            )}
+          </div>
+          <Input
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Veya URL yapıştır"
+            className="text-xs font-mono"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Anasayfa hero arka plan. Yatay 16:9 (1920×1080+) JPG/PNG/WebP/MP4. Maks 30 MB.
+          </p>
         </div>
       </div>
     </div>
