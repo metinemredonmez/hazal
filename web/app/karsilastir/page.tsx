@@ -382,7 +382,7 @@ function KarsilastirContent() {
   );
 }
 
-function RowLabel({ children }: { children: React.ReactNode }) {
+function RowLabel({ children }: { children?: React.ReactNode }) {
   return (
     <div className="bg-white border border-border rounded-md px-3 py-3 text-[10px] tracking-[0.3em] uppercase text-muted-foreground self-center">
       {children}

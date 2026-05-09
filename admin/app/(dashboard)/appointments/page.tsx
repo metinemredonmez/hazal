@@ -214,6 +214,31 @@ function CalendarView({
   const [selectedDate, setSelectedDate] = React.useState<string | null>(
     today.toISOString().slice(0, 10),
   );
+  const [draggingId, setDraggingId] = React.useState<string | null>(null);
+  const [dragOverDay, setDragOverDay] = React.useState<string | null>(null);
+
+  async function handleDrop(targetDateKey: string, apptId: string) {
+    const appt = items.find((a) => a.id === apptId);
+    if (!appt) return;
+    const old = new Date(appt.startsAt);
+    const oldKey = old.toISOString().slice(0, 10);
+    if (oldKey === targetDateKey) return;
+    // Preserve time of day
+    const [y, m, d] = targetDateKey.split("-").map(Number);
+    const newDate = new Date(y, m - 1, d, old.getHours(), old.getMinutes());
+    try {
+      await api(`/api/admin/appointments/${apptId}`, {
+        method: "PATCH",
+        body: { startsAt: newDate.toISOString() },
+      });
+      toast.success(
+        `Randevu taşındı: ${newDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long" })}`,
+      );
+      onChange();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Taşınamadı");
+    }
+  }
 
   // Group appointments by YYYY-MM-DD
   const byDay = React.useMemo(() => {
@@ -285,17 +310,36 @@ function CalendarView({
               const appts = byDay.get(key) ?? [];
               const isToday = key === todayKey;
               const isSelected = key === selectedDate;
+              const isDragOver = dragOverDay === key;
               return (
                 <button
                   key={idx}
                   onClick={() => setSelectedDate(key)}
+                  onDragOver={(e) => {
+                    if (draggingId) {
+                      e.preventDefault();
+                      setDragOverDay(key);
+                    }
+                  }}
+                  onDragLeave={() => {
+                    if (dragOverDay === key) setDragOverDay(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const id = e.dataTransfer.getData("text/appt-id");
+                    setDragOverDay(null);
+                    setDraggingId(null);
+                    if (id) handleDrop(key, id);
+                  }}
                   className={
                     "aspect-square flex flex-col items-center justify-start p-1.5 text-xs border rounded transition-colors " +
-                    (isSelected
-                      ? "border-[#C9A96E] bg-[#C9A96E]/10"
-                      : isToday
-                        ? "border-[#14141A] bg-[#14141A]/5"
-                        : "border-transparent hover:bg-muted")
+                    (isDragOver
+                      ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-300"
+                      : isSelected
+                        ? "border-[#C9A96E] bg-[#C9A96E]/10"
+                        : isToday
+                          ? "border-[#14141A] bg-[#14141A]/5"
+                          : "border-transparent hover:bg-muted")
                   }
                 >
                   <span
@@ -338,18 +382,43 @@ function CalendarView({
               Bu gün randevu yok
             </p>
           ) : (
-            <div className="space-y-1.5">
-              {selectedAppts
-                .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
-                .map((a) => (
-                  <AppointmentCard
-                    key={a.id}
-                    appointment={a}
-                    onEdit={() => onEdit(a)}
-                    onChange={onChange}
-                  />
-                ))}
-            </div>
+            <>
+              <p className="text-[10px] text-muted-foreground mb-2">
+                💡 Randevuyu sürükle, başka güne bırak
+              </p>
+              <div className="space-y-1.5">
+                {selectedAppts
+                  .sort(
+                    (a, b) =>
+                      new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
+                  )
+                  .map((a) => (
+                    <div
+                      key={a.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData("text/appt-id", a.id);
+                        e.dataTransfer.effectAllowed = "move";
+                        setDraggingId(a.id);
+                      }}
+                      onDragEnd={() => {
+                        setDraggingId(null);
+                        setDragOverDay(null);
+                      }}
+                      className={
+                        "cursor-move transition-opacity " +
+                        (draggingId === a.id ? "opacity-40" : "")
+                      }
+                    >
+                      <AppointmentCard
+                        appointment={a}
+                        onEdit={() => onEdit(a)}
+                        onChange={onChange}
+                      />
+                    </div>
+                  ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
