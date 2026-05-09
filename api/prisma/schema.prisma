@@ -585,6 +585,26 @@ model NewsletterSubscriber {
   @@index([unsubscribed, createdAt])
 }
 
+/**
+ * Saha ziyaret kaydı — Hazal'ın gittiği lokasyonlar.
+ * Manuel ("Buradayım" butonu) veya otomatik (randevu COMPLETED → kayıt) eklenir.
+ * Haritada gri pin olarak gösterilir, geçmişe referans için.
+ */
+model VisitedLocation {
+  id            String    @id @default(uuid())
+  lat           Float
+  lng           Float
+  label         String?   // adres veya kısa açıklama
+  appointmentId String?   // bağlantılı randevu varsa
+  customerName  String?
+  notes         String?
+  visitedAt     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+
+  @@index([visitedAt])
+  @@index([appointmentId])
+}
+
 enum MailTemplateCategory {
   PROMOTION       // Yeni ilan, aylık bülten, kampanya
   APPOINTMENT     // Randevu hatırlatma / onay

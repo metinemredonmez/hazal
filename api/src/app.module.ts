@@ -21,6 +21,7 @@ import { CustomersModule } from './customers/customers.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { MailTemplatesModule } from './mail-templates/mail-templates.module';
 import { MorningSummaryModule } from './morning-summary/morning-summary.module';
+import { VisitedLocationsModule } from './visited-locations/visited-locations.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { MorningSummaryModule } from './morning-summary/morning-summary.module';
     ContactsModule,
     MailTemplatesModule,
     MorningSummaryModule,
+    VisitedLocationsModule,
   ],
 })
 export class AppModule {}
