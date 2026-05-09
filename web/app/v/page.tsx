@@ -5,7 +5,7 @@ import {
   Phone,
   Mail,
   MessageCircle,
-  Instagram,
+  Camera as Instagram,
   Globe,
   Download,
   MapPin,
