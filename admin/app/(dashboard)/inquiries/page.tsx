@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import { cn, formatDateTime } from "@/lib/utils";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 import type { Inquiry, InquiriesResponse, InquiryStatus } from "@/lib/types";
 
 const STATUS_LABEL: Record<InquiryStatus, string> = {
@@ -191,7 +192,15 @@ export default function InquiriesPage() {
 
   async function deleteInquiry() {
     if (!selected) return;
-    if (!confirm("Bu talebi silmek istediğine emin misin?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Talebi sil?",
+        description: "Bu müşteri talebi kalıcı olarak silinecek. Geri alınamaz.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/inquiries/${selected.id}`, { method: "DELETE" });
       toast.success("Silindi");

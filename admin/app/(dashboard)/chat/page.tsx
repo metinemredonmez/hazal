@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
 import { cn, formatDateTime } from "@/lib/utils";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 import { getAdminSocket } from "@/lib/socket";
 import type { ChatSession, ChatSessionSummary, ChatMessage, ChatChannel } from "@/lib/types";
 
@@ -122,7 +123,15 @@ export default function ChatPage() {
 
   async function closeSession() {
     if (!active) return;
-    if (!confirm("Bu sohbeti kapatmak istediğine emin misin?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Sohbeti kapat?",
+        description: "Müşteri yeniden mesaj atana kadar bu sohbet pasif olur.",
+        confirmLabel: "Kapat",
+        variant: "warning",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/chat/sessions/${active.id}/close`, { method: "PATCH" });
       setActive(null);

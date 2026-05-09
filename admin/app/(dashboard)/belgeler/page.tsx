@@ -45,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api, API_URL } from "@/lib/api";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 
 type Category =
   | "CONTRACT"
@@ -147,7 +148,15 @@ export default function BelgelerPage() {
   }
 
   async function deleteDoc(id: string) {
-    if (!confirm("Bu belgeyi silmek istediğinden emin misin?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Belgeyi sil?",
+        description: "Belge ve diskteki dosya kalıcı olarak silinecek.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/documents/${id}`, { method: "DELETE" });
       toast.success("Silindi");

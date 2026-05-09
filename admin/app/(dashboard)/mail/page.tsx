@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 
 interface EmailMessage {
   id: string;
@@ -119,7 +120,15 @@ export default function MailPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Bu maili silmek istediğinden emin misin?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Maili sil?",
+        description: "Bu mail kalıcı olarak silinecek. Geri alınamaz.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/mail/${id}`, { method: "DELETE" });
       setItems((prev) => prev.filter((m) => m.id !== id));

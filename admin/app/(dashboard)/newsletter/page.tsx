@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { api } from "@/lib/api";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 
 interface Subscriber {
   id: string;
@@ -85,7 +86,15 @@ export default function NewsletterPage() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Bu aboneyi tamamen sil?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Aboneyi sil?",
+        description: "Bu e-posta aboneliği tamamen silinecek. Geri alınamaz.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     setActingId(id);
     try {
       await api(`/api/admin/newsletter/${id}`, { method: "DELETE" });

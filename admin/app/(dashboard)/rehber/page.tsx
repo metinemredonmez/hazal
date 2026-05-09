@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 
 interface Contact {
   id: string;
@@ -95,7 +96,15 @@ export default function RehberPage() {
   }
 
   async function deleteContact(id: string) {
-    if (!confirm("Sil?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Kişiyi sil?",
+        description: "Bu kişi rehberden kalıcı olarak silinecek.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/contacts/${id}`, { method: "DELETE" });
       toast.success("Silindi");

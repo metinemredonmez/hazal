@@ -36,6 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 
 interface BlogPost {
   id: string;
@@ -88,7 +89,15 @@ export default function BlogPage() {
   }, [refresh]);
 
   async function deletePost(id: string) {
-    if (!confirm("Bu yazıyı silmek istediğinden emin misin?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Yazıyı sil?",
+        description: "Bu yazı kalıcı olarak silinecek. Geri alınamaz.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/blog/${id}`, { method: "DELETE" });
       toast.success("Silindi");

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { cn, formatDateTime } from "@/lib/utils";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 import type { Appointment, AppointmentStatus, Listing, Paginated } from "@/lib/types";
 
 const STATUS_LABEL: Record<AppointmentStatus, string> = {
@@ -371,7 +372,15 @@ function AppointmentCard({
   });
 
   async function deleteAppt() {
-    if (!confirm("Randevuyu silmek istediğinden emin misin?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Randevuyu sil?",
+        description: "Bu randevu kalıcı olarak silinecek. Müşteriye bilgi vermeyi unutma.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/appointments/${appointment.id}`, { method: "DELETE" });
       toast.success("Silindi");

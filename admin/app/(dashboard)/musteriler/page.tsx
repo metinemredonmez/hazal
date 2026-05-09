@@ -36,6 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
+import { confirmDialog } from "@/components/admin/confirm-dialog";
 
 type Status = "LEAD" | "ACTIVE" | "CLIENT" | "INACTIVE" | "LOST";
 type Source = "WEB" | "REFERRAL" | "SOCIAL" | "PHONE" | "WALK_IN" | "PARTNER" | "OTHER";
@@ -118,7 +119,15 @@ export default function MusterilerPage() {
   }, [refresh]);
 
   async function deleteCustomer(id: string) {
-    if (!confirm("Müşteriyi silmek istediğinden emin misin?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Müşteriyi sil?",
+        description: "Müşterinin tüm bilgileri silinecek. Geri alınamaz.",
+        confirmLabel: "Sil",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       await api(`/api/admin/customers/${id}`, { method: "DELETE" });
       toast.success("Silindi");
