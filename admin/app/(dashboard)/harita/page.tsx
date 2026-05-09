@@ -416,7 +416,7 @@ export default function HaritaPage() {
         title="Harita"
         description="İlanlar, randevular ve planlanan ziyaretler tek haritada"
       />
-      <main className="flex-1 relative">
+      <main className="flex-1 relative min-h-[calc(100vh-44px)]">
         {!mapboxToken ? (
           <div className="absolute inset-0 flex items-center justify-center bg-muted/30">
             <Card className="max-w-md">
@@ -440,7 +440,11 @@ export default function HaritaPage() {
           </div>
         ) : (
           <>
-            <div ref={mapContainer} className="absolute inset-0" />
+            <div
+              ref={mapContainer}
+              className="absolute inset-0"
+              style={{ minHeight: "calc(100vh - 44px)" }}
+            />
 
             {/* Loading overlay */}
             {loading && (
