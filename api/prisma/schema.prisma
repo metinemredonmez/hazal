@@ -634,3 +634,30 @@ model MailTemplate {
 
   @@index([category])
 }
+
+/**
+ * Web ziyaretçilerinin "kayıtlı arama" tanımları.
+ * Cron her gün arar — yeni eklenen + kriterlere uyan ilan varsa email atar.
+ */
+model SavedSearch {
+  id          String   @id @default(uuid())
+  email       String
+  name        String?  // visitor name
+  label       String?  // arama adı, örn: "Bebek 3+1 deniz manzaralı"
+  // Filter criteria — JSON
+  // { type, category, district, city, minPrice, maxPrice, currency, minBedrooms }
+  criteria    Json
+  // Email frequency: instant (cron her saat), daily (cron 09:00), weekly (Pzt 09:00)
+  frequency   String   @default("daily") // instant | daily | weekly
+  // Last notification info
+  lastNotifiedAt   DateTime?
+  // Last seen listing IDs (so we don't double-notify same listing)
+  lastSeenListingIds String[] @default([])
+  active      Boolean  @default(true)
+  unsubscribeToken String @unique @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active, frequency])
+  @@index([email])
+}
