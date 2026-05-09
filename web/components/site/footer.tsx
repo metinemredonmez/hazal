@@ -125,6 +125,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/favorilerim" className="hover:text-[#C9A96E]">
+                  {locale === "tr" ? "Favorilerim" : "My Favorites"}
+                </Link>
+              </li>
+              <li>
                 <Link href="/v" className="hover:text-[#C9A96E]">
                   {locale === "tr" ? "Kartvizit" : "Card"}
                 </Link>

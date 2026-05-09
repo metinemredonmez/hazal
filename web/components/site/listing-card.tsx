@@ -74,6 +74,50 @@ export function ListingCard({ listing, size = "default" }: Props) {
             </span>
           )}
         </div>
+
+        {/* Favori + Karşılaştır overlay (sağ üst) */}
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+          <button
+            onClick={onFav}
+            aria-label={isFav ? "Favorilerden çıkar" : "Favorilere ekle"}
+            title={isFav ? "Favorilerden çıkar" : "Favorilere ekle"}
+            className={
+              "w-8 h-8 rounded-full backdrop-blur flex items-center justify-center transition-all " +
+              (isFav
+                ? "bg-red-500 text-white shadow-lg"
+                : "bg-white/85 text-[#14141A] hover:bg-white opacity-0 group-hover:opacity-100")
+            }
+          >
+            <Heart className={"h-4 w-4 " + (isFav ? "fill-current" : "")} />
+          </button>
+          <button
+            onClick={onCmp}
+            aria-label={
+              isCmp
+                ? "Karşılaştırmadan çıkar"
+                : cmp.full
+                  ? `Maks ${cmp.max} ilan karşılaştırılabilir`
+                  : "Karşılaştırmaya ekle"
+            }
+            title={
+              isCmp
+                ? "Karşılaştırmadan çıkar"
+                : cmp.full
+                  ? `Maks ${cmp.max} ilan`
+                  : "Karşılaştır"
+            }
+            className={
+              "w-8 h-8 rounded-full backdrop-blur flex items-center justify-center transition-all " +
+              (isCmp
+                ? "bg-[#C9A96E] text-[#14141A] shadow-lg"
+                : cmp.full
+                  ? "bg-white/40 text-[#14141A]/40 cursor-not-allowed opacity-0 group-hover:opacity-100"
+                  : "bg-white/85 text-[#14141A] hover:bg-white opacity-0 group-hover:opacity-100")
+            }
+          >
+            {isCmp ? <Check className="h-4 w-4" /> : <GitCompare className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
       <div className="pt-5 pb-2">
