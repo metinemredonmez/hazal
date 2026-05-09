@@ -25,6 +25,8 @@ interface PushStatus {
 interface SendResult {
   id: string | null;
   recipients: number;
+  emailsSent?: number;
+  emailsFailed?: number;
 }
 
 interface Template {
@@ -83,6 +85,7 @@ export default function PushPage() {
   const [bodyEn, setBodyEn] = React.useState("");
   const [url, setUrl] = React.useState("");
   const [imageUrl, setImageUrl] = React.useState("");
+  const [emailRecipients, setEmailRecipients] = React.useState("");
   const [sending, setSending] = React.useState(false);
   const [status, setStatus] = React.useState<PushStatus | null>(null);
   const [lastResult, setLastResult] = React.useState<SendResult | null>(null);
@@ -143,6 +146,18 @@ export default function PushPage() {
       toast.error("TR ve EN başlık + içerik zorunlu");
       return;
     }
+
+    const recipients = emailRecipients
+      .split(/[\s,;\n]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const invalid = recipients.find((e) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+    if (invalid) {
+      toast.error(`Geçersiz e-posta: ${invalid}`);
+      return;
+    }
+
     setSending(true);
     try {
       const res = await api<SendResult>("/api/admin/push/send", {
@@ -154,16 +169,25 @@ export default function PushPage() {
           bodyEn,
           url: url || undefined,
           imageUrl: imageUrl || undefined,
+          emailRecipients: recipients.length > 0 ? recipients : undefined,
         },
       });
       setLastResult(res);
-      toast.success(`Gönderildi · ${res.recipients} alıcı`);
+      const emailMsg =
+        res.emailsSent && res.emailsSent > 0
+          ? ` + ${res.emailsSent} e-posta`
+          : "";
+      toast.success(`Gönderildi · ${res.recipients} push${emailMsg}`);
+      if (res.emailsFailed && res.emailsFailed > 0) {
+        toast.warning(`${res.emailsFailed} e-posta gönderilemedi`);
+      }
       setTitleTr("");
       setTitleEn("");
       setBodyTr("");
       setBodyEn("");
       setUrl("");
       setImageUrl("");
+      setEmailRecipients("");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Gönderilemedi";
       toast.error(message);
@@ -334,9 +358,26 @@ export default function PushPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2">
-              <p className="text-xs text-muted-foreground">
-                📢 Bildirim, web sitenizden bildirim almayı kabul etmiş tüm ziyaretçilere gönderilir.
+            <div className="space-y-1.5 pt-2 border-t">
+              <Label htmlFor="emailRecipients" className="flex items-center gap-2">
+                📧 E-posta ile de gönder (opsiyonel)
+              </Label>
+              <Textarea
+                id="emailRecipients"
+                value={emailRecipients}
+                onChange={(e) => setEmailRecipients(e.target.value)}
+                placeholder="ahmet@example.com, ayse@example.com&#10;veya her satıra bir e-posta"
+                rows={3}
+                className="font-mono text-xs"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Push aboneliği olmayan kişilere de aynı bildirimi e-posta olarak yollar. Virgülle veya satır ile ayır.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+              <p className="text-xs text-muted-foreground flex-1">
+                📢 Push, sitede bildirim aboneliği olan ziyaretçilere; e-posta ise yukarıda listelediğin adreslere gönderilir.
               </p>
               <Button
                 onClick={handleSend}
@@ -349,10 +390,24 @@ export default function PushPage() {
             </div>
 
             {lastResult && (
-              <div className="text-xs text-muted-foreground border-t pt-3">
-                Son gönderim · ID:{" "}
-                <code className="text-foreground">{lastResult.id ?? "—"}</code> · Alıcı:{" "}
-                <strong className="text-foreground">{lastResult.recipients}</strong>
+              <div className="text-xs text-muted-foreground border-t pt-3 space-y-1">
+                <div>
+                  Son gönderim · ID:{" "}
+                  <code className="text-foreground">{lastResult.id ?? "—"}</code> · Push:{" "}
+                  <strong className="text-foreground">{lastResult.recipients}</strong>
+                  {typeof lastResult.emailsSent === "number" && lastResult.emailsSent > 0 && (
+                    <>
+                      {" · E-posta: "}
+                      <strong className="text-foreground">{lastResult.emailsSent}</strong>
+                    </>
+                  )}
+                  {typeof lastResult.emailsFailed === "number" && lastResult.emailsFailed > 0 && (
+                    <>
+                      {" · "}
+                      <span className="text-red-600">Başarısız: {lastResult.emailsFailed}</span>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </CardContent>

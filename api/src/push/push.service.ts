@@ -1,6 +1,7 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SendPushDto } from './dto/send-push.dto';
+import { EmailService } from '../notifications/email.service';
 
 interface OneSignalCreateResponse {
   id?: string;
@@ -14,13 +15,18 @@ export class PushService {
   private readonly logger = new Logger(PushService.name);
   private readonly endpoint = 'https://api.onesignal.com/notifications';
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly email: EmailService,
+  ) {}
 
   isConfigured(): boolean {
     return Boolean(this.config.get('ONESIGNAL_APP_ID') && this.config.get('ONESIGNAL_REST_API_KEY'));
   }
 
-  async send(dto: SendPushDto): Promise<{ id: string | null; recipients: number }> {
+  async send(
+    dto: SendPushDto,
+  ): Promise<{ id: string | null; recipients: number; emailsSent: number; emailsFailed: number }> {
     const appId = this.config.get<string>('ONESIGNAL_APP_ID');
     const apiKey = this.config.get<string>('ONESIGNAL_REST_API_KEY');
     if (!appId || !apiKey) {
@@ -72,7 +78,70 @@ export class PushService {
         `OneSignal error: ${JSON.stringify(json.errors ?? json)}`,
       );
     }
-    return { id: json.id ?? null, recipients: json.recipients ?? 0 };
+
+    let emailsSent = 0;
+    let emailsFailed = 0;
+    const recipients = (dto.emailRecipients ?? []).filter(Boolean);
+    if (recipients.length > 0) {
+      const html = this.buildEmailHtml(dto);
+      await Promise.all(
+        recipients.map(async (to) => {
+          try {
+            await this.email.send({
+              to,
+              subject: dto.titleTr,
+              text: dto.bodyTr + (dto.url ? `\n\n${dto.url}` : ''),
+              html,
+            });
+            emailsSent++;
+          } catch (err) {
+            emailsFailed++;
+            this.logger.warn(`Email to ${to} failed: ${(err as Error).message}`);
+          }
+        }),
+      );
+    }
+
+    return {
+      id: json.id ?? null,
+      recipients: json.recipients ?? 0,
+      emailsSent,
+      emailsFailed,
+    };
+  }
+
+  private buildEmailHtml(dto: SendPushDto): string {
+    const safeTitle = this.escapeHtml(dto.titleTr);
+    const safeBody = this.escapeHtml(dto.bodyTr).replace(/\n/g, '<br/>');
+    const image = dto.imageUrl
+      ? `<img src="${this.escapeAttr(dto.imageUrl)}" alt="" style="width:100%;max-width:560px;border-radius:8px;display:block;margin:0 auto 20px;" />`
+      : '';
+    const cta = dto.url
+      ? `<p style="text-align:center;margin:24px 0 0;"><a href="${this.escapeAttr(dto.url)}" style="display:inline-block;background:#14141A;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;letter-spacing:0.05em;">Detayları Gör</a></p>`
+      : '';
+    return `<!doctype html><html><body style="margin:0;padding:24px;background:#FAF8F4;font-family:Inter,system-ui,-apple-system,sans-serif;color:#14141A;">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #E5E2DD;padding:32px 28px;border-radius:8px;">
+    <p style="font-size:10px;letter-spacing:0.4em;color:#C9A96E;text-transform:uppercase;margin:0 0 12px;">Hazal Muti Real Estate</p>
+    <h1 style="font-size:22px;font-weight:500;margin:0 0 16px;line-height:1.3;">${safeTitle}</h1>
+    ${image}
+    <p style="font-size:15px;line-height:1.6;color:#3a3a40;margin:0;">${safeBody}</p>
+    ${cta}
+    <hr style="border:none;border-top:1px solid #E5E2DD;margin:32px 0 16px;" />
+    <p style="font-size:11px;color:#888;margin:0;">Bu e-posta size Hazal Muti Real Estate tarafından gönderilmiştir.</p>
+  </div>
+</body></html>`;
+  }
+
+  private escapeHtml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  private escapeAttr(s: string): string {
+    return this.escapeHtml(s).replace(/'/g, '&#39;');
   }
 
   /** Get current OneSignal app config (web settings, etc.) */

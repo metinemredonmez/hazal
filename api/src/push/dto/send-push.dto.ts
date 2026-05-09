@@ -1,4 +1,4 @@
-import { IsArray, IsObject, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsEmail, IsObject, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class SendPushDto {
   @IsString()
@@ -42,4 +42,13 @@ export class SendPushDto {
   @IsOptional()
   @IsObject()
   data?: Record<string, unknown>;
+
+  /**
+   * Optional: also send the same notification as an email to these addresses.
+   * Useful for clients who haven't subscribed to web push but should still be reached.
+   */
+  @IsOptional()
+  @IsArray()
+  @IsEmail({}, { each: true })
+  emailRecipients?: string[];
 }
