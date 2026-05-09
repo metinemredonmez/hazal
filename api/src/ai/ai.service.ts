@@ -775,6 +775,37 @@ Examples:
           },
         },
       },
+      {
+        type: 'function',
+        function: {
+          name: 'suggest_price_for_listing',
+          description:
+            "Bir ilan için piyasa fiyat önerisi. Aynı kategori + bölgedeki aktif ilanları kıyaslar, m² fiyatı hesaplar, AI ile yorumlar.",
+          parameters: {
+            type: 'object',
+            properties: { slug: { type: 'string' } },
+            required: ['slug'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'draft_email',
+          description:
+            'Müşteriye veya talebe yanıt e-posta taslağı oluşturur. Onay için Hazal\'a sunulur — gönderilmez.',
+          parameters: {
+            type: 'object',
+            properties: {
+              context: { type: 'string', description: 'Konunun ne hakkında olduğu' },
+              customerName: { type: 'string' },
+              recipientEmail: { type: 'string' },
+              listingSlug: { type: 'string' },
+            },
+            required: ['context'],
+          },
+        },
+      },
     ];
 
     const today = new Date();
@@ -800,6 +831,8 @@ Yazma (aksiyon — ÖNCE NIYET TEYIDI ALMADAN ÇAĞIRMA):
 - duplicate_listing (ilanı kopyala — DRAFT olur)
 - add_note_to_inquiry (talebe not ekle)
 - draft_whatsapp_message (WhatsApp mesaj taslağı yaz, gönderme)
+- draft_email (e-posta taslağı yaz — onay için Hazal'a sunulur, otomatik gönderilmez)
+- suggest_price_for_listing (piyasa kıyas + AI yorum, fiyat önerisi)
 
 Yazma kuralları:
 - Aksiyon istendiğinde önce kullanıcıdan **net teyit** al ("Onaylıyor musun?" gibi).
@@ -1378,6 +1411,142 @@ Cevap kuralları:
         return {
           ok: true,
           message: draft.choices[0]?.message?.content?.trim() ?? '',
+        };
+      }
+
+      if (name === 'suggest_price_for_listing') {
+        if (!this.client) return { error: 'AI servisi kapalı' };
+        const target = await this.prisma.listing.findUnique({
+          where: { slug: args.slug as string },
+          select: {
+            slug: true,
+            titleTr: true,
+            type: true,
+            category: true,
+            district: true,
+            city: true,
+            bedrooms: true,
+            areaM2: true,
+            price: true,
+            currency: true,
+          },
+        });
+        if (!target) return { error: 'İlan bulunamadı' };
+
+        const peers = await this.prisma.listing.findMany({
+          where: {
+            status: 'ACTIVE',
+            type: target.type,
+            category: target.category,
+            district: target.district ?? undefined,
+            slug: { not: target.slug },
+          },
+          take: 10,
+          select: {
+            slug: true,
+            titleTr: true,
+            price: true,
+            currency: true,
+            areaM2: true,
+            bedrooms: true,
+          },
+        });
+
+        const peerStats = peers
+          .filter((p) => p.areaM2 && Number(p.areaM2) > 0)
+          .map((p) => ({
+            slug: p.slug,
+            pricePerM2: Number(p.price) / Number(p.areaM2),
+            currency: p.currency,
+          }));
+        const avgPerM2 =
+          peerStats.length > 0
+            ? peerStats.reduce((s, p) => s + p.pricePerM2, 0) / peerStats.length
+            : null;
+        const targetPerM2 =
+          target.areaM2 && Number(target.areaM2) > 0
+            ? Number(target.price) / Number(target.areaM2)
+            : null;
+
+        const summary = await this.client.chat.completions.create({
+          model: this.model,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'Türkçe gayrimenkul piyasa yorumu yap. KISA (3 cümle). Sayıları bold yapma, düz ver. Karar verici tona uy.',
+            },
+            {
+              role: 'user',
+              content: `Hedef ilan: ${target.titleTr} · ${target.bedrooms ?? '?'}+1 · ${target.areaM2 ?? '?'}m² · ${Number(target.price).toLocaleString('tr-TR')} ${target.currency} (${targetPerM2 ? Math.round(targetPerM2).toLocaleString('tr-TR') + '/m²' : 'm² yok'})\nBölge: ${target.district ?? target.city ?? '-'}\n\nKarşılaştırılabilir ${peerStats.length} ilanın ortalama m² fiyatı: ${avgPerM2 ? Math.round(avgPerM2).toLocaleString('tr-TR') : '?'}.\n\nHedefin piyasaya göre konumu nasıl? Fiyat önerisi (range) ver.`,
+            },
+          ],
+          temperature: 0.4,
+          max_tokens: 250,
+        });
+
+        return {
+          ok: true,
+          target: {
+            slug: target.slug,
+            titleTr: target.titleTr,
+            currentPrice: Number(target.price),
+            currency: target.currency,
+            pricePerM2: targetPerM2,
+          },
+          market: {
+            peerCount: peers.length,
+            avgPricePerM2: avgPerM2,
+            sampleSlugs: peerStats.slice(0, 5).map((p) => p.slug),
+          },
+          recommendation: summary.choices[0]?.message?.content?.trim() ?? '',
+        };
+      }
+
+      if (name === 'draft_email') {
+        if (!this.client) return { error: 'AI servisi kapalı' };
+        const ctx = args.context as string;
+        const customerName = (args.customerName as string) ?? '';
+        const recipientEmail = (args.recipientEmail as string) ?? '';
+        let listingInfo = '';
+        if (args.listingSlug) {
+          const l = await this.prisma.listing.findUnique({
+            where: { slug: args.listingSlug as string },
+            select: { titleTr: true, district: true, price: true, currency: true },
+          });
+          if (l) {
+            listingInfo = `\nİlgili ilan: ${l.titleTr} · ${l.district ?? ''} · ${Number(l.price).toLocaleString('tr-TR')} ${l.currency}`;
+          }
+        }
+        const draft = await this.client.chat.completions.create({
+          model: this.model,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'Türkçe profesyonel e-posta yaz. Hazal Muti kimliğiyle. Selamlama + 2-3 paragraf gövde + nazik kapanış. JSON döndür: {"subject":"...","body":"..."}',
+            },
+            {
+              role: 'user',
+              content: `Bağlam: ${ctx}\nMüşteri: ${customerName}${listingInfo}\n\nKonu satırı + gövde yaz.`,
+            },
+          ],
+          temperature: 0.5,
+          max_tokens: 600,
+          response_format: { type: 'json_object' },
+        });
+        let parsed: { subject?: string; body?: string } = {};
+        try {
+          parsed = JSON.parse(draft.choices[0]?.message?.content ?? '{}');
+        } catch {
+          // ignore
+        }
+        return {
+          ok: true,
+          recipientEmail,
+          subject: parsed.subject ?? '',
+          body: parsed.body ?? '',
+          note: 'Bu sadece taslak. Hazal onaylamadan gönderilmez. Mail sekmesi üzerinden gönder.',
         };
       }
 

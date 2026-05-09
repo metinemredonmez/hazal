@@ -533,7 +533,40 @@ function TemplatePickerDialog({ onClose }: { onClose: () => void }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {selected.variables?.map((v) => (
                 <div key={v.key} className="space-y-1">
-                  <Label className="text-xs">{v.label}</Label>
+                  <div className="flex items-center justify-between gap-2">
+                    <Label className="text-xs">{v.label}</Label>
+                    {v.type === "textarea" && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            toast.info("AI öneriyor...");
+                            const res = await api<{ bullets?: string[]; result?: string }>(
+                              "/api/admin/ai/structure-bullets",
+                              {
+                                method: "POST",
+                                body: {
+                                  prompt: `Belge: ${selected.name}\nAlan: ${v.label}\nKısa, formal madde madde Türkçe içerik öner.`,
+                                  count: 4,
+                                },
+                              },
+                            );
+                            const text = (res.bullets ?? []).join("\n") || res.result || "";
+                            if (text) {
+                              setValues((p) => ({ ...p, [v.key]: text }));
+                            } else {
+                              toast.error("AI öneri üretemedi");
+                            }
+                          } catch (err) {
+                            toast.error(err instanceof Error ? err.message : "AI hatası");
+                          }
+                        }}
+                        className="text-[10px] tracking-wider uppercase text-[#C9A96E] hover:underline"
+                      >
+                        ✨ AI
+                      </button>
+                    )}
+                  </div>
                   {v.type === "date" ? (
                     <Input
                       type="date"
@@ -550,9 +583,9 @@ function TemplatePickerDialog({ onClose }: { onClose: () => void }) {
                         setValues((p) => ({ ...p, [v.key]: e.target.value }))
                       }
                     />
-                  ) : v.type === "address" ? (
+                  ) : v.type === "address" || v.type === "textarea" ? (
                     <Textarea
-                      rows={2}
+                      rows={v.type === "textarea" ? 4 : 2}
                       value={values[v.key] ?? ""}
                       onChange={(e) =>
                         setValues((p) => ({ ...p, [v.key]: e.target.value }))

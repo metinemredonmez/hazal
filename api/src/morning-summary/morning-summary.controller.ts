@@ -10,12 +10,14 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MorningSummaryService } from './morning-summary.service';
+import { HourlyRemindersService } from './hourly-reminders.service';
 
 @ApiTags('morning-summary')
 @Controller()
 export class MorningSummaryController {
   constructor(
     private readonly summary: MorningSummaryService,
+    private readonly hourly: HourlyRemindersService,
     private readonly config: ConfigService,
   ) {}
 
@@ -50,5 +52,19 @@ export class MorningSummaryController {
   @UseGuards(JwtAuthGuard)
   async preview() {
     return this.summary.build();
+  }
+
+  /**
+   * Hourly reminder cron — call every hour 09-20:
+   *   0 9-20 * * *  curl -X POST -H "x-cron-secret: $CRON_SECRET" \
+   *      https://api.hazalmuti.com/api/cron/hourly-reminders
+   */
+  @Post('cron/hourly-reminders')
+  async runHourly(@Headers('x-cron-secret') secret: string) {
+    const expected = this.config.get<string>('CRON_SECRET');
+    if (!expected || secret !== expected) {
+      throw new UnauthorizedException('Invalid or missing x-cron-secret header');
+    }
+    return this.hourly.run();
   }
 }

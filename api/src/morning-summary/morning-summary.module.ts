@@ -4,11 +4,12 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { PushModule } from '../push/push.module';
 import { MorningSummaryService } from './morning-summary.service';
 import { MorningSummaryController } from './morning-summary.controller';
+import { HourlyRemindersService } from './hourly-reminders.service';
 
 @Module({
   imports: [AuthModule, NotificationsModule, PushModule],
-  providers: [MorningSummaryService],
+  providers: [MorningSummaryService, HourlyRemindersService],
   controllers: [MorningSummaryController],
-  exports: [MorningSummaryService],
+  exports: [MorningSummaryService, HourlyRemindersService],
 })
 export class MorningSummaryModule {}
