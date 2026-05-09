@@ -52,6 +52,11 @@ export class ConciergeChatDto {
   @IsOptional()
   @IsIn(['tr', 'en'])
   locale?: 'tr' | 'en';
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  visitorId?: string;
 }
 
 export class AssistantChatDto {

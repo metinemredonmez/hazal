@@ -1,7 +1,9 @@
 import { Injectable, ServiceUnavailableException, NotFoundException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
+import { ChatChannel, ChatSender } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatService } from '../chat/chat.service';
 import {
   GenerateDescriptionDto,
   TranslateDto,
@@ -25,6 +27,7 @@ export class AiService {
   constructor(
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
+    private readonly chat: ChatService,
   ) {
     const key = this.config.get<string>('OPENAI_API_KEY');
     if (key && key.length > 10) {
@@ -1677,6 +1680,25 @@ Rules:
 
     const validSlugs = new Set(catalog.map((l) => l.slug));
     const recommendedSlugs = recommend.filter((s) => validSlugs.has(s)).slice(0, 3);
+
+    // ChatSession kayıt — visitorId varsa son ziyaretçi mesajı + AI cevabı kaydet
+    if (dto.visitorId) {
+      try {
+        const session = await this.chat.getOrCreateSession(dto.visitorId, {
+          channel: ChatChannel.AI_CONCIERGE,
+        });
+        // Son ziyaretçi mesajı dto.messages'in son user mesajıdır
+        const lastUserMsg = [...dto.messages].reverse().find((m) => m.role === 'user');
+        if (lastUserMsg?.content) {
+          await this.chat.addMessage(session.id, ChatSender.VISITOR, lastUserMsg.content);
+        }
+        if (cleanReply) {
+          await this.chat.addMessage(session.id, ChatSender.ADMIN, cleanReply);
+        }
+      } catch (err) {
+        this.logger.warn(`Concierge ChatSession kayit hatasi: ${(err as Error).message}`);
+      }
+    }
 
     return { reply: cleanReply, recommendedSlugs, suggestInquiry };
   }

@@ -53,6 +53,7 @@ export default function ChatPage() {
   const [loading, setLoading] = React.useState(true);
   const [channelFilter, setChannelFilter] = React.useState<ChatChannel | "ALL">("ALL");
   const [stats, setStats] = React.useState<Array<{ channel: ChatChannel; count: number }>>([]);
+  const [manualOpen, setManualOpen] = React.useState(false);
   const messagesRef = React.useRef<HTMLDivElement>(null);
 
   const loadSessions = React.useCallback(() => {
@@ -150,6 +151,15 @@ export default function ChatPage() {
           sessions.length === 0
             ? "Henüz sohbet yok"
             : `${sessions.length} sohbet · ${sessions.reduce((a, s) => a + s.unreadCount, 0)} okunmamış`
+        }
+        actions={
+          <Button
+            size="sm"
+            onClick={() => setManualOpen(true)}
+            className="bg-[#14141A] hover:bg-black text-white gap-1.5 h-8"
+          >
+            <Hash className="h-3.5 w-3.5" /> Manuel Kayıt
+          </Button>
         }
       />
       <main className="flex-1 px-4 py-4 animate-fade-up space-y-3">
@@ -333,6 +343,180 @@ export default function ChatPage() {
           </Card>
         </div>
       </main>
+
+      <ManualLogDialog
+        open={manualOpen}
+        onOpenChange={setManualOpen}
+        onCreated={() => {
+          setManualOpen(false);
+          loadSessions();
+          loadStats();
+        }}
+      />
     </>
+  );
+}
+
+function ManualLogDialog({
+  open,
+  onOpenChange,
+  onCreated,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onCreated: () => void;
+}) {
+  const [channel, setChannel] = React.useState<ChatChannel>("PHONE");
+  const [name, setName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [note, setNote] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!open) {
+      setName("");
+      setPhone("");
+      setEmail("");
+      setNote("");
+      setChannel("PHONE");
+    }
+  }, [open]);
+
+  if (!open) return null;
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!note.trim()) {
+      toast.error("Not zorunlu");
+      return;
+    }
+    if (!name.trim()) {
+      toast.error("İsim zorunlu");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await api("/api/admin/chat/sessions/manual", {
+        method: "POST",
+        body: {
+          channel,
+          visitorName: name.trim(),
+          visitorPhone: phone.trim() || undefined,
+          visitorEmail: email.trim() || undefined,
+          note: note.trim(),
+        },
+      });
+      toast.success("Kayıt oluşturuldu");
+      onCreated();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Hata");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+      onClick={() => onOpenChange(false)}
+    >
+      <form
+        onSubmit={submit}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-card max-w-md w-full rounded-md shadow-2xl overflow-hidden"
+      >
+        <div className="bg-[#14141A] text-white px-5 py-3 flex items-center justify-between">
+          <h2 className="text-sm tracking-wider uppercase">Manuel Konuşma Kaydı</h2>
+          <button type="button" onClick={() => onOpenChange(false)} className="opacity-70 hover:opacity-100">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="p-5 space-y-3">
+          <div>
+            <label className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 block">
+              Kanal
+            </label>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(["PHONE", "EMAIL", "OTHER"] as ChatChannel[]).map((c) => {
+                const selected = channel === c;
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setChannel(c)}
+                    className={cn(
+                      "h-9 text-xs uppercase tracking-wider border rounded-md transition-colors",
+                      selected
+                        ? "bg-[#14141A] text-white border-[#14141A]"
+                        : "bg-background border-border hover:border-[#C9A96E]",
+                    )}
+                  >
+                    {c === "PHONE" ? "Telefon" : c === "EMAIL" ? "E-posta" : "Diğer"}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 block">
+              İsim *
+            </label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ahmet Yılmaz"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 block">
+                Telefon
+              </label>
+              <Input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+90 5xx ..."
+              />
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 block">
+                E-posta
+              </label>
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ornek@email.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 block">
+              Not / İçerik *
+            </label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={4}
+              placeholder="Konuşma özeti, müşteri talebi, atılacak adım..."
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/30"
+            />
+          </div>
+        </div>
+
+        <div className="px-5 py-3 border-t border-border bg-muted/30 flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            İptal
+          </Button>
+          <Button type="submit" disabled={submitting} className="bg-[#14141A] hover:bg-black text-white">
+            Kaydet
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

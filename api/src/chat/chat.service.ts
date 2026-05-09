@@ -1,22 +1,79 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ChatSender } from '@prisma/client';
+import { ChatSender, ChatChannel } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ChatService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getOrCreateSession(visitorId: string, info?: { visitorName?: string; visitorEmail?: string }) {
+  async getOrCreateSession(
+    visitorId: string,
+    info?: {
+      visitorName?: string;
+      visitorEmail?: string;
+      visitorPhone?: string;
+      channel?: ChatChannel;
+    },
+  ) {
     return this.prisma.chatSession.upsert({
       where: { visitorId },
       update: {
         visitorName: info?.visitorName ?? undefined,
         visitorEmail: info?.visitorEmail ?? undefined,
+        visitorPhone: info?.visitorPhone ?? undefined,
+        channel: info?.channel ?? undefined,
       },
       create: {
         visitorId,
         visitorName: info?.visitorName,
         visitorEmail: info?.visitorEmail,
+        visitorPhone: info?.visitorPhone,
+        channel: info?.channel ?? ChatChannel.WEB,
+      },
+    });
+  }
+
+  /** Manuel kayıt — admin paneli telefon/diğer için. */
+  async createManualSession(input: {
+    channel: ChatChannel;
+    visitorName?: string;
+    visitorPhone?: string;
+    visitorEmail?: string;
+    note: string;
+  }) {
+    const visitorId = `manual-${input.channel.toLowerCase()}-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    const session = await this.prisma.chatSession.create({
+      data: {
+        visitorId,
+        visitorName: input.visitorName,
+        visitorPhone: input.visitorPhone,
+        visitorEmail: input.visitorEmail,
+        channel: input.channel,
+      },
+    });
+    if (input.note?.trim()) {
+      await this.prisma.chatMessage.create({
+        data: {
+          sessionId: session.id,
+          sender: ChatSender.ADMIN,
+          content: input.note,
+          read: true,
+        },
+      });
+    }
+    return session;
+  }
+
+  /** Sonuncu mesajı admin notu olarak ekler (manuel session'a follow-up). */
+  async appendAdminNote(sessionId: string, note: string) {
+    return this.prisma.chatMessage.create({
+      data: {
+        sessionId,
+        sender: ChatSender.ADMIN,
+        content: note,
+        read: true,
       },
     });
   }

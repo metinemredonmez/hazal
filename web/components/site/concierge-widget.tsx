@@ -42,6 +42,20 @@ export function ConciergeWidget() {
   const [sending, setSending] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
+  // Persistent visitor ID — admin tarafında ChatSession'a bağlı kalsın
+  const visitorId = React.useMemo(() => {
+    if (typeof window === "undefined") return undefined;
+    let id = localStorage.getItem("hazal-visitor-id");
+    if (!id) {
+      id =
+        "visitor-" +
+        Math.random().toString(36).slice(2, 10) +
+        Date.now().toString(36);
+      localStorage.setItem("hazal-visitor-id", id);
+    }
+    return id;
+  }, []);
+
   // Welcome message on first open
   React.useEffect(() => {
     if (open && messages.length === 0) {
@@ -80,6 +94,7 @@ export function ConciergeWidget() {
         body: {
           messages: history.map((m) => ({ role: m.role, content: m.content })),
           locale,
+          visitorId,
         },
         auth: false,
       });
