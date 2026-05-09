@@ -3,6 +3,8 @@
 import * as React from "react";
 import { Play, X, Volume2, VolumeX } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
+import { useSettings } from "@/lib/use-settings";
+import { pageContent, pick } from "@/lib/page-content";
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "https://api.hazalmuti.com").replace(
   /\/$/,
@@ -38,8 +40,41 @@ const DEFAULT_VIDEOS: VideoItem[] = [
   },
 ];
 
-export function VideoShowcase({ videos = DEFAULT_VIDEOS }: { videos?: VideoItem[] }) {
+export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) {
   const [locale] = useLocale();
+  const settings = useSettings();
+  const home = pageContent(settings).home;
+
+  // CMS'ten video al, yoksa default'ları göster
+  const cmsVideos: VideoItem[] = [1, 2, 3]
+    .map((n) => {
+      const url = home?.[`showcaseVideo${n}Url` as keyof typeof home] as string | undefined;
+      if (!url) return null;
+      const titleObj = home?.[`showcaseVideo${n}Title` as keyof typeof home] as
+        | { tr: string; en: string }
+        | undefined;
+      const date = home?.[`showcaseVideo${n}Date` as keyof typeof home] as string | undefined;
+      return {
+        src: url,
+        titleTr: pick(titleObj, "tr", `Video ${n}`),
+        titleEn: pick(titleObj, "en", `Video ${n}`),
+        date,
+      } as VideoItem;
+    })
+    .filter((v): v is VideoItem => v !== null);
+
+  const videos =
+    propVideos && propVideos.length > 0
+      ? propVideos
+      : cmsVideos.length > 0
+        ? cmsVideos
+        : DEFAULT_VIDEOS;
+
+  // Hiç video yoksa bölümü gizle (CMS boş + default da olmazsa)
+  if (videos.length === 0) return null;
+
+  // Add #t=0.5 fragment so browser shows first frame as preview poster
+  const withPreview = (src: string) => (src.includes("#t=") ? src : `${src}#t=0.5`);
   const [active, setActive] = React.useState<VideoItem | null>(null);
   const [muted, setMuted] = React.useState(true);
 
@@ -63,44 +98,46 @@ export function VideoShowcase({ videos = DEFAULT_VIDEOS }: { videos?: VideoItem[
   }, [active]);
 
   return (
-    <section className="bg-[#0E0E0E] text-[#F5F2EC] py-20 lg:py-28 px-6 lg:px-10">
-      <div className="max-w-[1600px] mx-auto">
-        <div className="mb-10 lg:mb-14">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+    <section className="bg-[#0E0E0E] text-[#F5F2EC] py-14 lg:py-20 px-6 lg:px-10">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="mb-8 lg:mb-10">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-2">
             {locale === "tr" ? "Video Sunum" : "Video Showcase"}
           </p>
-          <h2 className="font-display font-light text-3xl lg:text-5xl">
+          <h2 className="font-display font-light text-2xl lg:text-3xl">
             {locale === "tr" ? "Mülklerden kareler" : "Frames from properties"}
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {videos.map((v) => (
             <button
               key={v.src}
               onClick={() => setActive(v)}
-              className="group relative aspect-[4/5] overflow-hidden bg-[#1A1A1F] rounded-sm"
+              className="group relative aspect-[16/10] overflow-hidden bg-[#1A1A1F] rounded-sm"
             >
               <video
-                src={v.src}
+                src={withPreview(v.src)}
                 preload="metadata"
                 muted
                 playsInline
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-14 h-14 rounded-full bg-[#C9A96E]/95 text-[#14141A] flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                  <Play className="h-5 w-5 fill-current ml-0.5" />
+                <div className="w-11 h-11 rounded-full bg-[#C9A96E]/95 text-[#14141A] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <Play className="h-4 w-4 fill-current ml-0.5" />
                 </div>
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-5 text-left">
-                <p className="text-[9px] tracking-[0.4em] uppercase text-[#C9A96E] mb-1">
-                  {v.date}
-                </p>
-                <h3 className="font-display text-xl text-white">
+              <div className="absolute bottom-0 left-0 right-0 p-3.5 text-left">
+                {v.date && (
+                  <p className="text-[9px] tracking-[0.4em] uppercase text-[#C9A96E] mb-1">
+                    {v.date}
+                  </p>
+                )}
+                <h3 className="font-display text-base text-white line-clamp-1">
                   {locale === "tr" ? v.titleTr : v.titleEn}
                 </h3>
               </div>
@@ -128,10 +165,12 @@ export function VideoShowcase({ videos = DEFAULT_VIDEOS }: { videos?: VideoItem[
             onClick={(e) => e.stopPropagation()}
           >
             <video
+              key={active.src}
               src={active.src}
               poster={active.poster}
               autoPlay
               controls
+              preload="auto"
               muted={muted}
               playsInline
               className="w-full h-auto max-h-[85vh] rounded-sm shadow-2xl bg-black"

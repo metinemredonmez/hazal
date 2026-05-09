@@ -380,6 +380,54 @@ function HomeSection({ getBi, setBi, getStr, setStr }: SectionProps & { getStr: 
           />
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader className="py-3 px-4 border-b border-border">
+          <CardTitle className="text-xs">Video Showcase (anasayfa video bölümü)</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 space-y-3">
+          <p className="text-[11px] text-muted-foreground">
+            Anasayfada 3'lü grid olarak gösterilen videolar (tıkla → lightbox).
+            Her birine başlık + tarih ve MP4 URL gir. Boş bırakılan slot gösterilmez.
+          </p>
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="border border-border rounded-md p-3 space-y-2.5">
+              <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
+                Video {n}
+              </p>
+              <SectionImageField
+                label="Video dosyası (MP4)"
+                hint="MP4 yükleyebilir veya URL yapıştırabilirsin (max 30 MB öneri)"
+                value={getStr(["home", `showcaseVideo${n}Url`])}
+                onChange={(v) => setStr(["home", `showcaseVideo${n}Url`], v)}
+                aspectClass="w-32 h-20"
+                acceptVideo
+              />
+              <BiInput
+                label="Başlık"
+                tr={getBi(["home", `showcaseVideo${n}Title`]).tr}
+                en={getBi(["home", `showcaseVideo${n}Title`]).en}
+                onTr={(v) => setBi(["home", `showcaseVideo${n}Title`], "tr", v)}
+                onEn={(v) => setBi(["home", `showcaseVideo${n}Title`], "en", v)}
+                placeholder={{ tr: "Atılgan Royal", en: "Atılgan Royal" }}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 block">
+                    Tarih (opsiyonel)
+                  </label>
+                  <input
+                    value={getStr(["home", `showcaseVideo${n}Date`])}
+                    onChange={(e) => setStr(["home", `showcaseVideo${n}Date`], e.target.value)}
+                    placeholder="24.12.2025"
+                    className="w-full h-9 px-2 text-sm border border-input rounded-md bg-background"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }

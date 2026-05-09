@@ -26,6 +26,16 @@ export interface PageContent {
     contactSubtitle?: BilingualText;
     contactImageUrl?: string;           // contact CTA arkaplan
     contactCtaLabel?: BilingualText;
+    // Video showcase — anasayfa video bölümü (3 slot, opsiyonel)
+    showcaseVideo1Url?: string;
+    showcaseVideo1Title?: BilingualText;
+    showcaseVideo1Date?: string;
+    showcaseVideo2Url?: string;
+    showcaseVideo2Title?: BilingualText;
+    showcaseVideo2Date?: string;
+    showcaseVideo3Url?: string;
+    showcaseVideo3Title?: BilingualText;
+    showcaseVideo3Date?: string;
   };
   about?: {
     heroEyebrow?: BilingualText;
