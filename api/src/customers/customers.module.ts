@@ -99,6 +99,21 @@ class CustomersService {
       updatedAt: Date;
       messages: Array<{ content: string; createdAt: Date; sender: string }>;
     };
+    type DocEvent = {
+      id: string;
+      title: string;
+      category: string;
+      fileName: string;
+      createdAt: Date;
+    };
+    type VisitEvent = {
+      id: string;
+      label: string | null;
+      notes: string | null;
+      lat: number;
+      lng: number;
+      visitedAt: Date;
+    };
 
     const [emails, documents, visits, chats] = (await Promise.all([
       email
@@ -158,7 +173,7 @@ class CustomersService {
             take: 20,
           })
         : Promise.resolve([] as ChatEvent[]),
-    ])) as [EmailEvent[], unknown[], unknown[], ChatEvent[]];
+    ])) as [EmailEvent[], DocEvent[], VisitEvent[], ChatEvent[]];
 
     // Build merged timeline events
     type Event = {

@@ -578,7 +578,7 @@ export class ListingsService {
           descriptionTr: obj.descriptionTr || titleTr,
           descriptionEn: obj.descriptionEn || titleEn,
           slug: await this.generateUniqueSlug(titleEn || titleTr),
-          price: new Prisma.Decimal(priceNum),
+          price: priceNum,
           currency: currency as any,
           type: type as any,
           category: category as any,
@@ -588,7 +588,7 @@ export class ListingsService {
 
         if (obj.bedrooms) data.bedrooms = parseInt(obj.bedrooms, 10);
         if (obj.bathrooms) data.bathrooms = parseInt(obj.bathrooms, 10);
-        if (obj.areaM2) data.areaM2 = new Prisma.Decimal(Number(obj.areaM2));
+        if (obj.areaM2) data.areaM2 = Number(obj.areaM2);
         if (obj.yearBuilt) data.yearBuilt = parseInt(obj.yearBuilt, 10);
         if (obj.address) data.address = obj.address;
         if (obj.city) data.city = obj.city;
