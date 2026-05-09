@@ -12,6 +12,9 @@ import {
   ArrowLeft,
   Languages,
   Sparkles,
+  Upload,
+  Image as ImageIcon,
+  X,
 } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -378,16 +381,10 @@ function AboutSection({ getBi, setBi, getStr, setStr }: AboutSectionProps) {
             onEn={(v) => setBi(["about", "heroTitle"], "en", v)}
             placeholder={{ tr: "Hazal Muti", en: "Hazal Muti" }}
           />
-          <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Portre fotoğraf URL (1080×1440 önerilir)
-            </Label>
-            <Input
-              value={getStr(["about", "portraitUrl"])}
-              onChange={(e) => setStr(["about", "portraitUrl"], e.target.value)}
-              placeholder="https://hazalmuti.com/uploads/hazal-portrait.jpg"
-            />
-          </div>
+          <PortraitUploadField
+            value={getStr(["about", "portraitUrl"])}
+            onChange={(v) => setStr(["about", "portraitUrl"], v)}
+          />
         </CardContent>
       </Card>
 
@@ -651,6 +648,120 @@ function BiInput({
             rows={multiline ? 4 : undefined}
             placeholder={placeholder?.en}
           />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PortraitUploadField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [uploading, setUploading] = React.useState(false);
+  const fileRef = React.useRef<HTMLInputElement>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Sadece görsel dosya yükle");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Dosya 10 MB'dan büyük olamaz");
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("files", file);
+      const res = await api<Array<{ url: string }>>("/api/admin/uploads", {
+        method: "POST",
+        body: fd,
+      });
+      const url = res[0]?.url;
+      if (!url) throw new Error("Upload başarısız");
+      onChange(url);
+      toast.success("Portre yüklendi");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Upload başarısız");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        Hakkımda Portresi (1080×1440 önerilir)
+      </Label>
+
+      <div className="flex gap-3 items-start">
+        {/* Önizleme */}
+        <div className="w-24 h-32 rounded-md bg-muted border border-border overflow-hidden shrink-0 flex items-center justify-center">
+          {value ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={value}
+              alt="Portre"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+          )}
+        </div>
+
+        <div className="flex-1 space-y-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFile}
+          />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="gap-1.5"
+            >
+              {uploading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Upload className="h-3.5 w-3.5" />
+              )}
+              {value ? "Değiştir" : "Yükle"}
+            </Button>
+            {value && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onChange("")}
+                className="gap-1.5"
+              >
+                <X className="h-3.5 w-3.5" /> Kaldır
+              </Button>
+            )}
+          </div>
+          <Input
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Veya URL yapıştır"
+            className="text-xs font-mono"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Hakkımda sayfasında ve anasayfa portre alanında bu fotoğraf görünür.
+            JPG/PNG/WebP, dik (3:4) oran tercih edilir.
+          </p>
         </div>
       </div>
     </div>
