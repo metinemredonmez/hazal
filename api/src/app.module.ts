@@ -20,6 +20,7 @@ import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 import { CustomersModule } from './customers/customers.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { MailTemplatesModule } from './mail-templates/mail-templates.module';
+import { MorningSummaryModule } from './morning-summary/morning-summary.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { MailTemplatesModule } from './mail-templates/mail-templates.module';
     CustomersModule,
     ContactsModule,
     MailTemplatesModule,
+    MorningSummaryModule,
   ],
 })
 export class AppModule {}

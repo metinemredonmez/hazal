@@ -13,6 +13,8 @@ import {
   Star,
   MessageCircle,
   BookOpen,
+  Upload,
+  FileText,
 } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,6 +60,7 @@ export default function RehberPage() {
   const [filter, setFilter] = React.useState<string | "ALL" | "FAVORITES">("ALL");
   const [editing, setEditing] = React.useState<Contact | null>(null);
   const [creating, setCreating] = React.useState(false);
+  const [importing, setImporting] = React.useState(false);
 
   const refresh = React.useCallback(async () => {
     setLoading(true);
@@ -160,12 +163,21 @@ export default function RehberPage() {
               className="pl-9 h-9 text-sm"
             />
           </div>
-          <Button
-            onClick={() => setCreating(true)}
-            className="bg-[#14141A] hover:bg-black text-white gap-2"
-          >
-            <Plus className="h-3.5 w-3.5" /> Kişi Ekle
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setImporting(true)}
+              variant="outline"
+              className="gap-2"
+            >
+              <Upload className="h-3.5 w-3.5" /> İçe Aktar
+            </Button>
+            <Button
+              onClick={() => setCreating(true)}
+              className="bg-[#14141A] hover:bg-black text-white gap-2"
+            >
+              <Plus className="h-3.5 w-3.5" /> Kişi Ekle
+            </Button>
+          </div>
         </div>
 
         {/* List */}
@@ -287,7 +299,229 @@ export default function RehberPage() {
           }}
         />
       )}
+
+      {importing && (
+        <ImportDialog
+          onClose={() => setImporting(false)}
+          onDone={() => {
+            setImporting(false);
+            refresh();
+          }}
+        />
+      )}
     </>
+  );
+}
+
+interface ImportResult {
+  imported: number;
+  skipped: number;
+  duplicates: number;
+  errors: Array<{ row: number; reason: string }>;
+}
+
+function ImportDialog({
+  onClose,
+  onDone,
+}: {
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const [format, setFormat] = React.useState<"csv" | "vcard">("csv");
+  const [text, setText] = React.useState("");
+  const [importing, setImporting] = React.useState(false);
+  const [result, setResult] = React.useState<ImportResult | null>(null);
+
+  function onFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const content = reader.result as string;
+      setText(content);
+      // Auto-detect format
+      if (/BEGIN:VCARD/i.test(content)) setFormat("vcard");
+      else setFormat("csv");
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }
+
+  async function runImport() {
+    if (!text.trim()) {
+      toast.error("İçerik boş");
+      return;
+    }
+    setImporting(true);
+    try {
+      const r = await api<ImportResult>(
+        `/api/admin/contacts/import/${format}`,
+        { method: "POST", body: { text } },
+      );
+      setResult(r);
+      if (r.imported > 0) {
+        toast.success(`${r.imported} kişi içe aktarıldı`);
+      } else {
+        toast.warning("Hiç kişi eklenmedi");
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Hata");
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>📇 Rehbere İçe Aktar</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          {!result ? (
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setFormat("csv")}
+                  className={
+                    "p-3 rounded-md border text-left transition-colors " +
+                    (format === "csv"
+                      ? "border-[#C9A96E] bg-[#C9A96E]/10"
+                      : "border-border hover:bg-muted/30")
+                  }
+                >
+                  <p className="text-xs font-medium">📊 CSV / Excel</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Excel'den dışa aktarılan
+                  </p>
+                </button>
+                <button
+                  onClick={() => setFormat("vcard")}
+                  className={
+                    "p-3 rounded-md border text-left transition-colors " +
+                    (format === "vcard"
+                      ? "border-[#C9A96E] bg-[#C9A96E]/10"
+                      : "border-border hover:bg-muted/30")
+                  }
+                >
+                  <p className="text-xs font-medium">📱 vCard (.vcf)</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    iPhone / Android rehber
+                  </p>
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs">Dosya Yükle</Label>
+                <Input
+                  type="file"
+                  accept={format === "csv" ? ".csv,.txt" : ".vcf,.vcard"}
+                  onChange={onFileSelect}
+                  className="cursor-pointer"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Veya aşağıya doğrudan yapıştır.
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">İçerik</Label>
+                <Textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  rows={10}
+                  className="font-mono text-xs"
+                  placeholder={
+                    format === "csv"
+                      ? "name,phone,email,company,role\nAhmet Yılmaz,+90 532 ...,ahmet@x.com,ABC Avukat,Avukat\n..."
+                      : "BEGIN:VCARD\nVERSION:3.0\nFN:Ahmet Yılmaz\nTEL:+90...\nEND:VCARD\n..."
+                  }
+                />
+              </div>
+
+              {format === "csv" && (
+                <div className="text-[11px] text-muted-foreground bg-muted/50 p-2 rounded">
+                  💡 <strong>CSV ipuçları:</strong> İlk satır başlık olabilir
+                  (name, phone, email, company, role, category, notes). Türkçe
+                  başlık da çalışır (ad, telefon, eposta, şirket, görev).
+                  Virgül, noktalı virgül veya tab ayırıcı kullanılabilir.
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-2">
+                <div className="p-3 bg-emerald-50 rounded text-center">
+                  <p className="text-2xl font-light text-emerald-700">
+                    {result.imported}
+                  </p>
+                  <p className="text-[10px] uppercase tracking-wider text-emerald-700/70 mt-1">
+                    Eklendi
+                  </p>
+                </div>
+                <div className="p-3 bg-amber-50 rounded text-center">
+                  <p className="text-2xl font-light text-amber-700">
+                    {result.duplicates}
+                  </p>
+                  <p className="text-[10px] uppercase tracking-wider text-amber-700/70 mt-1">
+                    Yinelenen
+                  </p>
+                </div>
+                <div className="p-3 bg-red-50 rounded text-center">
+                  <p className="text-2xl font-light text-red-700">
+                    {result.skipped}
+                  </p>
+                  <p className="text-[10px] uppercase tracking-wider text-red-700/70 mt-1">
+                    Atlandı
+                  </p>
+                </div>
+              </div>
+              {result.errors.length > 0 && (
+                <div className="space-y-1 max-h-40 overflow-y-auto p-2 bg-red-50 rounded">
+                  <p className="text-[10px] font-medium text-red-700 uppercase tracking-wider">
+                    Hatalar
+                  </p>
+                  {result.errors.slice(0, 20).map((e, i) => (
+                    <p key={i} className="text-[11px] text-red-700">
+                      Satır {e.row}: {e.reason}
+                    </p>
+                  ))}
+                  {result.errors.length > 20 && (
+                    <p className="text-[10px] text-red-700/70 mt-1">
+                      ... ve {result.errors.length - 20} tane daha
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          {result ? (
+            <Button onClick={onDone} className="bg-[#14141A] text-white">
+              Tamam
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" onClick={onClose} disabled={importing}>
+                İptal
+              </Button>
+              <Button
+                onClick={runImport}
+                disabled={importing || !text.trim()}
+                className="bg-[#14141A] text-white gap-2"
+              >
+                {importing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                <FileText className="h-3.5 w-3.5" />
+                İçe Aktar
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
