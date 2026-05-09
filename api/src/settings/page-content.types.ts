@@ -14,18 +14,23 @@ export interface BilingualText {
 export interface PageContent {
   home?: {
     heroEyebrow?: BilingualText;        // small line above hero title
+    heroMediaUrl?: string;              // hero arkaplan (settings.heroMediaUrl yedek)
     heroCtaLabel?: BilingualText;       // hero button text
     featuredTitle?: BilingualText;      // "Featured listings" section heading
     featuredSubtitle?: BilingualText;
+    featuredImageUrl?: string;          // öne çıkan ilanlar bölümü banner
     aboutHeading?: BilingualText;       // "Every client, a single story." line
+    aboutImageUrl?: string;             // teaser bölümü ek görsel (yan kart)
     aboutCtaLabel?: BilingualText;
     contactHeading?: BilingualText;     // "Your next home, found together"
     contactSubtitle?: BilingualText;
+    contactImageUrl?: string;           // contact CTA arkaplan
     contactCtaLabel?: BilingualText;
   };
   about?: {
     heroEyebrow?: BilingualText;
     heroTitle?: BilingualText;          // bigger /hakkimizda hero
+    heroImageUrl?: string;              // /hakkimizda hero arkaplan
     intro?: BilingualText;              // 1-2 line intro paragraph
     bio1?: BilingualText;               // first long paragraph
     bio2?: BilingualText;               // second long paragraph (optional)
@@ -37,6 +42,7 @@ export interface PageContent {
   contact?: {
     heroEyebrow?: BilingualText;
     heroTitle?: BilingualText;
+    heroImageUrl?: string;              // /iletisim hero arkaplan
     intro?: BilingualText;              // text below the heading
     workingHours?: BilingualText;       // free text — multiline
     addressLine?: BilingualText;        // override settings.address if set

@@ -784,6 +784,141 @@ function HeroMediaUploadField({
   );
 }
 
+function SectionImageField({
+  label,
+  hint,
+  value,
+  onChange,
+  aspectClass = "w-32 h-20",
+  acceptVideo = false,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  onChange: (v: string) => void;
+  aspectClass?: string;
+  acceptVideo?: boolean;
+}) {
+  const [uploading, setUploading] = React.useState(false);
+  const fileRef = React.useRef<HTMLInputElement>(null);
+  const isVideo = /\.(mp4|mov|webm)$/i.test(value);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ok =
+      file.type.startsWith("image/") ||
+      (acceptVideo && file.type.startsWith("video/"));
+    if (!ok) {
+      toast.error(
+        acceptVideo ? "Sadece görsel veya video" : "Sadece görsel yükle",
+      );
+      return;
+    }
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error("Dosya 30 MB'dan büyük olamaz");
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("files", file);
+      const res = await api<Array<{ url: string }>>("/api/admin/uploads", {
+        method: "POST",
+        body: fd,
+      });
+      const url = res[0]?.url;
+      if (!url) throw new Error("Upload başarısız");
+      onChange(url);
+      toast.success(`${label} yüklendi`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Upload başarısız");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </Label>
+      <div className="flex gap-3 items-start">
+        <div
+          className={`${aspectClass} rounded-md bg-muted border border-border overflow-hidden shrink-0 flex items-center justify-center`}
+        >
+          {value ? (
+            isVideo ? (
+              <video
+                src={value}
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={value}
+                alt={label}
+                className="w-full h-full object-cover"
+              />
+            )
+          ) : (
+            <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+          )}
+        </div>
+        <div className="flex-1 space-y-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept={acceptVideo ? "image/*,video/*" : "image/*"}
+            className="hidden"
+            onChange={handleFile}
+          />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="gap-1.5"
+            >
+              {uploading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Upload className="h-3.5 w-3.5" />
+              )}
+              {value ? "Değiştir" : "Yükle"}
+            </Button>
+            {value && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onChange("")}
+                className="gap-1.5"
+              >
+                <X className="h-3.5 w-3.5" /> Kaldır
+              </Button>
+            )}
+          </div>
+          <Input
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Veya URL yapıştır"
+            className="text-xs font-mono"
+          />
+          {hint && (
+            <p className="text-[11px] text-muted-foreground">{hint}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PortraitUploadField({
   value,
   onChange,

@@ -212,80 +212,91 @@ export default function RehberPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
             {data.items.map((c) => (
-              <Card key={c.id} className="hover:border-[#C9A96E] transition-colors">
-                <CardContent className="p-3">
-                  <div className="flex items-start justify-between mb-2">
+              <Card
+                key={c.id}
+                className="hover:border-[#C9A96E] transition-colors group"
+              >
+                <CardContent className="p-2.5">
+                  {/* Üst sıra: ad + kategori + edit/delete */}
+                  <div className="flex items-center gap-2 min-w-0">
+                    <button
+                      onClick={() => toggleFavorite(c)}
+                      className="shrink-0 text-muted-foreground hover:text-[#C9A96E]"
+                      title={c.favorite ? "Favoriden çıkar" : "Favorile"}
+                    >
+                      <Star
+                        className={
+                          "h-3.5 w-3.5 " +
+                          (c.favorite
+                            ? "text-[#C9A96E] fill-current"
+                            : "text-muted-foreground/40")
+                        }
+                      />
+                    </button>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium line-clamp-1 flex items-center gap-1.5">
-                        {c.favorite && <Star className="h-3 w-3 text-[#C9A96E] fill-current" />}
+                      <p className="text-xs font-medium leading-tight truncate">
                         {c.name}
                       </p>
-                      {c.role && (
-                        <p className="text-xs text-muted-foreground line-clamp-1">{c.role}</p>
-                      )}
-                      {c.company && (
-                        <p className="text-[11px] text-muted-foreground line-clamp-1">
-                          🏢 {c.company}
-                        </p>
-                      )}
+                      <p className="text-[10px] text-muted-foreground leading-tight truncate">
+                        {[c.role, c.company].filter(Boolean).join(" · ") || (c.category ?? "—")}
+                      </p>
                     </div>
                     {c.category && (
-                      <span className="text-[10px] uppercase tracking-wider bg-muted px-1.5 py-0.5 rounded">
+                      <span className="text-[9px] uppercase tracking-wider bg-muted px-1.5 py-0.5 rounded shrink-0 hidden sm:inline">
                         {c.category}
                       </span>
                     )}
+                    <div className="flex gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => setEditing(c)}
+                        className="w-6 h-6 inline-flex items-center justify-center text-muted-foreground hover:text-foreground"
+                        title="Düzenle"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => deleteContact(c.id)}
+                        className="w-6 h-6 inline-flex items-center justify-center text-muted-foreground hover:text-destructive"
+                        title="Sil"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {c.phone && (
-                      <a
-                        href={`tel:${c.phone}`}
-                        className="inline-flex items-center gap-1 text-xs bg-[#14141A] text-white px-2.5 py-1 rounded hover:bg-[#C9A96E]"
-                      >
-                        <Phone className="h-3 w-3" /> Ara
-                      </a>
-                    )}
-                    {c.phone && (
-                      <a
-                        href={`https://wa.me/${c.phone.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-xs border border-border px-2.5 py-1 rounded hover:border-[#C9A96E]"
-                      >
-                        <MessageCircle className="h-3 w-3" /> WA
-                      </a>
-                    )}
+
+                  {/* Aksiyon butonları — kompakt, ikon-only, sadece 3 */}
+                  <div className="flex gap-1 mt-2">
+                    {c.phone ? (
+                      <>
+                        <a
+                          href={`tel:${c.phone}`}
+                          title={`Ara · ${c.phone}`}
+                          className="flex-1 inline-flex items-center justify-center h-7 bg-[#14141A] text-white rounded hover:bg-[#C9A96E] hover:text-[#14141A]"
+                        >
+                          <Phone className="h-3 w-3" />
+                        </a>
+                        <a
+                          href={`https://wa.me/${c.phone.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="WhatsApp"
+                          className="flex-1 inline-flex items-center justify-center h-7 border border-border rounded hover:border-emerald-500 hover:text-emerald-600"
+                        >
+                          <MessageCircle className="h-3 w-3" />
+                        </a>
+                      </>
+                    ) : null}
                     {c.email && (
                       <a
                         href={`mailto:${c.email}`}
-                        className="inline-flex items-center gap-1 text-xs border border-border px-2.5 py-1 rounded hover:border-[#C9A96E]"
+                        title={`Mail · ${c.email}`}
+                        className="flex-1 inline-flex items-center justify-center h-7 border border-border rounded hover:border-[#C9A96E]"
                       >
                         <Mail className="h-3 w-3" />
                       </a>
                     )}
-                  </div>
-                  <div className="flex justify-between mt-2 pt-2 border-t border-border">
-                    <button
-                      onClick={() => toggleFavorite(c)}
-                      className="text-[11px] text-muted-foreground hover:text-[#C9A96E]"
-                    >
-                      {c.favorite ? "★ Çıkar" : "☆ Favorile"}
-                    </button>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => setEditing(c)}
-                        className="text-[11px] text-muted-foreground hover:text-foreground"
-                      >
-                        <Edit3 className="h-3 w-3 inline" />
-                      </button>
-                      <button
-                        onClick={() => deleteContact(c.id)}
-                        className="text-[11px] text-muted-foreground hover:text-destructive ml-1"
-                      >
-                        <Trash2 className="h-3 w-3 inline" />
-                      </button>
-                    </div>
                   </div>
                 </CardContent>
               </Card>

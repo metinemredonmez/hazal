@@ -22,6 +22,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { MailTemplatesModule } from './mail-templates/mail-templates.module';
 import { MorningSummaryModule } from './morning-summary/morning-summary.module';
 import { VisitedLocationsModule } from './visited-locations/visited-locations.module';
+import { SavedSearchesModule } from './saved-searches/saved-searches.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { VisitedLocationsModule } from './visited-locations/visited-locations.mo
     MailTemplatesModule,
     MorningSummaryModule,
     VisitedLocationsModule,
+    SavedSearchesModule,
   ],
 })
 export class AppModule {}
