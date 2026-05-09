@@ -14,6 +14,17 @@ async function bootstrap() {
 
   app.use(helmet({ crossOriginResourcePolicy: false }));
 
+  // CyberPanel/LiteSpeed reverse proxy duplicates the Origin header
+  // ("https://x.com, https://x.com") which breaks CORS matching.
+  // Sanitize before any CORS middleware sees it.
+  app.use((req: { headers: { origin?: string } }, _res: unknown, next: () => void) => {
+    const origin = req.headers.origin;
+    if (typeof origin === 'string' && origin.includes(',')) {
+      req.headers.origin = origin.split(',')[0].trim();
+    }
+    next();
+  });
+
   const corsOrigins = (config.get<string>('CORS_ORIGINS') ?? 'http://localhost:3000')
     .split(',')
     .map((s) => s.trim())
