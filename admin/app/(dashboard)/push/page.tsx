@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Send, BellRing, AlertCircle, Sparkles, Home, TrendingDown, Calendar, Newspaper, Settings as SettingsIcon, Save, Loader2 } from "lucide-react";
+import { Send, BellRing, AlertCircle, Sparkles, Home, TrendingDown, Calendar, Newspaper, Settings as SettingsIcon, Save, Loader2, Users, Search, Check, Heart, Phone, Gift, Building2, Clock } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -76,6 +76,52 @@ const TEMPLATES: Template[] = [
     bodyTr: "İstanbul lüks gayrimenkul piyasası — bu ayın özet analizi.",
     bodyEn: "Istanbul luxury real estate — this month's summary analysis.",
   },
+  // ─── Sade / Minimal şablonlar ──────────────────────────────────
+  {
+    id: "minimal-hello",
+    label: "Selam",
+    icon: Heart,
+    titleTr: "Hazal Muti",
+    titleEn: "Hazal Muti",
+    bodyTr: "Merhaba 👋",
+    bodyEn: "Hello 👋",
+  },
+  {
+    id: "minimal-call-back",
+    label: "Geri Dönüş",
+    icon: Phone,
+    titleTr: "Sizi aradık",
+    titleEn: "We tried to reach you",
+    bodyTr: "Müsait olduğunuzda dönerseniz sevinirim.",
+    bodyEn: "Please call back when you're available.",
+  },
+  {
+    id: "minimal-thank-you",
+    label: "Teşekkür",
+    icon: Gift,
+    titleTr: "Teşekkürler",
+    titleEn: "Thank you",
+    bodyTr: "Güveniniz için teşekkür ederim. İyi günlerde kullanın.",
+    bodyEn: "Thank you for your trust. Wishing you the best.",
+  },
+  {
+    id: "minimal-new-portfolio",
+    label: "Portföy",
+    icon: Building2,
+    titleTr: "Yeni portföy",
+    titleEn: "New portfolio",
+    bodyTr: "İlgilenebileceğinizi düşündüğüm yeni ilanlar var.",
+    bodyEn: "I have new listings you might like.",
+  },
+  {
+    id: "minimal-followup",
+    label: "Takip",
+    icon: Clock,
+    titleTr: "Hatırlatma",
+    titleEn: "Reminder",
+    bodyTr: "Geçen hafta görüştüğümüz konuda durum nedir?",
+    bodyEn: "Any update on what we discussed last week?",
+  },
 ];
 
 export default function PushPage() {
@@ -86,6 +132,7 @@ export default function PushPage() {
   const [url, setUrl] = React.useState("");
   const [imageUrl, setImageUrl] = React.useState("");
   const [emailRecipients, setEmailRecipients] = React.useState("");
+  const [recipientPickerOpen, setRecipientPickerOpen] = React.useState(false);
   const [sending, setSending] = React.useState(false);
   const [status, setStatus] = React.useState<PushStatus | null>(null);
   const [lastResult, setLastResult] = React.useState<SendResult | null>(null);
