@@ -104,10 +104,10 @@ export class EmailService {
         }));
       }
       // Resend v6 type union requires either `react` or `html`/`text`. We pass
-      // html/text dynamically so cast to bypass the strict discriminated union.
-      const result = await this.resend.emails.send(
-        payload as Parameters<typeof this.resend.emails.send>[0],
-      );
+      // html/text dynamically so cast through unknown to bypass the strict
+      // discriminated union.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await this.resend.emails.send(payload as unknown as any);
       if (result.error) {
         throw new Error(`Resend error: ${result.error.message}`);
       }
