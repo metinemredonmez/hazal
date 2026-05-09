@@ -38,31 +38,7 @@ export class ListingsAdminController {
     return this.listings.timeseries(days ? parseInt(days, 10) : 30);
   }
 
-  @Get(':id')
-  getOne(@Param('id') id: string) {
-    return this.listings.getById(id);
-  }
-
-  @Post()
-  create(@Body() dto: CreateListingDto) {
-    return this.listings.create(dto);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateListingDto) {
-    return this.listings.update(id, dto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.listings.remove(id);
-  }
-
-  @Post(':id/duplicate')
-  duplicate(@Param('id') id: string) {
-    return this.listings.duplicate(id);
-  }
-
+  // Bulk routes — :id'den ÖNCE tanimlanmasi sart, aksi halde NestJS :id ile catch eder
   @Get('bulk/template')
   bulkTemplate() {
     return {
@@ -89,6 +65,31 @@ export class ListingsAdminController {
   @Post('bulk/delete')
   bulkDelete(@Body() body: { ids: string[] }) {
     return this.listings.bulkDelete(body.ids);
+  }
+
+  @Get(':id')
+  getOne(@Param('id') id: string) {
+    return this.listings.getById(id);
+  }
+
+  @Post()
+  create(@Body() dto: CreateListingDto) {
+    return this.listings.create(dto);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateListingDto) {
+    return this.listings.update(id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.listings.remove(id);
+  }
+
+  @Post(':id/duplicate')
+  duplicate(@Param('id') id: string) {
+    return this.listings.duplicate(id);
   }
 
   @Post(':id/images')

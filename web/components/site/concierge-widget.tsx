@@ -126,12 +126,13 @@ export function ConciergeWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 group flex items-center justify-center gap-0 hover:gap-2 bg-[#14141A] hover:bg-[#C9A96E] text-white rounded-full shadow-xl w-12 h-12 hover:w-auto hover:h-12 hover:px-5 transition-all overflow-hidden ring-2 ring-white/30"
+          className="concierge-fab fixed bottom-5 right-5 z-50 group flex items-center justify-center gap-0 hover:gap-2 bg-[#14141A] hover:bg-[#C9A96E] text-white rounded-full shadow-xl w-12 h-12 hover:w-auto hover:h-12 hover:px-5 transition-all overflow-hidden ring-2 ring-[#C9A96E]/40"
           aria-label={locale === "tr" ? "Sanal danışmanı aç" : "Open AI concierge"}
           title={locale === "tr" ? "Sanal Danışman" : "AI Concierge"}
         >
-          <Sparkles className="h-4 w-4 text-[#C9A96E] group-hover:text-white transition-colors shrink-0" />
-          <span className="hidden group-hover:inline text-xs tracking-[0.2em] uppercase whitespace-nowrap">
+          <span className="concierge-pulse" aria-hidden />
+          <Sparkles className="concierge-spark h-4 w-4 text-[#C9A96E] group-hover:text-white transition-colors shrink-0 relative" />
+          <span className="hidden group-hover:inline text-xs tracking-[0.2em] uppercase whitespace-nowrap relative">
             {locale === "tr" ? "Sanal Danışman" : "AI Concierge"}
           </span>
         </button>
