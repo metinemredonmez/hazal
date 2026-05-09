@@ -406,19 +406,31 @@ export default function PushPage() {
             </div>
 
             <div className="space-y-1.5 pt-2 border-t">
-              <Label htmlFor="emailRecipients" className="flex items-center gap-2">
-                📧 E-posta ile de gönder (opsiyonel)
-              </Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="emailRecipients" className="flex items-center gap-2">
+                  📧 E-posta ile de gönder (opsiyonel)
+                </Label>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setRecipientPickerOpen(true)}
+                  className="gap-1.5 text-xs h-7"
+                >
+                  <Users className="h-3 w-3" />
+                  Kayıtlılardan Seç
+                </Button>
+              </div>
               <Textarea
                 id="emailRecipients"
                 value={emailRecipients}
                 onChange={(e) => setEmailRecipients(e.target.value)}
-                placeholder="ahmet@example.com, ayse@example.com&#10;veya her satıra bir e-posta"
+                placeholder="ahmet@example.com, ayse@example.com&#10;veya 'Kayıtlılardan Seç' ile müşteri/rehber/bülten abonelerinden seç"
                 rows={3}
                 className="font-mono text-xs"
               />
               <p className="text-[11px] text-muted-foreground">
-                Push aboneliği olmayan kişilere de aynı bildirimi e-posta olarak yollar. Virgülle veya satır ile ayır.
+                Push aboneliği olmayan kişilere de aynı bildirimi e-posta olarak yollar.
+                Manuel yaz (virgülle/satır ile) veya yukarıdan kayıtlı kişilerden seç.
               </p>
             </div>
 
@@ -538,6 +550,319 @@ export default function PushPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {recipientPickerOpen && (
+        <RecipientPickerDialog
+          existing={emailRecipients}
+          onClose={() => setRecipientPickerOpen(false)}
+          onApply={(emails) => {
+            setEmailRecipients(emails);
+            setRecipientPickerOpen(false);
+            toast.success(`${emails.split(/[,\n]/).filter(Boolean).length} alıcı eklendi`);
+          }}
+        />
+      )}
     </>
+  );
+}
+
+interface PickerPerson {
+  email: string;
+  name: string;
+  source: "customer" | "contact" | "newsletter" | "inquiry";
+  meta?: string;
+}
+
+function RecipientPickerDialog({
+  existing,
+  onClose,
+  onApply,
+}: {
+  existing: string;
+  onClose: () => void;
+  onApply: (emails: string) => void;
+}) {
+  const [people, setPeople] = React.useState<PickerPerson[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [search, setSearch] = React.useState("");
+  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  const [filter, setFilter] = React.useState<"all" | PickerPerson["source"]>("all");
+
+  // Pre-select emails already in textarea
+  React.useEffect(() => {
+    const existingEmails = existing
+      .split(/[\s,;\n]+/)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    if (existingEmails.length > 0) {
+      setSelected(new Set(existingEmails));
+    }
+  }, [existing]);
+
+  // Load all sources in parallel
+  React.useEffect(() => {
+    Promise.all([
+      api<{ items: Array<{ email: string | null; name: string; status?: string }> }>(
+        "/api/admin/customers?pageSize=500",
+      ).catch(() => ({ items: [] })),
+      api<{ items: Array<{ email: string | null; name: string; company?: string | null }> }>(
+        "/api/admin/contacts?pageSize=500",
+      ).catch(() => ({ items: [] })),
+      api<{ items: Array<{ email: string; name: string | null }> }>(
+        "/api/admin/newsletter?pageSize=500",
+      ).catch(() => ({ items: [] })),
+      api<{ items: Array<{ email: string; name: string }> }>(
+        "/api/admin/inquiries?pageSize=200",
+      ).catch(() => ({ items: [] })),
+    ])
+      .then(([customers, contacts, newsletter, inquiries]) => {
+        const combined: PickerPerson[] = [];
+        const seen = new Set<string>();
+
+        const add = (p: PickerPerson) => {
+          const k = p.email.toLowerCase();
+          if (!k || !/@/.test(k) || seen.has(k)) return;
+          seen.add(k);
+          combined.push(p);
+        };
+
+        customers.items?.forEach((c) =>
+          c.email && add({
+            email: c.email,
+            name: c.name,
+            source: "customer",
+            meta: c.status,
+          }),
+        );
+        contacts.items?.forEach((c) =>
+          c.email && add({
+            email: c.email,
+            name: c.name,
+            source: "contact",
+            meta: c.company ?? undefined,
+          }),
+        );
+        newsletter.items?.forEach((n) =>
+          add({
+            email: n.email,
+            name: n.name ?? n.email.split("@")[0],
+            source: "newsletter",
+          }),
+        );
+        inquiries.items?.forEach((i) =>
+          add({
+            email: i.email,
+            name: i.name,
+            source: "inquiry",
+          }),
+        );
+
+        setPeople(combined);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = React.useMemo(() => {
+    let list = people;
+    if (filter !== "all") list = list.filter((p) => p.source === filter);
+    const q = search.trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        (p) => p.email.toLowerCase().includes(q) || p.name.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [people, filter, search]);
+
+  const counts = React.useMemo(
+    () => ({
+      all: people.length,
+      customer: people.filter((p) => p.source === "customer").length,
+      contact: people.filter((p) => p.source === "contact").length,
+      newsletter: people.filter((p) => p.source === "newsletter").length,
+      inquiry: people.filter((p) => p.source === "inquiry").length,
+    }),
+    [people],
+  );
+
+  const SOURCE_META: Record<PickerPerson["source"], { label: string; color: string }> = {
+    customer: { label: "Müşteri", color: "bg-emerald-100 text-emerald-700" },
+    contact: { label: "Rehber", color: "bg-blue-100 text-blue-700" },
+    newsletter: { label: "Bülten", color: "bg-violet-100 text-violet-700" },
+    inquiry: { label: "Talep", color: "bg-amber-100 text-amber-700" },
+  };
+
+  function toggle(email: string) {
+    const k = email.toLowerCase();
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
+  }
+
+  function selectAllVisible() {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      filtered.forEach((p) => next.add(p.email.toLowerCase()));
+      return next;
+    });
+  }
+
+  function clearAll() {
+    setSelected(new Set());
+  }
+
+  function apply() {
+    const emails = Array.from(selected).join(", ");
+    onApply(emails);
+  }
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="px-5 py-3 border-b">
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Users className="h-4 w-4 text-[#C9A96E]" />
+            Kayıtlı Kişilerden Seç
+            <span className="ml-auto text-xs font-normal text-muted-foreground">
+              {selected.size} seçili
+            </span>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="px-5 pt-3 pb-2 space-y-2 border-b">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Ad veya e-posta ara..."
+              className="pl-9 h-9"
+            />
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {(["all", "customer", "contact", "newsletter", "inquiry"] as const).map((k) => {
+              const label = k === "all" ? "Tümü" : SOURCE_META[k as PickerPerson["source"]]?.label;
+              const count = counts[k];
+              const active = filter === k;
+              return (
+                <button
+                  key={k}
+                  onClick={() => setFilter(k)}
+                  className={
+                    "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] border transition-colors " +
+                    (active
+                      ? "bg-[#14141A] text-white border-[#14141A]"
+                      : "bg-white text-foreground/70 border-border hover:bg-muted/50")
+                  }
+                >
+                  {label}
+                  {count > 0 && (
+                    <span
+                      className={
+                        "ml-0.5 rounded-full px-1.5 text-[9px] " +
+                        (active ? "bg-white/20" : "bg-muted")
+                      }
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-2">
+          {loading ? (
+            <div className="text-center py-8 text-sm text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2" />
+              Yükleniyor...
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-8 text-sm text-muted-foreground">
+              <Users className="h-8 w-8 mx-auto opacity-30 mb-2" />
+              {search ? "Sonuç bulunamadı" : "Kayıtlı kişi yok"}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {filtered.map((p) => {
+                const k = p.email.toLowerCase();
+                const isSelected = selected.has(k);
+                const meta = SOURCE_META[p.source];
+                return (
+                  <button
+                    key={k}
+                    onClick={() => toggle(p.email)}
+                    className={
+                      "w-full text-left px-3 py-2 rounded border transition-colors " +
+                      (isSelected
+                        ? "border-[#C9A96E] bg-[#C9A96E]/10"
+                        : "border-border hover:bg-muted/40")
+                    }
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={
+                          "shrink-0 w-4 h-4 rounded border flex items-center justify-center " +
+                          (isSelected
+                            ? "bg-[#14141A] border-[#14141A]"
+                            : "border-border")
+                        }
+                      >
+                        {isSelected && <Check className="h-3 w-3 text-white" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-medium truncate">{p.name}</p>
+                          <span
+                            className={`text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider ${meta.color}`}
+                          >
+                            {meta.label}
+                          </span>
+                          {p.meta && (
+                            <span className="text-[10px] text-muted-foreground truncate">
+                              · {p.meta}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {p.email}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="px-5 py-3 border-t flex-row !justify-between gap-2">
+          <div className="flex gap-1.5">
+            <Button variant="outline" size="sm" onClick={selectAllVisible}>
+              Görüneni Seç
+            </Button>
+            <Button variant="outline" size="sm" onClick={clearAll}>
+              Temizle
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose}>
+              İptal
+            </Button>
+            <Button
+              onClick={apply}
+              disabled={selected.size === 0}
+              className="bg-[#14141A] text-white"
+            >
+              Uygula ({selected.size})
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
