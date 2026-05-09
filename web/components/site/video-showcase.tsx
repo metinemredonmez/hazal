@@ -109,12 +109,12 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 lg:gap-3 max-w-3xl mx-auto">
           {videos.map((v) => (
             <button
               key={v.src}
               onClick={() => setActive(v)}
-              className="group relative aspect-[16/10] overflow-hidden bg-[#1A1A1F] rounded-sm"
+              className="group relative aspect-[9/16] overflow-hidden bg-[#1A1A1F] rounded-sm"
             >
               <video
                 src={withPreview(v.src)}
@@ -161,7 +161,7 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
           </button>
 
           <div
-            className="relative w-full max-w-6xl"
+            className="relative flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
             <video
@@ -173,14 +173,16 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
               preload="auto"
               muted={muted}
               playsInline
-              className="w-full h-auto max-h-[85vh] rounded-sm shadow-2xl bg-black"
+              className="block max-h-[85vh] max-w-[95vw] w-auto h-auto rounded-sm shadow-2xl bg-black"
             />
-            <div className="mt-4 flex items-center justify-between text-white/85">
-              <div>
-                <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E]">
-                  {active.date}
-                </p>
-                <h3 className="font-display text-2xl mt-1">
+            <div className="mt-3 flex items-center justify-between gap-4 text-white/85 w-full max-w-md">
+              <div className="text-center flex-1">
+                {active.date && (
+                  <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E]">
+                    {active.date}
+                  </p>
+                )}
+                <h3 className="font-display text-lg mt-0.5">
                   {locale === "tr" ? active.titleTr : active.titleEn}
                 </h3>
               </div>
