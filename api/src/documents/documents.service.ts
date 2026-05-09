@@ -151,6 +151,16 @@ export class DocumentsService {
     const tpl = await this.findTemplate(id);
     let html = tpl.htmlBody;
 
+    // Fetch signature from Settings if available — for {{HAZAL_IMZA}} embed
+    const settings = await this.prisma.siteSettings.findUnique({
+      where: { id: 'singleton' },
+      select: { signatureUrl: true, brandName: true },
+    });
+
+    const signatureHtml = settings?.signatureUrl
+      ? `<img src="${this.escapeHtml(settings.signatureUrl)}" alt="İmza" style="max-height:80px;width:auto;display:block;" />`
+      : `<span style="font-family:'Brush Script MT',cursive;font-size:32px;color:#14141A;">${this.escapeHtml(settings?.brandName ?? 'Hazal Muti')}</span>`;
+
     const all: Record<string, string> = {
       ...values,
       year: new Date().getFullYear().toString(),
@@ -159,6 +169,8 @@ export class DocumentsService {
         month: 'long',
         year: 'numeric',
       }),
+      // Special placeholder: HAZAL_IMZA
+      HAZAL_IMZA: signatureHtml,
     };
 
     // Format currency-ish values
@@ -177,8 +189,8 @@ export class DocumentsService {
       all[key] ? body : '',
     );
 
-    // Variable replacement
-    html = html.replace(/\{\{(\w+)\}\}/g, (_, key) => all[key] ?? '');
+    // Variable replacement (allow A-Z, _ in key for HAZAL_IMZA)
+    html = html.replace(/\{\{([\w]+)\}\}/g, (_, key) => all[key] ?? '');
 
     return html;
   }

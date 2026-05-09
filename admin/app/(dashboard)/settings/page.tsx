@@ -25,11 +25,17 @@ export default function SettingsPage() {
   const [settings, setSettings] = React.useState<SiteSettings | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
-  const [uploadingMedia, setUploadingMedia] = React.useState<"hero" | "logo" | null>(null);
+  const [uploadingMedia, setUploadingMedia] = React.useState<
+    "hero" | "logo" | "signature" | null
+  >(null);
   const heroFileInputRef = React.useRef<HTMLInputElement>(null);
   const logoFileInputRef = React.useRef<HTMLInputElement>(null);
+  const signatureFileInputRef = React.useRef<HTMLInputElement>(null);
 
-  async function uploadAndSet(file: File, target: "hero" | "logo") {
+  async function uploadAndSet(
+    file: File,
+    target: "hero" | "logo" | "signature",
+  ) {
     setUploadingMedia(target);
     try {
       const fd = new FormData();
@@ -41,8 +47,15 @@ export default function SettingsPage() {
       const url = res[0]?.url;
       if (!url) throw new Error("Upload başarısız");
       if (target === "hero") update("heroMediaUrl", url);
-      else update("logoUrl", url);
-      toast.success(target === "hero" ? "Hero medya yüklendi" : "Logo yüklendi");
+      else if (target === "logo") update("logoUrl", url);
+      else update("signatureUrl", url);
+      toast.success(
+        target === "hero"
+          ? "Hero medya yüklendi"
+          : target === "logo"
+            ? "Logo yüklendi"
+            : "İmza yüklendi",
+      );
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Upload başarısız";
       toast.error(message);
@@ -286,6 +299,82 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="p-4">
             <DigitalCardSection />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="py-3 px-4 border-b border-border">
+            <CardTitle className="text-xs">İmza (Belge Şablonları için)</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <Field
+              label="İmza görseli"
+              hint="Belge şablonlarındaki {{HAZAL_IMZA}} placeholder'ı bu imzayla doldurulur. PNG (transparent arkaplan tercih), maks 1 MB. Beyaz/aydınlık zemin için siyah/koyu imza kullan."
+            >
+              <input
+                ref={signatureFileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) uploadAndSet(file, "signature");
+                  e.target.value = "";
+                }}
+              />
+              <div className="flex items-start gap-3">
+                <div className="w-32 h-20 rounded bg-muted/50 border border-dashed border-border flex items-center justify-center overflow-hidden shrink-0">
+                  {settings.signatureUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={settings.signatureUrl}
+                      alt="İmza"
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : (
+                    <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => signatureFileInputRef.current?.click()}
+                      disabled={uploadingMedia === "signature"}
+                      className="gap-1.5"
+                    >
+                      {uploadingMedia === "signature" ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Upload className="h-3.5 w-3.5" />
+                      )}
+                      {settings.signatureUrl ? "Değiştir" : "İmza Yükle"}
+                    </Button>
+                    {settings.signatureUrl && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => update("signatureUrl", "")}
+                        className="gap-1.5"
+                      >
+                        <XIcon className="h-3.5 w-3.5" /> Kaldır
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    💡 Belge şablonu HTML'inde{" "}
+                    <code className="bg-muted px-1 rounded text-[10px]">
+                      {"{{HAZAL_IMZA}}"}
+                    </code>{" "}
+                    yer tutucusunu kullan. Render sırasında imza görseli embed
+                    edilir.
+                  </p>
+                </div>
+              </div>
+            </Field>
           </CardContent>
         </Card>
 

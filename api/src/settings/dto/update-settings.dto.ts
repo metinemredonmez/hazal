@@ -25,6 +25,7 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() heroSubtitleTr?: string;
   @IsOptional() @IsString() heroSubtitleEn?: string;
   @IsOptional() @IsString() heroMediaUrl?: string;
+  @IsOptional() @IsString() signatureUrl?: string;
   @IsOptional() @IsString() aboutTr?: string;
   @IsOptional() @IsString() aboutEn?: string;
   @IsOptional() @IsString() seoTitleTr?: string;

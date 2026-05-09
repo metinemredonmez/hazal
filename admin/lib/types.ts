@@ -135,6 +135,7 @@ export interface SiteSettings {
   heroSubtitleTr: string | null;
   heroSubtitleEn: string | null;
   heroMediaUrl: string | null;
+  signatureUrl: string | null;
   aboutTr: string | null;
   aboutEn: string | null;
   seoTitleTr: string | null;

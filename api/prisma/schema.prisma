@@ -285,6 +285,10 @@ model SiteSettings {
   heroSubtitleTr  String?
   heroSubtitleEn  String?
   heroMediaUrl    String?
+  // Hazal'ın el yazısı imza PNG'si (transparent arkaplan tercih). Belge
+  // şablonlarında {{HAZAL_IMZA}} placeholder'ı render sırasında bu URL
+  // ile <img> tag'e dönüştürülür.
+  signatureUrl    String?
   aboutTr         String?
   aboutEn         String?
   seoTitleTr      String?
