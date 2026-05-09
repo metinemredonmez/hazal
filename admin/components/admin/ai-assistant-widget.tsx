@@ -27,6 +27,7 @@ const QUICK_PROMPTS = [
 export function AIAssistantWidget() {
   const open = useUI((s) => s.aiOpen);
   const setOpen = useUI((s) => s.setAIOpen);
+  const toggleOpen = useUI((s) => s.toggleAI);
   const seedPrompt = useUI((s) => s.aiSeedPrompt);
   const clearSeed = useUI((s) => s.clearAISeed);
   const [messages, setMessages] = React.useState<Message[]>([]);
@@ -79,7 +80,7 @@ export function AIAssistantWidget() {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        setOpen((v) => !v);
+        toggleOpen();
       }
       if (e.key === "Escape" && open) {
         setOpen(false);
@@ -87,7 +88,7 @@ export function AIAssistantWidget() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, setOpen, toggleOpen]);
 
   async function send(text?: string) {
     const userText = (text ?? input).trim();
