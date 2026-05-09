@@ -357,11 +357,11 @@ export default function CustomerProfilePage() {
                             {e.summary}
                           </p>
                         )}
-                        {e.meta?.listing && (
+                        {e.meta?.listing ? (
                           <p className="text-[11px] text-[#C9A96E] mt-0.5">
                             🏠 {String(e.meta.listing)}
                           </p>
-                        )}
+                        ) : null}
                         <p className="text-[10px] text-muted-foreground mt-0.5">
                           {formatDateTime(e.at)}
                         </p>
