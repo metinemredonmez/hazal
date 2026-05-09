@@ -22,9 +22,10 @@ import {
   Map as MapIcon,
   Users,
   BookOpen,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/store";
+import { useAuth, useUI } from "@/lib/store";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
@@ -47,7 +48,7 @@ const NAV: Array<{ label: string; href: string; icon: React.ComponentType<{ clas
   { label: "Güvenlik", href: "/audit", icon: History },
 ];
 
-export function Sidebar() {
+function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const admin = useAuth((s) => s.admin);
@@ -56,12 +57,13 @@ export function Sidebar() {
   function handleLogout() {
     logout();
     router.push("/login");
+    onNavigate?.();
   }
 
   return (
-    <aside className="hidden lg:flex h-screen w-52 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border sticky top-0">
-      <div className="px-4 pt-5 pb-4">
-        <Link href="/" className="block select-none">
+    <>
+      <div className="px-4 pt-5 pb-4 flex items-center justify-between">
+        <Link href="/" onClick={onNavigate} className="block select-none">
           <p className="font-display text-base tracking-[0.18em] uppercase leading-none">
             HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
           </p>
@@ -69,17 +71,27 @@ export function Sidebar() {
             Real Estate · Admin
           </p>
         </Link>
+        {onNavigate && (
+          <button
+            onClick={onNavigate}
+            className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground"
+            aria-label="Kapat"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       <Separator className="bg-sidebar-border" />
 
-      <nav className="flex-1 px-2 py-3 space-y-0.5">
+      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
         {NAV.map(({ label, href, icon: Icon }) => {
           const active = href === "/" ? pathname === href : pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs transition-all",
                 active
@@ -99,6 +111,7 @@ export function Sidebar() {
       <div className="px-2 py-3">
         <Link
           href="/profile"
+          onClick={onNavigate}
           className="flex items-center gap-2.5 rounded px-2.5 py-1.5 transition-colors hover:bg-sidebar-accent/60"
         >
           <Avatar className="h-7 w-7 border border-sidebar-border">
@@ -127,6 +140,42 @@ export function Sidebar() {
           <span>Çıkış</span>
         </button>
       </div>
-    </aside>
+    </>
+  );
+}
+
+export function Sidebar() {
+  const open = useUI((s) => s.mobileSidebarOpen);
+  const setOpen = useUI((s) => s.setMobileSidebarOpen);
+
+  // Close drawer when route changes (handled by SidebarContent onNavigate)
+  React.useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex h-screen w-52 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border sticky top-0">
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            onClick={() => setOpen(false)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in"
+          />
+          <aside className="absolute left-0 top-0 h-full w-64 flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-2xl animate-in slide-in-from-left">
+            <SidebarContent onNavigate={() => setOpen(false)} />
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

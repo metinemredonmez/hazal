@@ -719,6 +719,9 @@ function PreviewDialog({
   const [customerName, setCustomerName] = React.useState(doc.customerName ?? "");
   const [tags, setTags] = React.useState((doc.tags ?? []).join(", "));
   const [saving, setSaving] = React.useState(false);
+  const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
+  const [previewError, setPreviewError] = React.useState<string | null>(null);
+  const [loadingPreview, setLoadingPreview] = React.useState(false);
 
   const fullUrl = doc.fileUrl.startsWith("http")
     ? doc.fileUrl
@@ -729,6 +732,38 @@ function PreviewDialog({
   const isHtml = mime === "text/html" || /\.html?$/i.test(doc.fileName);
   const isOffice = /(officedocument|msword|excel|spreadsheet)/i.test(mime);
   const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fullUrl)}`;
+
+  // Fetch the file and convert to a blob URL so the iframe is same-origin
+  // (avoids X-Frame-Options / CORP / cross-subdomain blocks). Fallback to
+  // the "open externally" UI if fetch fails (e.g. server SSL issues).
+  React.useEffect(() => {
+    if (!isPdf && !isHtml) return;
+    let cancelled = false;
+    let url: string | null = null;
+    setLoadingPreview(true);
+    setPreviewError(null);
+    fetch(fullUrl, { credentials: "omit" })
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.blob();
+      })
+      .then((b) => {
+        if (cancelled) return;
+        url = URL.createObjectURL(b);
+        setBlobUrl(url);
+      })
+      .catch((err: Error) => {
+        if (cancelled) return;
+        setPreviewError(err.message || "Önizleme yüklenemedi");
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingPreview(false);
+      });
+    return () => {
+      cancelled = true;
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [fullUrl, isPdf, isHtml]);
 
   const dirty =
     title !== doc.title ||
@@ -791,11 +826,43 @@ function PreviewDialog({
                 className="max-w-full max-h-full object-contain"
               />
             ) : isPdf || isHtml ? (
-              <iframe
-                src={fullUrl}
-                title={doc.title}
-                className="w-full h-full border-0 bg-white"
-              />
+              loadingPreview ? (
+                <div className="text-center text-sm text-muted-foreground">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-[#C9A96E]" />
+                  Önizleme yükleniyor…
+                </div>
+              ) : previewError ? (
+                <div className="text-center p-8 max-w-md">
+                  <FileText className="h-16 w-16 mx-auto opacity-30 mb-4 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Önizleme yüklenemedi.
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mb-4">{previewError}</p>
+                  <div className="flex gap-2 justify-center">
+                    <a
+                      href={fullUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm inline-flex items-center gap-1 px-3 py-2 bg-white border rounded-md hover:bg-muted"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" /> Yeni sekmede aç
+                    </a>
+                    <a
+                      href={fullUrl}
+                      download={doc.fileName}
+                      className="text-sm inline-flex items-center gap-1 px-3 py-2 bg-white border rounded-md hover:bg-muted"
+                    >
+                      <Download className="h-3.5 w-3.5" /> İndir
+                    </a>
+                  </div>
+                </div>
+              ) : blobUrl ? (
+                <iframe
+                  src={blobUrl}
+                  title={doc.title}
+                  className="w-full h-full border-0 bg-white"
+                />
+              ) : null
             ) : isOffice ? (
               <iframe
                 src={officeUrl}

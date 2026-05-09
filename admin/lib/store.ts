@@ -5,6 +5,18 @@ import { persist } from "zustand/middleware";
 import type { Admin } from "./types";
 import { api, tokenStore } from "./api";
 
+interface UIState {
+  mobileSidebarOpen: boolean;
+  setMobileSidebarOpen: (v: boolean) => void;
+  toggleMobileSidebar: () => void;
+}
+
+export const useUI = create<UIState>((set) => ({
+  mobileSidebarOpen: false,
+  setMobileSidebarOpen: (v) => set({ mobileSidebarOpen: v }),
+  toggleMobileSidebar: () => set((s) => ({ mobileSidebarOpen: !s.mobileSidebarOpen })),
+}));
+
 interface AuthState {
   admin: Admin | null;
   loading: boolean;

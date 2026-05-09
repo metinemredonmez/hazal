@@ -10,7 +10,9 @@ export function AboutTeaser() {
   const [locale] = useLocale();
   const tx = t[locale];
   const settings = useSettings();
-  const home = pageContent(settings).home;
+  const content = pageContent(settings);
+  const home = content.home;
+  const about = content.about;
 
   const aboutText =
     locale === "tr"
@@ -25,6 +27,7 @@ export function AboutTeaser() {
     locale === "tr" ? "Her müşteri,\ntek bir hikâye." : "Every client,\na single story.",
   );
   const ctaLabel = pick(home?.aboutCtaLabel, locale, tx.sections.aboutCta);
+  const portrait = about?.portraitUrl ?? settings?.heroMediaUrl ?? "/login-bg.jpg";
 
   return (
     <section className="bg-[#0E0E0E] text-[#F5F2EC] py-24 lg:py-32 px-6 lg:px-10">
@@ -33,9 +36,9 @@ export function AboutTeaser() {
           <div className="aspect-[3/4] bg-[#1A1A1F] overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={settings?.heroMediaUrl ?? "/login-bg.jpg"}
+              src={portrait}
               alt="Hazal Muti"
-              className="w-full h-full object-cover grayscale"
+              className="w-full h-full object-cover"
             />
           </div>
         </div>

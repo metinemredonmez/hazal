@@ -12,7 +12,18 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
-  app.use(helmet({ crossOriginResourcePolicy: false }));
+  // Helmet bypassed for static file routes so PDFs/HTML can be embedded
+  // in iframes from admin.hazalmuti.com (different subdomain from api.).
+  const helmetMw = helmet({
+    crossOriginResourcePolicy: false,
+    contentSecurityPolicy: false,
+  });
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/uploads/') || req.path.startsWith('/documents/')) {
+      return next();
+    }
+    helmetMw(req, res, next);
+  });
 
   // CyberPanel/LiteSpeed reverse proxy duplicates the Origin header
   // ("https://x.com, https://x.com") which breaks CORS matching.
@@ -54,11 +65,23 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api', { exclude: ['/'] });
 
+  // Static files: explicit cross-origin headers so admin/web can embed
+  // them in <iframe> / <img> across subdomains.
+  const staticHeaders = (
+    _req: unknown,
+    res: { setHeader: (k: string, v: string) => void },
+    next: () => void,
+  ) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  };
+
   const uploadDir = config.get<string>('UPLOAD_DIR') ?? './uploads';
-  app.use('/uploads', express.static(join(process.cwd(), uploadDir)));
+  app.use('/uploads', staticHeaders, express.static(join(process.cwd(), uploadDir)));
 
   const documentsDir = config.get<string>('DOCUMENTS_DIR') ?? './documents';
-  app.use('/documents', express.static(join(process.cwd(), documentsDir)));
+  app.use('/documents', staticHeaders, express.static(join(process.cwd(), documentsDir)));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Hazal Muti Real Estate API')

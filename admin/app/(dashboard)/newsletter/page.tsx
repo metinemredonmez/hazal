@@ -178,7 +178,7 @@ export default function NewsletterPage() {
               Aboneler {data && `(${data.total})`}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 overflow-x-auto">
             {loading && !data ? (
               <div className="p-4 space-y-2">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -192,7 +192,7 @@ export default function NewsletterPage() {
                 düşer.
               </div>
             ) : (
-              <Table>
+              <Table className="min-w-[700px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>E-posta</TableHead>
