@@ -341,6 +341,190 @@ const TEMPLATES: TemplateSeed[] = [
 
 <div class="footer">© {{year}} Hazal Muti Real Estate · {{date}}</div>`,
   },
+  {
+    name: 'İlan Görme Tutanağı',
+    category: 'CONTRACT',
+    description: 'Müşterinin ilanı yerinde gördüğüne dair tutanak — komisyon hakkını korur',
+    variables: [
+      { key: 'customerName', label: 'Müşteri Adı', type: 'text' },
+      { key: 'customerIdNo', label: 'TC Kimlik No', type: 'text' },
+      { key: 'customerPhone', label: 'Telefon', type: 'text' },
+      { key: 'propertyAddress', label: 'İlan Adresi', type: 'address' },
+      { key: 'listingTitle', label: 'İlan Başlığı', type: 'text' },
+      { key: 'visitDate', label: 'Ziyaret Tarihi', type: 'date' },
+      { key: 'visitTime', label: 'Saat', type: 'text', default: '14:00' },
+    ],
+    htmlBody: `${baseStyle}
+<div class="header">
+  <h1>İlan Görme Tutanağı</h1>
+  <p>Hazal Muti Real Estate</p>
+</div>
+
+<h2>Taraf Bilgileri</h2>
+<table>
+  <tr><td class="label">Müşteri</td><td>{{customerName}}</td></tr>
+  <tr><td class="label">TC Kimlik No</td><td>{{customerIdNo}}</td></tr>
+  <tr><td class="label">Telefon</td><td>{{customerPhone}}</td></tr>
+  <tr><td class="label">Danışman</td><td>Hazal Muti</td></tr>
+</table>
+
+<h2>Mülk Bilgileri</h2>
+<table>
+  <tr><td class="label">İlan</td><td>{{listingTitle}}</td></tr>
+  <tr><td class="label">Adres</td><td>{{propertyAddress}}</td></tr>
+  <tr><td class="label">Ziyaret</td><td>{{visitDate}} · {{visitTime}}</td></tr>
+</table>
+
+<div class="clause">
+  <p><strong>Madde 1 — Tutanak konusu.</strong> Yukarıda kimlik bilgileri yazılı müşteri, yine yukarıda belirtilen mülkü, Hazal Muti Real Estate aracılığı ile yerinde görmüştür.</p>
+  <p><strong>Madde 2 — Komisyon hakkı.</strong> Müşteri, bu mülkü doğrudan veya dolaylı yollarla (eş, çocuk, akraba, şirket, üçüncü kişi vb.) satın alması veya kiralaması hâlinde komisyon ücretini Hazal Muti'ye ödemekle yükümlüdür.</p>
+  <p><strong>Madde 3 — Süre.</strong> Bu yükümlülük, ziyaret tarihinden itibaren <strong>12 (oniki) ay</strong> süre ile geçerlidir.</p>
+  <p><strong>Madde 4 — Komisyon oranı.</strong> Satışlarda satış bedelinin %2'si + KDV, kiralamalarda 1 aylık kira bedeli + KDV olarak ödenir.</p>
+</div>
+
+<div class="signature-block">
+  <div>
+    <p><strong>Müşteri</strong></p>
+    <p>{{customerName}}</p>
+    <p>İmza: ________________</p>
+  </div>
+  <div>
+    <p><strong>Danışman</strong></p>
+    <p>Hazal Muti</p>
+    {{HAZAL_IMZA}}
+  </div>
+</div>
+
+<div class="footer">© {{year}} Hazal Muti Real Estate · {{date}}</div>`,
+  },
+  {
+    name: 'Değerleme Raporu',
+    category: 'CONTRACT',
+    description: 'Mülk için yaklaşık piyasa değeri tahmini — bilgilendirme amaçlı',
+    variables: [
+      { key: 'customerName', label: 'Talep Eden', type: 'text' },
+      { key: 'propertyAddress', label: 'Mülk Adresi', type: 'address' },
+      { key: 'propertyType', label: 'Mülk Tipi', type: 'text', default: 'Daire' },
+      { key: 'areaM2', label: 'Brüt Alan (m²)', type: 'number' },
+      { key: 'bedrooms', label: 'Oda Sayısı', type: 'text', default: '3+1' },
+      { key: 'yearBuilt', label: 'Yapım Yılı', type: 'number' },
+      { key: 'estimatedValue', label: 'Tahmini Değer (TL)', type: 'currency' },
+      { key: 'pricePerSqm', label: 'm² Fiyat (TL)', type: 'currency' },
+      { key: 'comparablesNote', label: 'Karşılaştırılabilir İlanlar', type: 'textarea' },
+      { key: 'marketCommentary', label: 'Piyasa Yorumu', type: 'textarea' },
+    ],
+    htmlBody: `${baseStyle}
+<div class="header">
+  <h1>Değerleme Raporu</h1>
+  <p>Hazal Muti Real Estate · Piyasa Görüşü</p>
+</div>
+
+<p style="margin-top:24px;">Sayın <strong>{{customerName}}</strong>,</p>
+<p>Aşağıda belirtilen mülk için piyasa verileri ve karşılaştırmalı ilan analizi temelinde hazırlanmış değerleme görüşümüz sunulmaktadır.</p>
+
+<h2>Mülk Bilgileri</h2>
+<table>
+  <tr><td class="label">Adres</td><td>{{propertyAddress}}</td></tr>
+  <tr><td class="label">Tipi</td><td>{{propertyType}}</td></tr>
+  <tr><td class="label">Brüt Alan</td><td>{{areaM2}} m²</td></tr>
+  <tr><td class="label">Oda</td><td>{{bedrooms}}</td></tr>
+  <tr><td class="label">Yapım Yılı</td><td>{{yearBuilt}}</td></tr>
+</table>
+
+<h2>Değerleme</h2>
+<table>
+  <tr><td class="label">Tahmini Piyasa Değeri</td><td><strong>{{estimatedValue}} TL</strong></td></tr>
+  <tr><td class="label">m² Birim Fiyat</td><td>{{pricePerSqm}} TL/m²</td></tr>
+</table>
+
+<h2>Karşılaştırılabilir İlanlar</h2>
+<div class="clause">
+  <p>{{comparablesNote}}</p>
+</div>
+
+<h2>Piyasa Yorumu</h2>
+<div class="clause">
+  <p>{{marketCommentary}}</p>
+</div>
+
+<div class="clause" style="margin-top:32px; background:#FFF8E1; padding:12px; border-left:3px solid #C9A96E;">
+  <p style="font-size:11px;"><strong>Önemli not.</strong> İşbu rapor SPK lisanslı resmi ekspertiz raporu değildir. Tapu işlemleri, kredi başvuruları ve resmi vatandaşlık başvuruları için lisanslı ekspertiz şirketinden rapor alınması gerekir. Sunulan değer, mevcut piyasa verilerine ve karşılaştırılabilir ilanlara dayalı görüşümüzdür.</p>
+</div>
+
+<div style="margin-top:48px;">
+  <p><strong>Hazal Muti</strong></p>
+  <p>Hazal Muti Real Estate · {{date}}</p>
+  {{HAZAL_IMZA}}
+</div>
+
+<div class="footer">© {{year}} Hazal Muti Real Estate · {{date}}</div>`,
+  },
+  {
+    name: 'Müşteri Bilgi Formu',
+    category: 'CONTRACT',
+    description: 'Yeni müşteri kayıt + tercihler + bütçe + iletişim onayı (KVKK)',
+    variables: [
+      { key: 'customerName', label: 'Ad Soyad', type: 'text' },
+      { key: 'customerIdNo', label: 'TC Kimlik / Pasaport No', type: 'text' },
+      { key: 'customerPhone', label: 'Telefon', type: 'text' },
+      { key: 'customerEmail', label: 'E-posta', type: 'text' },
+      { key: 'customerAddress', label: 'Adres', type: 'address' },
+      { key: 'preferenceType', label: 'Aradığı (Satılık/Kiralık)', type: 'text' },
+      { key: 'preferenceDistrict', label: 'Tercih Edilen Bölge', type: 'text' },
+      { key: 'preferenceBedrooms', label: 'Oda Sayısı', type: 'text' },
+      { key: 'budgetMin', label: 'Bütçe Min (TL)', type: 'currency' },
+      { key: 'budgetMax', label: 'Bütçe Max (TL)', type: 'currency' },
+      { key: 'preferenceNotes', label: 'Özel İstekler', type: 'textarea' },
+      { key: 'fillDate', label: 'Form Tarihi', type: 'date' },
+    ],
+    htmlBody: `${baseStyle}
+<div class="header">
+  <h1>Müşteri Bilgi Formu</h1>
+  <p>Hazal Muti Real Estate</p>
+</div>
+
+<h2>Kişisel Bilgiler</h2>
+<table>
+  <tr><td class="label">Ad Soyad</td><td>{{customerName}}</td></tr>
+  <tr><td class="label">TC / Pasaport</td><td>{{customerIdNo}}</td></tr>
+  <tr><td class="label">Telefon</td><td>{{customerPhone}}</td></tr>
+  <tr><td class="label">E-posta</td><td>{{customerEmail}}</td></tr>
+  <tr><td class="label">Adres</td><td>{{customerAddress}}</td></tr>
+</table>
+
+<h2>Aranan Mülk</h2>
+<table>
+  <tr><td class="label">Tip</td><td>{{preferenceType}}</td></tr>
+  <tr><td class="label">Bölge</td><td>{{preferenceDistrict}}</td></tr>
+  <tr><td class="label">Oda</td><td>{{preferenceBedrooms}}</td></tr>
+  <tr><td class="label">Bütçe</td><td>{{budgetMin}} TL – {{budgetMax}} TL</td></tr>
+</table>
+
+<h2>Özel İstekler</h2>
+<div class="clause"><p>{{preferenceNotes}}</p></div>
+
+<h2>İletişim Onayı (KVKK)</h2>
+<div class="clause" style="font-size:11px;">
+  <p>Yukarıda paylaştığım iletişim bilgilerimin Hazal Muti Real Estate tarafından yalnızca gayrimenkul danışmanlık hizmeti kapsamında kullanılmasına ve uygun ilanlardan SMS, WhatsApp ve e-posta yoluyla bilgi almama onay veriyorum.</p>
+  <p>İstediğim zaman bu onayı geri çekme hakkım olduğunu kabul ediyorum.</p>
+</div>
+
+<div class="signature-block">
+  <div>
+    <p><strong>Müşteri</strong></p>
+    <p>{{customerName}}</p>
+    <p>Tarih: {{fillDate}}</p>
+    <p>İmza: ________________</p>
+  </div>
+  <div>
+    <p><strong>Danışman</strong></p>
+    <p>Hazal Muti</p>
+    {{HAZAL_IMZA}}
+  </div>
+</div>
+
+<div class="footer">© {{year}} Hazal Muti Real Estate · {{date}}</div>`,
+  },
 ];
 
 async function main() {
