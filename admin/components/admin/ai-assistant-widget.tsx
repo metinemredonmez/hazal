@@ -177,19 +177,19 @@ export function AIAssistantWidget() {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button — kompakt, ekranı kaplamasın */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 group flex items-center gap-2 bg-[#14141A] hover:bg-[#C9A96E] text-white rounded-full shadow-lg pl-4 pr-5 py-3 transition-colors"
+          className="fixed bottom-4 right-4 z-50 group flex items-center justify-center gap-0 hover:gap-2 bg-[#14141A] hover:bg-[#C9A96E] text-white rounded-full shadow-lg w-11 h-11 hover:w-auto hover:h-11 hover:px-4 transition-all overflow-hidden"
           aria-label="AI Asistan'ı aç (Cmd+K)"
           title="AI Asistan (⌘K)"
         >
-          <Sparkles className="h-4 w-4 text-[#C9A96E] group-hover:text-white transition-colors" />
-          <span className="text-xs tracking-[0.2em] uppercase font-medium">
+          <Sparkles className="h-4 w-4 text-[#C9A96E] group-hover:text-white transition-colors shrink-0" />
+          <span className="hidden group-hover:inline text-xs tracking-[0.2em] uppercase font-medium whitespace-nowrap">
             AI Asistan
           </span>
-          <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[10px] bg-white/10 rounded border border-white/20">
+          <kbd className="hidden group-hover:lg:inline-flex items-center px-1.5 py-0.5 text-[10px] bg-white/10 rounded border border-white/20">
             ⌘K
           </kbd>
         </button>

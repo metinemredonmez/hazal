@@ -475,11 +475,11 @@ export default function HaritaPage() {
               </button>
             )}
 
-            {/* "Buradayım" — bottom right */}
+            {/* "Buradayım" — bottom LEFT (sağ alt AI Asistan'a ayrılmış) */}
             <button
               onClick={handleHereIAm}
               disabled={acquiringGps}
-              className="absolute bottom-6 right-6 z-10 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#C9A96E] hover:bg-[#b8965e] text-[#14141A] shadow-lg font-medium text-sm disabled:opacity-60 transition-colors"
+              className="absolute bottom-6 left-6 z-10 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#C9A96E] hover:bg-[#b8965e] text-[#14141A] shadow-lg font-medium text-sm disabled:opacity-60 transition-colors"
             >
               {acquiringGps ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
