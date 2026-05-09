@@ -77,7 +77,12 @@ interface CombinedResponse {
 
 const TYPE_META: Record<
   EventType,
-  { label: string; color: string; bg: string; icon: React.ComponentType<{ className?: string }> }
+  {
+    label: string;
+    color: string;
+    bg: string;
+    icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  }
 > = {
   APPOINTMENT: { label: "Randevu", color: "#C9A96E", bg: "bg-[#C9A96E]/15", icon: Star },
   OPEN_HOUSE: { label: "Açık Ev", color: "#7C3AED", bg: "bg-purple-500/15", icon: Home },
