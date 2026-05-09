@@ -1091,11 +1091,14 @@ function SendByEmailDialog({
           <DialogTitle>📧 Belgeyi e-posta ile gönder</DialogTitle>
         </DialogHeader>
         <div className="space-y-3 py-2">
-          <div className="text-xs p-2 bg-muted rounded flex items-center gap-2">
-            <FileText className="h-3.5 w-3.5 text-[#C9A96E] shrink-0" />
-            <span className="truncate">
-              <strong>{doc.title}</strong> · {doc.fileName}
-            </span>
+          <div className="text-xs p-2 bg-muted rounded flex items-start gap-2">
+            <FileText className="h-3.5 w-3.5 text-[#C9A96E] shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <p className="font-medium truncate">{doc.title}</p>
+              <p className="text-[10px] text-muted-foreground truncate">
+                {doc.fileName}
+              </p>
+            </div>
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Alıcı *</Label>
@@ -1118,8 +1121,10 @@ function SendByEmailDialog({
               rows={6}
             />
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            ⚠️ Mail eki olarak <strong>{doc.fileName}</strong> ({Math.ceil(doc.fileSize / 1024)} KB) iliştirilecek.
+          <p className="text-[11px] text-muted-foreground break-words">
+            ⚠️ Mail eki olarak{" "}
+            <strong className="break-all">{doc.fileName}</strong>{" "}
+            ({Math.ceil(doc.fileSize / 1024)} KB) iliştirilecek.
           </p>
         </div>
         <DialogFooter>
