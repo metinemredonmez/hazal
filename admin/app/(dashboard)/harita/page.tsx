@@ -599,32 +599,50 @@ export default function HaritaPage() {
 function ListingPanel({ listing }: { listing: Listing }) {
   const cover = listing.images?.[0]?.url;
   return (
-    <div>
+    <div className="space-y-2.5">
       {cover && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={cover} alt={listing.titleTr} className="w-full h-32 object-cover rounded mb-2" />
+        <img
+          src={cover}
+          alt={listing.titleTr}
+          className="w-full h-32 object-cover rounded"
+        />
       )}
-      <p className="text-sm font-medium line-clamp-2 mb-1">{listing.titleTr}</p>
-      <p className="text-xs text-muted-foreground mb-2">
-        {listing.district} · {listing.bedrooms ? `${listing.bedrooms}+1` : ""}
-      </p>
-      <p className="text-base font-light mb-3">
+      <p className="text-sm font-medium line-clamp-2">{listing.titleTr}</p>
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">
+          📍 {listing.district ?? listing.city ?? "—"}
+          {listing.bedrooms && ` · ${listing.bedrooms}+1`}
+        </span>
+        <span className="text-[10px] uppercase tracking-wider text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+          {listing.status}
+        </span>
+      </div>
+      <p className="text-lg font-light text-[#C9A96E]">
         {Number(listing.price).toLocaleString("tr-TR")} {listing.currency}
       </p>
-      <div className="flex gap-2">
+      <div className="grid grid-cols-2 gap-1.5 pt-1">
         <a
           href={`/listings/${listing.id}`}
-          className="flex-1 text-xs text-center px-3 py-2 bg-[#14141A] text-white rounded hover:bg-[#C9A96E]"
+          className="text-[11px] text-center px-2 py-2 bg-[#14141A] text-white rounded hover:bg-[#C9A96E] hover:text-[#14141A]"
         >
-          Düzenle
+          📝 Düzenle
         </a>
         <a
-          href={`https://www.google.com/maps?q=${listing.lat},${listing.lng}`}
+          href={`/ilanlar/${listing.slug}`}
           target="_blank"
           rel="noreferrer"
-          className="flex-1 text-xs text-center px-3 py-2 border border-border rounded hover:border-[#C9A96E]"
+          className="text-[11px] text-center px-2 py-2 border rounded hover:border-[#C9A96E]"
         >
-          Yol tarifi
+          🌐 Web'de Gör
+        </a>
+        <a
+          href={`https://www.google.com/maps/dir/?api=1&destination=${listing.lat},${listing.lng}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-[11px] text-center px-2 py-2 border rounded hover:border-[#C9A96E] col-span-2"
+        >
+          🗺️ Yol Tarifi
         </a>
       </div>
     </div>
@@ -633,55 +651,114 @@ function ListingPanel({ listing }: { listing: Listing }) {
 
 function AppointmentPanel({ appointment }: { appointment: Appointment }) {
   const time = new Date(appointment.startsAt);
+  const cleanPhone = appointment.phone?.replace(/[^0-9+]/g, "") ?? "";
+  const waPhone = cleanPhone.startsWith("+")
+    ? cleanPhone.slice(1)
+    : cleanPhone.replace(/^0/, "90");
+  const waText = encodeURIComponent(
+    `Merhaba ${appointment.name}, randevumuzu hatırlatmak isterim.`,
+  );
   return (
-    <div>
-      <p className="text-sm font-medium mb-1">{appointment.name}</p>
-      <p className="text-xs text-muted-foreground mb-2">
-        {time.toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })} ·{" "}
-        {time.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
-      </p>
-      {appointment.listing && (
-        <p className="text-xs text-[#C9A96E] mb-2">🏠 {appointment.listing.titleTr}</p>
-      )}
-      <div className="flex gap-2 mt-3">
+    <div className="space-y-2.5">
+      <div>
+        <p className="text-sm font-medium">{appointment.name}</p>
+        <p className="text-[10px] uppercase tracking-wider text-blue-700 bg-blue-100 inline-block px-1.5 py-0.5 rounded mt-1">
+          {appointment.status}
+        </p>
+      </div>
+
+      <div className="text-xs text-muted-foreground space-y-1 bg-muted/40 p-2 rounded">
+        <p>
+          🕐 {time.toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
+          {" · "}
+          <strong>{time.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</strong>
+        </p>
+        {appointment.phone && <p>📞 {appointment.phone}</p>}
+        {appointment.listing && (
+          <p className="text-[#C9A96E]">🏠 {appointment.listing.titleTr}</p>
+        )}
+        {appointment.location && <p>📍 {appointment.location}</p>}
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5">
         {appointment.phone && (
-          <a
-            href={`tel:${appointment.phone}`}
-            className="flex-1 text-xs text-center px-3 py-2 bg-[#14141A] text-white rounded"
-          >
-            Ara
-          </a>
+          <>
+            <a
+              href={`tel:${appointment.phone}`}
+              className="text-[11px] text-center px-2 py-2 bg-[#14141A] text-white rounded inline-flex items-center justify-center gap-1"
+            >
+              📞 Ara
+            </a>
+            <a
+              href={`https://wa.me/${waPhone}?text=${waText}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] text-center px-2 py-2 bg-emerald-600 text-white rounded inline-flex items-center justify-center gap-1"
+            >
+              💬 WhatsApp
+            </a>
+          </>
         )}
         <a
-          href="/appointments"
-          className="flex-1 text-xs text-center px-3 py-2 border border-border rounded"
+          href={`https://www.google.com/maps/dir/?api=1&destination=${appointment.listing?.lat ?? ""},${appointment.listing?.lng ?? ""}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-[11px] text-center px-2 py-2 border rounded hover:border-[#C9A96E]"
         >
-          Detay
+          🗺️ Yol
         </a>
       </div>
+
+      <a
+        href="/appointments"
+        className="block text-[11px] text-center px-2 py-1.5 text-muted-foreground hover:text-foreground"
+      >
+        Tüm randevular →
+      </a>
     </div>
   );
 }
 
 function EventPanel({ event }: { event: CalendarEvent }) {
   const time = new Date(event.startsAt);
+  const typeLabel: Record<string, string> = {
+    OPEN_HOUSE: "🏠 Açık Ev",
+    INSPECTION: "🔍 Ekspertiz",
+    PLANNED_VISIT: "📍 Yer Gösterimi",
+    CONTRACT_END: "📜 Sözleşme Bitiş",
+    PAYMENT_DUE: "💰 Ödeme Vadesi",
+    LISTING_EXPIRY: "⏰ İlan Süresi",
+    MARKETING_ACTION: "📢 Pazarlama",
+    REMINDER: "🔔 Hatırlatma",
+    OTHER: "Diğer",
+  };
   return (
-    <div>
-      <p className="text-sm font-medium mb-1">{event.title}</p>
-      <p className="text-xs text-muted-foreground mb-1">{event.type}</p>
-      <p className="text-xs text-muted-foreground mb-2">
-        {time.toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })} ·{" "}
-        {time.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
-      </p>
-      {event.location && <p className="text-xs mb-2">📍 {event.location}</p>}
-      {event.customerName && <p className="text-xs mb-2">👤 {event.customerName}</p>}
+    <div className="space-y-2.5">
+      <div>
+        <p className="text-sm font-medium line-clamp-2">{event.title}</p>
+        <p className="text-[10px] uppercase tracking-wider text-violet-700 bg-violet-100 inline-block px-1.5 py-0.5 rounded mt-1">
+          {typeLabel[event.type] ?? event.type}
+        </p>
+      </div>
+
+      <div className="text-xs text-muted-foreground space-y-1 bg-muted/40 p-2 rounded">
+        <p>
+          🕐 {time.toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
+          {" · "}
+          <strong>{time.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</strong>
+        </p>
+        {event.location && <p>📍 {event.location}</p>}
+        {event.customerName && <p>👤 {event.customerName}</p>}
+        {event.listing && <p className="text-[#C9A96E]">🏠 {event.listing.titleTr}</p>}
+      </div>
+
       <a
-        href={`https://www.google.com/maps?q=${event.lat},${event.lng}`}
+        href={`https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}`}
         target="_blank"
         rel="noreferrer"
-        className="block w-full text-xs text-center px-3 py-2 bg-[#14141A] text-white rounded"
+        className="block w-full text-[11px] text-center px-2 py-2 bg-[#14141A] text-white rounded"
       >
-        Yol tarifi
+        🗺️ Yol Tarifi
       </a>
     </div>
   );
