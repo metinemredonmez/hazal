@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../notifications/email.service';
 import { PushService } from '../push/push.service';
 
-interface MorningSummary {
+export interface MorningSummary {
   date: string;
   appointmentsToday: Array<{
     id: string;

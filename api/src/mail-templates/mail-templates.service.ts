@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { MailTemplateCategory } from '@prisma/client';
+import { MailTemplateCategory, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface CreateMailTemplateInput {
@@ -37,14 +37,16 @@ export class MailTemplatesService {
         subject: input.subject,
         bodyHtml: input.bodyHtml,
         bodyText: input.bodyText ?? this.stripHtml(input.bodyHtml),
-        variables: (input.variables ?? null) as object | null,
+        variables: input.variables
+          ? (input.variables as unknown as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
         isDefault: input.isDefault ?? false,
       },
     });
   }
 
   update(id: string, input: Partial<CreateMailTemplateInput>) {
-    const data: Record<string, unknown> = {};
+    const data: Prisma.MailTemplateUpdateInput = {};
     if (input.name !== undefined) data.name = input.name;
     if (input.category !== undefined) data.category = input.category;
     if (input.subject !== undefined) data.subject = input.subject;
@@ -54,7 +56,11 @@ export class MailTemplatesService {
     } else if (input.bodyText !== undefined) {
       data.bodyText = input.bodyText;
     }
-    if (input.variables !== undefined) data.variables = input.variables;
+    if (input.variables !== undefined) {
+      data.variables = input.variables
+        ? (input.variables as unknown as Prisma.InputJsonValue)
+        : Prisma.JsonNull;
+    }
     if (input.isDefault !== undefined) data.isDefault = input.isDefault;
     return this.prisma.mailTemplate.update({ where: { id }, data });
   }

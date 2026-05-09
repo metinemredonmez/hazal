@@ -10,7 +10,7 @@ import {
   Phone,
   Mail as MailIcon,
   Sparkles,
-  Instagram,
+  Camera,
   Hash,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -33,7 +33,7 @@ const CHANNELS: Array<{
   { key: "ALL", label: "Tümü", icon: MessagesSquare, color: "text-muted-foreground" },
   { key: "WEB", label: "Web", icon: Globe, color: "text-blue-600" },
   { key: "WHATSAPP", label: "WhatsApp", icon: Phone, color: "text-emerald-600" },
-  { key: "INSTAGRAM", label: "Instagram", icon: Instagram, color: "text-pink-600" },
+  { key: "INSTAGRAM", label: "Instagram", icon: Camera, color: "text-pink-600" },
   { key: "AI_CONCIERGE", label: "AI", icon: Sparkles, color: "text-amber-600" },
   { key: "EMAIL", label: "E-posta", icon: MailIcon, color: "text-violet-600" },
   { key: "PHONE", label: "Telefon", icon: Phone, color: "text-slate-600" },

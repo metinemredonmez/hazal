@@ -174,7 +174,7 @@ class ContactsService {
       headers.forEach((h, i) => {
         const key = fieldMap[h];
         if (!key || !cells[i]) return;
-        (out as Record<string, string>)[key] = cells[i];
+        (out as unknown as Record<string, string>)[key] = cells[i];
       });
       return out;
     });
