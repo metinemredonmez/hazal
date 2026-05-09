@@ -107,6 +107,7 @@ export default function HaritaPage() {
   const [events, setEvents] = React.useState<CalendarEvent[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [visited, setVisited] = React.useState<VisitedLocation[]>([]);
+  const [mapReady, setMapReady] = React.useState(false);
   const [activeLayers, setActiveLayers] = React.useState<Record<LayerKey, boolean>>({
     listings: true,
     appointments: true,
@@ -185,8 +186,10 @@ export default function HaritaPage() {
       mapRef.current = map;
 
       // Container 0px ile başlamış olabilir (flex layout race) — load sonrası resize.
+      // Marker'ları map yüklendikten SONRA ekle (yoksa konumlar bozuluyor).
       map.on("load", () => {
         setTimeout(() => map.resize(), 50);
+        setMapReady(true);
       });
       // Window resize yakalama
       const onResize = () => map.resize();
@@ -200,9 +203,9 @@ export default function HaritaPage() {
     };
   }, [mapboxToken]);
 
-  // Render markers when data or layers change
+  // Render markers when data or layers change — only after map style loaded
   React.useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !mapReady) return;
     let cancelled = false;
     (async () => {
       const mapboxgl = (await import("mapbox-gl")).default;
@@ -346,7 +349,7 @@ export default function HaritaPage() {
     return () => {
       cancelled = true;
     };
-  }, [listings, appointments, events, visited, activeLayers, showRoute]);
+  }, [mapReady, listings, appointments, events, visited, activeLayers, showRoute]);
 
   const counts = {
     listings: listings.length,
