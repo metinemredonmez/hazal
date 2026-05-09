@@ -66,7 +66,8 @@ The 400,000 USD citizenship-by-investment threshold continues to attract buyers 
 **Outlook**
 
 Easing monetary policy in H2 may strengthen premium-segment demand further. Limited supply — especially in coastal mansion inventory — will continue pushing prices up.`,
-    coverImage: '/uploads/blog/istanbul-bosphorus.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 2,
   },
   {
@@ -128,7 +129,8 @@ Morning coffee at Lucca, afternoon at Bebek Park, dinner at Mangerie or Aşşk K
 **Caveats**
 
 Parking and traffic are the hardest parts. Listings with in-building parking carry a premium.`,
-    coverImage: '/uploads/blog/bebek-cad.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 5,
   },
   {
@@ -194,7 +196,8 @@ May-September weekly rentals range 25,000-80,000 EUR. Professional villa managem
 **Foreign buyers**
 
 British, German, and Dutch buyers consider Bodrum an alternative to Mallorca, Saint-Tropez, and Mykonos due to tax advantages and price differential.`,
-    coverImage: '/uploads/blog/bodrum-villa.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 9,
   },
   {
@@ -270,7 +273,8 @@ British, German, and Dutch buyers consider Bodrum an alternative to Mallorca, Sa
 - Yalıkavak villa with private pier (small)
 
 **Process time**: 60-90 days with complete docs.`,
-    coverImage: '/uploads/blog/turk-vatandasligi.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 12,
   },
   {
@@ -320,7 +324,8 @@ British, German, and Dutch buyers consider Bodrum an alternative to Mallorca, Sa
 **For Turkish investors**
 
 İstanbul (core portfolio) + Bodrum (summer/seasonal) + Dubai (liquid yield) combination delivers an optimal 5-10M USD allocation.`,
-    coverImage: '/uploads/blog/global-luxury.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 16,
   },
   {
@@ -362,7 +367,8 @@ Her iki rapor da kur volatilitesi ve düzenleyici değişikliklerin yatırımcı
 **Risk note**
 
 Both reports highlight currency volatility and regulatory changes as core investor risks. USD-denominated leases and long-hold (5+ year) strategies are recommended.`,
-    coverImage: '/uploads/blog/knight-frank.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 22,
   },
   {
@@ -430,7 +436,8 @@ A well-executed smart home delivers **5-8% premium** at sale. But brand-dependen
 **Recommendation**
 
 Choose KNX (open standard, local integrators plentiful). Add Lutron layer for lighting. Reserve Crestron for ultra-luxe (10M+).`,
-    coverImage: '/uploads/blog/smart-home.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1558002038-1055907df827?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 28,
   },
   {
@@ -518,7 +525,8 @@ Mansion sales appreciated **180%+** in USD over the past decade. Limited supply 
 **Buyer profile**
 
 Turkish contractor and industrialist families dominate. Foreign interest exists but the historic status means long timelines and specialized advisory.`,
-    coverImage: '/uploads/blog/yali-bogaz.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1517942197970-21f5c08e1c84?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 35,
   },
 
@@ -587,7 +595,8 @@ Turkish contractor and industrialist families dominate. Foreign interest exists 
     bodyEn:
       'Interior and exterior presentation of a restored historic mansion in Bebek. View and architectural details in 4K.',
     externalUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    coverImage: '/uploads/blog/bebek-yali-tour.jpg',
+    coverImage:
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 8,
   },
 ];
