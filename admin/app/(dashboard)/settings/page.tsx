@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Save, Globe, ArrowRight, Upload, ImageIcon, X as XIcon, Mail } from "lucide-react";
+import { Loader2, Save, Globe, ArrowRight, Upload, ImageIcon, X as XIcon, Mail, QrCode, Copy, ExternalLink } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -282,6 +282,15 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader className="py-3 px-4 border-b border-border">
+            <CardTitle className="text-xs">Online Kartvizit</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <DigitalCardSection />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="py-3 px-4 border-b border-border">
             <CardTitle className="text-xs">Yerelleştirme</CardTitle>
           </CardHeader>
           <CardContent className="p-4 grid gap-3 md:grid-cols-3">
@@ -531,6 +540,99 @@ function Field({
       <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</Label>
       {children}
       {hint && <p className="text-[11px] text-muted-foreground/80 leading-snug">{hint}</p>}
+    </div>
+  );
+}
+
+function DigitalCardSection() {
+  const cardUrl = "https://hazalmuti.com/v";
+  // Free QR generator API (server-side, no JS lib needed)
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(cardUrl)}&margin=2`;
+
+  function copyLink() {
+    navigator.clipboard.writeText(cardUrl);
+    toast.success("Link kopyalandı");
+  }
+
+  function downloadQR() {
+    const a = document.createElement("a");
+    a.href = qrUrl;
+    a.download = "hazal-muti-kartvizit-qr.png";
+    a.target = "_blank";
+    a.click();
+  }
+
+  return (
+    <div className="grid md:grid-cols-[200px_1fr] gap-4 items-start">
+      {/* QR Preview */}
+      <div className="bg-white p-3 rounded-lg border flex flex-col items-center gap-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={qrUrl}
+          alt="Kartvizit QR Kodu"
+          className="w-full aspect-square object-contain"
+        />
+        <p className="text-[9px] uppercase tracking-wider text-muted-foreground text-center">
+          Kartvizit QR Kodu
+        </p>
+      </div>
+
+      {/* Info + Actions */}
+      <div className="space-y-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+            Online Kartvizit Linki
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 px-3 py-2 bg-muted rounded text-xs font-mono">
+              {cardUrl}
+            </code>
+            <Button size="sm" variant="outline" onClick={copyLink} className="gap-1.5">
+              <Copy className="h-3 w-3" />
+              Kopyala
+            </Button>
+          </div>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          Telefon, WhatsApp, e-posta, Instagram ve aktif portföyün tek sayfada.
+          Müşteriye linki yolla veya QR kodu yazdır → telefonla taranınca açılır,
+          tek tıkla rehbere kaydedilir.
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={cardUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#14141A] text-white text-xs rounded hover:bg-[#C9A96E] hover:text-[#14141A]"
+          >
+            <ExternalLink className="h-3 w-3" />
+            Önizle
+          </a>
+          <button
+            onClick={downloadQR}
+            className="inline-flex items-center gap-1.5 px-3 py-2 border rounded text-xs hover:bg-muted"
+          >
+            <QrCode className="h-3 w-3" />
+            QR İndir (PNG)
+          </button>
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(`Online kartvizitim: ${cardUrl}`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 border rounded text-xs hover:bg-muted text-emerald-700"
+          >
+            💬 WhatsApp ile Paylaş
+          </a>
+        </div>
+
+        <div className="text-[11px] text-muted-foreground bg-amber-50 border border-amber-200 rounded p-2">
+          💡 <strong>İpucu:</strong> QR kodu yazıcı kartına bastır, müşteriler
+          telefonla taradıkça kartvizitin açılır. Sosyal medyada veya
+          imzalarında bu linki kullan.
+        </div>
+      </div>
     </div>
   );
 }
