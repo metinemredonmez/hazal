@@ -222,17 +222,31 @@ model Inquiry {
   @@index([customerId])
 }
 
+enum ChatChannel {
+  WEB           // hazalmuti.com canlı sohbet widget'ı
+  WHATSAPP      // CollectAPI üzerinden WhatsApp
+  INSTAGRAM     // Instagram DM
+  AI_CONCIERGE  // Sanal danışman (AI) ile yapılan
+  EMAIL         // E-posta yoluyla başlayan
+  PHONE         // Telefon notları
+  OTHER
+}
+
 model ChatSession {
   id           String        @id @default(cuid())
   visitorId    String        @unique
   visitorName  String?
   visitorEmail String?
+  visitorPhone String?
+  channel      ChatChannel   @default(WEB)
+  externalRef  String?       // WhatsApp phone_id, Instagram thread, vs.
   closed       Boolean       @default(false)
   messages     ChatMessage[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
   @@index([closed])
+  @@index([channel])
 }
 
 model ChatMessage {

@@ -109,7 +109,7 @@ export default function HaritaPage() {
       const past = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
       const [listingsRes, appts, evts] = await Promise.all([
-        api<{ items: Listing[] }>("/api/admin/listings?pageSize=200&status=ACTIVE"),
+        api<{ items: Listing[] }>("/api/admin/listings?pageSize=100&status=ACTIVE"),
         api<Appointment[]>(`/api/admin/appointments?upcomingOnly=false`),
         api<CalendarEvent[]>(
           `/api/admin/calendar-events?fromDate=${past.toISOString()}&toDate=${future.toISOString()}`,
