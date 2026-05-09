@@ -27,7 +27,18 @@ export default function DigitalCardPage() {
   const phone = settings?.phone ?? "";
   const whatsapp = settings?.whatsapp ?? settings?.phone ?? "";
   const email = settings?.email ?? "info@hazalmuti.com";
-  const instagram = settings?.instagram ?? "";
+  const instagramRaw = settings?.instagram ?? "";
+  // URL veya username olabilir → sadece username çıkar
+  const instagramHandle = instagramRaw
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+    .replace(/^@/, "")
+    .replace(/\/$/, "")
+    .split("/")[0]
+    .trim();
+  const instagram = instagramHandle;
+  const instagramUrl = instagramHandle
+    ? `https://instagram.com/${instagramHandle}`
+    : "";
   const tagline = pick(
     about?.heroEyebrow,
     locale,
@@ -49,7 +60,7 @@ export default function DigitalCardPage() {
       phone && `TEL;TYPE=CELL:${phone}`,
       email && `EMAIL:${email}`,
       `URL:https://hazalmuti.com`,
-      instagram && `URL;TYPE=Instagram:https://instagram.com/${instagram.replace("@", "")}`,
+      instagramUrl && `URL;TYPE=Instagram:${instagramUrl}`,
       "ADR;TYPE=WORK:;;Bebek;İstanbul;;;Türkiye",
       "END:VCARD",
     ]
@@ -92,6 +103,7 @@ export default function DigitalCardPage() {
               src={portrait}
               alt={brandName}
               className="w-full h-full object-cover"
+              style={{ objectPosition: "center 20%" }}
             />
           </div>
           <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-2">
@@ -158,7 +170,7 @@ export default function DigitalCardPage() {
 
           {instagram && (
             <a
-              href={`https://instagram.com/${instagram.replace("@", "")}`}
+              href={instagramUrl}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-3 w-full bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 px-5 py-4 rounded-xl transition-opacity group"
@@ -166,9 +178,7 @@ export default function DigitalCardPage() {
               <Instagram className="h-5 w-5 shrink-0" />
               <div className="flex-1 text-left">
                 <p className="text-xs uppercase tracking-wider opacity-80">Instagram</p>
-                <p className="text-sm font-medium">
-                  {instagram.startsWith("@") ? instagram : `@${instagram}`}
-                </p>
+                <p className="text-sm font-medium">@{instagram}</p>
               </div>
               <ArrowUpRight className="h-4 w-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
             </a>

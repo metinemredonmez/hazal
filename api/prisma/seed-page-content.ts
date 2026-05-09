@@ -62,22 +62,22 @@ const PAGE_CONTENT = {
       en: "I provide premium real estate advisory across İstanbul's most distinguished neighborhoods.",
     },
     bio1: {
-      tr: "Coldwell Banker CB Plus ofisinde 9 yıllık tecrübeyle gayrimenkul danışmanlığı yapıyorum. Ege Üniversitesi İşletme ve Balıkesir Üniversitesi Muhasebe-Finansman Öğretmenliği mezunuyum; halen Nişantaşı Üniversitesi'nde Reklam ve Marka İletişimi yüksek lisansı yapıyorum. Daha önce uluslararası bir sağlık teknolojisi şirketinde satış ve satış sonrası destek alanında çalıştım — gayrimenkul sektörüne taşıdığım disiplin ve müşteri odaklılık bu deneyimden geliyor.",
-      en: "I have been a real estate consultant at Coldwell Banker CB Plus for 9 years. I graduated from Ege University Business Administration and Balıkesir University Accounting & Finance Teaching, and I am currently pursuing a Master's in Advertising and Brand Communication at Nişantaşı University. Prior to real estate I worked in sales and after-sales support at an international healthcare startup — the discipline and client focus I bring to property come from that background.",
+      tr: "Coldwell Banker CB Plus'ta gayrimenkul danışmanıyım. İstanbul ve Bodrum'da satış ve kiralama süreçlerinde müşterilere eşlik ediyorum.",
+      en: "I am a real estate consultant at Coldwell Banker CB Plus. I support clients through sales and leasing processes in İstanbul and Bodrum.",
     },
     bio2: {
-      tr: "Coldwell Banker'ın Global Luxury sertifikasyonuna sahibim. Boğaz hattı (Bebek, Yeniköy, Tarabya), Etiler, Cihangir ve Bodrum lüks segmentinde satış ve kiralama operasyonları yürütüyorum. Yabancı yatırımcı süreçlerinde — vatandaşlık eşiği, döviz transferi, ekspertiz raporu — deneyimliyim. Hedefim sadece bir gayrimenkul satmak değil, müşterinin hayat planına en uygun adresi birlikte bulmak. Bu nedenle kısa vadeli baskı yerine doğru kararı veren uzun vadeli ilişkiyi tercih ediyorum.",
-      en: "I am Coldwell Banker Global Luxury certified. My focus is on luxury sales and leasing across the Bosphorus line (Bebek, Yeniköy, Tarabya), Etiler, Cihangir, and Bodrum. I am experienced with foreign investor processes — citizenship threshold, currency transfer, appraisal. My goal isn't simply to close a transaction; it's to find the address that fits a client's life plan. I favour long-term relationships over short-term pressure.",
+      tr: "Her müşterinin önceliği farklı. Bu yüzden hızlı sonuç yerine doğru karara odaklanıyorum: ihtiyacı dinleyip portföyden uygun seçenekleri sunmak, yer gösterimi ve sözleşme sürecinde yanınızda olmak.",
+      en: "Every client has different priorities. So I focus on the right decision rather than the fastest outcome: listening, presenting fitting options from the portfolio, and being there through viewings and contracts.",
     },
     specialties: {
-      tr: 'Boğaz hattı yalı ve premium daireler (Bebek, Yeniköy, Tarabya)\nEtiler, Cihangir, Nişantaşı premium konut\nBodrum yat villaları (Yalıkavak, Türkbükü)\nYabancı alıcı + Türk vatandaşlığı süreci\nKira yönetimi ve lüks portföy gözetimi\nColdwell Banker Global Luxury sertifikalı',
-      en: 'Bosphorus line mansions & premium apartments (Bebek, Yeniköy, Tarabya)\nEtiler, Cihangir, Nişantaşı premium residential\nBodrum yacht villas (Yalıkavak, Türkbükü)\nForeign buyer & Turkish citizenship process\nRental management & luxury portfolio oversight\nColdwell Banker Global Luxury certified',
+      tr: 'Boğaz hattı (Bebek, Yeniköy, Tarabya)\nEtiler, Cihangir\nBodrum (Yalıkavak, Türkbükü)\nYabancı alıcı süreçleri',
+      en: 'Bosphorus line (Bebek, Yeniköy, Tarabya)\nEtiler, Cihangir\nBodrum (Yalıkavak, Türkbükü)\nForeign buyer processes',
     },
     quote: {
-      tr: '"Bir ev sadece bir bina değildir; ait olduğun bir hikâyedir."',
-      en: '"A home is not merely a building; it is a story you belong to."',
+      tr: '',
+      en: '',
     },
-    quoteAuthor: 'Hazal Muti',
+    quoteAuthor: '',
   },
   contact: {
     heroEyebrow: {
@@ -111,9 +111,9 @@ const SETTINGS_DEFAULTS = {
   email: 'hazal.muti@cb.com.tr',
   address: 'CB PLUS · İstanbul',
   aboutTr:
-    "Coldwell Banker CB Plus'ta 9 yıllık tecrübeyle gayrimenkul danışmanlığı yapıyorum. Boğaz hattı, Bebek, Etiler, Cihangir ve Bodrum'da seçkin bir portföy üzerinde çalışıyor; her müşteri için sessiz, kişisel ve sonuç odaklı bir hizmet sunuyorum. Coldwell Banker Global Luxury sertifikalıyım.",
+    "Coldwell Banker CB Plus'ta gayrimenkul danışmanıyım. İstanbul ve Bodrum'da satış ve kiralama süreçlerinde müşterilere eşlik ediyorum.",
   aboutEn:
-    "I have 9 years of experience as a real estate consultant at Coldwell Banker CB Plus. I work with a curated portfolio across the Bosphorus line, Bebek, Etiler, Cihangir and Bodrum, providing discreet, personalized and results-driven service. Coldwell Banker Global Luxury certified.",
+    "I am a real estate consultant at Coldwell Banker CB Plus. I support clients through sales and leasing in İstanbul and Bodrum.",
   instagram: 'https://www.instagram.com/cb.hazalmuti/',
 };
 
