@@ -52,8 +52,11 @@ export function Hero() {
       {/* Eyebrow line top-left */}
       <div className="absolute top-32 left-6 lg:left-10 z-10">
         <div className="flex items-center gap-3">
-          <div className="h-px w-16 bg-[#C9A96E]" />
-          <span className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E]">
+          <div className="h-[2px] w-16 bg-[#D4AF37]" />
+          <span
+            className="text-[11px] tracking-[0.4em] uppercase font-medium text-[#E5C870]"
+            style={{ textShadow: "0 1px 4px rgba(0,0,0,0.7)" }}
+          >
             {eyebrow}
           </span>
         </div>

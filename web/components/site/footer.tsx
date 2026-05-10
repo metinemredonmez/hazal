@@ -146,11 +146,6 @@ export function Footer() {
                 Instagram
               </a>
             )}
-            {settings?.linkedin && (
-              <a href={settings.linkedin} target="_blank" rel="noreferrer" className="hover:text-[#C9A96E]">
-                LinkedIn
-              </a>
-            )}
             {settings?.youtube && (
               <a href={settings.youtube} target="_blank" rel="noreferrer" className="hover:text-[#C9A96E]">
                 YouTube
