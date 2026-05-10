@@ -5,14 +5,43 @@ import * as React from "react";
 export type Locale = "tr" | "en";
 
 const KEY = "hazal_locale";
+const EVENT = "hazal-locale-change";
 
+/**
+ * Bilingual locale hook — TR ↔ EN.
+ *
+ * All components share the same locale via a custom window event +
+ * cross-tab `storage` event. Changing locale in one place (navbar)
+ * triggers re-render in every consumer simultaneously.
+ */
 export function useLocale(): [Locale, (l: Locale) => void] {
   const [locale, setLocaleState] = React.useState<Locale>("tr");
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Initial read
     const saved = window.localStorage.getItem(KEY) as Locale | null;
     if (saved === "tr" || saved === "en") setLocaleState(saved);
+
+    // Same-tab sync via custom event
+    const onCustom = (e: Event) => {
+      const next = (e as CustomEvent<Locale>).detail;
+      if (next === "tr" || next === "en") setLocaleState(next);
+    };
+    // Cross-tab sync via storage event
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== KEY) return;
+      const next = e.newValue as Locale | null;
+      if (next === "tr" || next === "en") setLocaleState(next);
+    };
+
+    window.addEventListener(EVENT, onCustom);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(EVENT, onCustom);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   const setLocale = React.useCallback((l: Locale) => {
@@ -20,6 +49,8 @@ export function useLocale(): [Locale, (l: Locale) => void] {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(KEY, l);
       document.documentElement.lang = l;
+      // Broadcast to all other useLocale consumers in this tab
+      window.dispatchEvent(new CustomEvent(EVENT, { detail: l }));
     }
   }, []);
 
