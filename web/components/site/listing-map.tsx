@@ -83,7 +83,7 @@ export function ListingMap({ lat, lng, title, zoom = 14 }: ListingMapProps) {
 
         {title && (
           <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-white/95 text-[#14141A] text-xs px-3 py-1.5 backdrop-blur shadow rounded-sm">
-            <MapPin className="h-3 w-3 text-[#C9A96E]" />
+            <MapPin className="h-3 w-3 text-[#D4B36A]" />
             <span className="line-clamp-1 max-w-[260px]">{title}</span>
           </div>
         )}
@@ -92,7 +92,7 @@ export function ListingMap({ lat, lng, title, zoom = 14 }: ListingMapProps) {
           href={directionsUrl}
           target="_blank"
           rel="noreferrer"
-          className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 bg-[#14141A] hover:bg-[#C9A96E] text-white text-xs tracking-[0.2em] uppercase px-4 py-2.5 transition-colors shadow-lg rounded-sm"
+          className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 bg-[#14141A] hover:bg-[#D4B36A] text-white text-xs tracking-[0.2em] uppercase px-4 py-2.5 transition-colors shadow-lg rounded-sm"
         >
           <Navigation className="h-3.5 w-3.5" />
           {locale === "tr" ? "Yol Tarifi" : "Directions"}
@@ -105,7 +105,7 @@ export function ListingMap({ lat, lng, title, zoom = 14 }: ListingMapProps) {
           href={gmapsUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#C9A96E] hover:text-[#C9A96E] text-[#14141A]/80 transition-colors rounded-sm"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#D4B36A] hover:text-[#D4B36A] text-[#14141A]/80 transition-colors rounded-sm"
         >
           <ExternalLink className="h-3 w-3" /> Google Maps
         </a>
@@ -113,7 +113,7 @@ export function ListingMap({ lat, lng, title, zoom = 14 }: ListingMapProps) {
           href={appleMapsUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#C9A96E] hover:text-[#C9A96E] text-[#14141A]/80 transition-colors rounded-sm"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#D4B36A] hover:text-[#D4B36A] text-[#14141A]/80 transition-colors rounded-sm"
         >
           <ExternalLink className="h-3 w-3" /> Apple Maps
         </a>
@@ -121,17 +121,17 @@ export function ListingMap({ lat, lng, title, zoom = 14 }: ListingMapProps) {
           href={wazeUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#C9A96E] hover:text-[#C9A96E] text-[#14141A]/80 transition-colors rounded-sm"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#D4B36A] hover:text-[#D4B36A] text-[#14141A]/80 transition-colors rounded-sm"
         >
           <ExternalLink className="h-3 w-3" /> Waze
         </a>
         <button
           onClick={copyCoords}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#C9A96E] hover:text-[#C9A96E] text-[#14141A]/80 transition-colors ml-auto rounded-sm"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E2DD] hover:border-[#D4B36A] hover:text-[#D4B36A] text-[#14141A]/80 transition-colors ml-auto rounded-sm"
         >
           {copied ? (
             <>
-              <Check className="h-3 w-3 text-[#C9A96E]" />
+              <Check className="h-3 w-3 text-[#D4B36A]" />
               {locale === "tr" ? "Kopyalandı" : "Copied"}
             </>
           ) : (

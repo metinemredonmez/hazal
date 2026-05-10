@@ -77,17 +77,17 @@ export function Hero() {
         href="/ilanlar"
         className="hidden lg:flex absolute bottom-24 right-10 z-10 items-center gap-3 group"
       >
-        <span className="text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC] group-hover:text-[#C9A96E] transition-colors">
+        <span className="text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC] group-hover:text-[#D4B36A] transition-colors">
           {ctaLabel}
         </span>
-        <ArrowRight className="h-4 w-4 text-[#C9A96E] transition-transform group-hover:translate-x-1" />
+        <ArrowRight className="h-4 w-4 text-[#D4B36A] transition-transform group-hover:translate-x-1" />
       </Link>
 
       {/* Mobile CTA bottom */}
       <div className="lg:hidden absolute bottom-10 left-6 right-6 z-10">
         <Link
           href="/ilanlar"
-          className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border-b border-[#C9A96E] text-[#C9A96E] pb-1"
+          className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border-b border-[#D4B36A] text-[#D4B36A] pb-1"
         >
           {ctaLabel} <ArrowRight className="h-3 w-3" />
         </Link>

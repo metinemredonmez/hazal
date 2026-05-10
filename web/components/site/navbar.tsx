@@ -113,7 +113,7 @@ export function Navbar() {
               href="/"
               className="font-display text-xl lg:text-2xl tracking-[0.18em] uppercase select-none"
             >
-              HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+              HAZAL <span className="italic font-light text-[#D4B36A]">MUTİ</span>
             </Link>
           </div>
 
@@ -121,13 +121,13 @@ export function Navbar() {
           <div className="hidden lg:flex items-center justify-end gap-5">
             <Link
               href="/iletisim"
-              className="text-[10px] tracking-[0.3em] uppercase hover:text-[#C9A96E] transition-colors"
+              className="text-[10px] tracking-[0.3em] uppercase hover:text-[#D4B36A] transition-colors"
             >
               {tx.nav.contact}
             </Link>
             <button
               onClick={() => setLocale(locale === "tr" ? "en" : "tr")}
-              className="text-[10px] tracking-[0.3em] uppercase hover:text-[#C9A96E] transition-colors"
+              className="text-[10px] tracking-[0.3em] uppercase hover:text-[#D4B36A] transition-colors"
               aria-label="Switch language"
             >
               {locale === "tr" ? "EN" : "TR"}
@@ -135,7 +135,7 @@ export function Navbar() {
             <Link
               href="/ilanlar"
               aria-label="Search"
-              className="hover:text-[#C9A96E] transition-colors"
+              className="hover:text-[#D4B36A] transition-colors"
             >
               <Search className="h-4 w-4" />
             </Link>
@@ -145,7 +145,7 @@ export function Navbar() {
           <div className="lg:hidden flex items-center justify-end gap-2">
             <button
               onClick={() => setLocale(locale === "tr" ? "en" : "tr")}
-              className="text-[10px] tracking-[0.3em] uppercase px-2 py-1.5 hover:text-[#C9A96E]"
+              className="text-[10px] tracking-[0.3em] uppercase px-2 py-1.5 hover:text-[#D4B36A]"
               aria-label="Switch language"
             >
               {locale === "tr" ? "EN" : "TR"}
@@ -153,7 +153,7 @@ export function Navbar() {
             <Link
               href="/ilanlar"
               aria-label="Search"
-              className="p-2 hover:text-[#C9A96E]"
+              className="p-2 hover:text-[#D4B36A]"
             >
               <Search className="h-4 w-4" />
             </Link>
@@ -199,7 +199,7 @@ function DesktopNavItem({
     return (
       <Link
         href={item.href ?? "#"}
-        className="text-[10px] tracking-[0.3em] uppercase hover:text-[#C9A96E] transition-colors"
+        className="text-[10px] tracking-[0.3em] uppercase hover:text-[#D4B36A] transition-colors"
       >
         {item.label}
       </Link>
@@ -210,7 +210,7 @@ function DesktopNavItem({
     <div ref={ref} className="relative">
       <button
         onClick={onOpen}
-        className="flex items-center gap-1 text-[10px] tracking-[0.3em] uppercase hover:text-[#C9A96E] transition-colors"
+        className="flex items-center gap-1 text-[10px] tracking-[0.3em] uppercase hover:text-[#D4B36A] transition-colors"
       >
         {item.label}
         <ChevronDown className={cn("h-3 w-3 transition-transform", open && "rotate-180")} />
@@ -221,7 +221,7 @@ function DesktopNavItem({
             <Link
               key={c.href}
               href={c.href}
-              className="block px-4 py-2 text-[11px] tracking-[0.15em] uppercase text-[#F5F2EC]/80 hover:text-[#C9A96E] hover:bg-white/5 transition-colors"
+              className="block px-4 py-2 text-[11px] tracking-[0.15em] uppercase text-[#F5F2EC]/80 hover:text-[#D4B36A] hover:bg-white/5 transition-colors"
             >
               {c.label}
             </Link>
@@ -271,12 +271,12 @@ function MobileMenu({
             onClick={onClose}
             className="font-display text-lg tracking-[0.18em] uppercase"
           >
-            HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+            HAZAL <span className="italic font-light text-[#D4B36A]">MUTİ</span>
           </Link>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="p-2 -mr-2 text-[#F5F2EC]/70 hover:text-[#C9A96E] transition-colors"
+            className="p-2 -mr-2 text-[#F5F2EC]/70 hover:text-[#D4B36A] transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -289,7 +289,7 @@ function MobileMenu({
               <li key={item.label}>
                 {item.children ? (
                   <div>
-                    <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+                    <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
                       {item.label}
                     </p>
                     <ul className="space-y-1.5 pl-1">
@@ -298,7 +298,7 @@ function MobileMenu({
                           <Link
                             href={c.href}
                             onClick={onClose}
-                            className="block py-1.5 font-display text-xl tracking-wide text-[#F5F2EC] hover:text-[#C9A96E] transition-colors"
+                            className="block py-1.5 font-display text-xl tracking-wide text-[#F5F2EC] hover:text-[#D4B36A] transition-colors"
                           >
                             {c.label}
                           </Link>
@@ -310,7 +310,7 @@ function MobileMenu({
                   <Link
                     href={item.href ?? "#"}
                     onClick={onClose}
-                    className="block font-display text-2xl tracking-wide hover:text-[#C9A96E] transition-colors"
+                    className="block font-display text-2xl tracking-wide hover:text-[#D4B36A] transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -324,7 +324,7 @@ function MobileMenu({
             <Link
               href="/iletisim"
               onClick={onClose}
-              className="flex items-center justify-center text-[11px] tracking-[0.4em] uppercase bg-[#C9A96E] text-[#0E0E0E] px-6 py-3.5 hover:bg-[#b8965e] transition-colors"
+              className="flex items-center justify-center text-[11px] tracking-[0.4em] uppercase bg-[#D4B36A] text-[#0E0E0E] px-6 py-3.5 hover:bg-[#b8965e] transition-colors"
             >
               {locale === "tr" ? "İletişime Geç" : "Get in Touch"}
             </Link>
@@ -333,7 +333,7 @@ function MobileMenu({
                 onSwitchLocale();
                 onClose();
               }}
-              className="block w-full text-center text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC]/60 hover:text-[#C9A96E] py-2"
+              className="block w-full text-center text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC]/60 hover:text-[#D4B36A] py-2"
             >
               {locale === "tr" ? "Switch to English" : "Türkçe'ye Geç"}
             </button>

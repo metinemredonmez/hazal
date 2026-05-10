@@ -98,7 +98,7 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
     <section className="bg-[#0E0E0E] text-[#F5F2EC] py-14 lg:py-20 px-6 lg:px-10">
       <div className="max-w-[1400px] mx-auto">
         <div className="mb-8 lg:mb-10">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-2">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-2">
             {locale === "tr" ? "Video Sunum" : "Video Showcase"}
           </p>
           <h2 className="font-display font-light text-2xl lg:text-3xl">
@@ -123,14 +123,14 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-11 h-11 rounded-full bg-[#C9A96E]/95 text-[#14141A] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                <div className="w-11 h-11 rounded-full bg-[#D4B36A]/95 text-[#14141A] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
                   <Play className="h-4 w-4 fill-current ml-0.5" />
                 </div>
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 p-3.5 text-left">
                 {v.date && (
-                  <p className="text-[9px] tracking-[0.4em] uppercase text-[#C9A96E] mb-1">
+                  <p className="text-[9px] tracking-[0.4em] uppercase text-[#D4B36A] mb-1">
                     {v.date}
                   </p>
                 )}
@@ -175,7 +175,7 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
             <div className="mt-3 flex items-center justify-between gap-4 text-white/85 w-full max-w-md">
               <div className="text-center flex-1">
                 {active.date && (
-                  <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E]">
+                  <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A]">
                     {active.date}
                   </p>
                 )}
@@ -185,7 +185,7 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
               </div>
               <button
                 onClick={() => setMuted((m) => !m)}
-                className="p-2 hover:text-[#C9A96E] transition-colors"
+                className="p-2 hover:text-[#D4B36A] transition-colors"
                 aria-label={muted ? "Unmute" : "Mute"}
               >
                 {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}

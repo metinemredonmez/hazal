@@ -16,16 +16,16 @@ export function CompareBar() {
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-2rem)]">
-      <div className="bg-[#14141A] text-[#F5F2EC] rounded-full shadow-2xl flex items-center gap-3 pl-5 pr-2 py-2 border border-[#C9A96E]/30">
-        <GitCompare className="h-4 w-4 text-[#C9A96E] shrink-0" />
+      <div className="bg-[#14141A] text-[#F5F2EC] rounded-full shadow-2xl flex items-center gap-3 pl-5 pr-2 py-2 border border-[#D4B36A]/30">
+        <GitCompare className="h-4 w-4 text-[#D4B36A] shrink-0" />
         <span className="text-xs tracking-wider">
-          <strong className="text-[#C9A96E]">{cmp.count}</strong>
+          <strong className="text-[#D4B36A]">{cmp.count}</strong>
           <span className="text-[#F5F2EC]/70">/{cmp.max}</span>{" "}
           {locale === "tr" ? "seçili" : "selected"}
         </span>
         <Link
           href={url}
-          className="inline-flex items-center gap-1.5 bg-[#C9A96E] text-[#14141A] hover:bg-[#b8965e] px-4 py-2 rounded-full text-xs font-medium tracking-wider uppercase transition-colors"
+          className="inline-flex items-center gap-1.5 bg-[#D4B36A] text-[#14141A] hover:bg-[#b8965e] px-4 py-2 rounded-full text-xs font-medium tracking-wider uppercase transition-colors"
         >
           {locale === "tr" ? "Karşılaştır" : "Compare"}
           <ArrowRight className="h-3 w-3" />

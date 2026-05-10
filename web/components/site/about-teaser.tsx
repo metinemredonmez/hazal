@@ -46,7 +46,7 @@ export function AboutTeaser() {
         </div>
 
         <div className="lg:col-span-7 order-1 lg:order-2">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-4">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
             {tx.about.heading}
           </p>
           <h2 className="font-display font-light text-4xl lg:text-6xl leading-[1.05] mb-8">
@@ -61,7 +61,7 @@ export function AboutTeaser() {
                   {rest && (
                     <>
                       <br />
-                      <span className="italic text-[#C9A96E]">{rest}</span>
+                      <span className="italic text-[#D4B36A]">{rest}</span>
                     </>
                   )}
                 </>
@@ -75,10 +75,10 @@ export function AboutTeaser() {
 
           <Link
             href="/hakkimizda"
-            className="inline-flex items-center gap-3 text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC] hover:text-[#C9A96E] group"
+            className="inline-flex items-center gap-3 text-[10px] tracking-[0.4em] uppercase text-[#F5F2EC] hover:text-[#D4B36A] group"
           >
             {ctaLabel}
-            <ArrowRight className="h-3.5 w-3.5 text-[#C9A96E] transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-3.5 w-3.5 text-[#D4B36A] transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </div>

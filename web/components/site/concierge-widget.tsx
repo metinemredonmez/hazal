@@ -141,12 +141,12 @@ export function ConciergeWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="concierge-fab fixed bottom-5 right-5 z-50 group flex items-center justify-center gap-0 hover:gap-2 bg-[#14141A] hover:bg-[#C9A96E] text-white rounded-full shadow-xl w-12 h-12 hover:w-auto hover:h-12 hover:px-5 transition-all overflow-hidden ring-2 ring-[#C9A96E]/40"
+          className="concierge-fab fixed bottom-5 right-5 z-50 group flex items-center justify-center gap-0 hover:gap-2 bg-[#14141A] hover:bg-[#D4B36A] text-white rounded-full shadow-xl w-12 h-12 hover:w-auto hover:h-12 hover:px-5 transition-all overflow-hidden ring-2 ring-[#D4B36A]/40"
           aria-label={locale === "tr" ? "Sanal danışmanı aç" : "Open AI concierge"}
           title={locale === "tr" ? "Sanal Danışman" : "AI Concierge"}
         >
           <span className="concierge-pulse" aria-hidden />
-          <Sparkles className="concierge-spark h-4 w-4 text-[#C9A96E] group-hover:text-white transition-colors shrink-0 relative" />
+          <Sparkles className="concierge-spark h-4 w-4 text-[#D4B36A] group-hover:text-white transition-colors shrink-0 relative" />
           <span className="hidden group-hover:inline text-xs tracking-[0.2em] uppercase whitespace-nowrap relative">
             {locale === "tr" ? "Sanal Danışman" : "AI Concierge"}
           </span>
@@ -159,7 +159,7 @@ export function ConciergeWidget() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-[#14141A] text-white">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#C9A96E]" />
+              <Sparkles className="h-4 w-4 text-[#D4B36A]" />
               <div>
                 <p className="text-xs tracking-[0.2em] uppercase font-medium">
                   {locale === "tr" ? "Sanal Danışman" : "AI Concierge"}
@@ -202,7 +202,7 @@ export function ConciergeWidget() {
                             <Link
                               key={l.id}
                               href={`/ilanlar/${l.slug}`}
-                              className="flex items-center gap-2.5 bg-white border border-[#E5E2DD] hover:border-[#C9A96E] px-3 py-2 rounded-md transition-colors group"
+                              className="flex items-center gap-2.5 bg-white border border-[#E5E2DD] hover:border-[#D4B36A] px-3 py-2 rounded-md transition-colors group"
                             >
                               {l.images?.[0]?.url && (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -221,7 +221,7 @@ export function ConciergeWidget() {
                                   {Number(l.price).toLocaleString("tr-TR")} {l.currency}
                                 </p>
                               </div>
-                              <ArrowRight className="h-3.5 w-3.5 text-[#C9A96E] shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                              <ArrowRight className="h-3.5 w-3.5 text-[#D4B36A] shrink-0 group-hover:translate-x-0.5 transition-transform" />
                             </Link>
                           ))}
                         </div>
@@ -229,7 +229,7 @@ export function ConciergeWidget() {
                       {m.suggestInquiry && (
                         <Link
                           href="/iletisim"
-                          className="inline-flex items-center gap-1.5 text-[11px] text-[#C9A96E] hover:underline"
+                          className="inline-flex items-center gap-1.5 text-[11px] text-[#D4B36A] hover:underline"
                         >
                           <ArrowRight className="h-3 w-3" />
                           {locale === "tr"
@@ -263,7 +263,7 @@ export function ConciergeWidget() {
                   <button
                     key={s}
                     onClick={() => sendMessage(s)}
-                    className="block w-full text-left text-xs bg-white border border-[#E5E2DD] hover:border-[#C9A96E] hover:bg-[#FAF8F4] px-3 py-2 rounded transition-colors text-[#14141A]"
+                    className="block w-full text-left text-xs bg-white border border-[#E5E2DD] hover:border-[#D4B36A] hover:bg-[#FAF8F4] px-3 py-2 rounded transition-colors text-[#14141A]"
                   >
                     {s}
                   </button>
@@ -293,13 +293,13 @@ export function ConciergeWidget() {
                 locale === "tr" ? "Aradığınız evi anlatın..." : "Tell me what you're looking for..."
               }
               rows={1}
-              className="flex-1 px-3 py-2 text-sm border border-[#E5E2DD] focus:border-[#C9A96E] focus:outline-none resize-none rounded"
+              className="flex-1 px-3 py-2 text-sm border border-[#E5E2DD] focus:border-[#D4B36A] focus:outline-none resize-none rounded"
               disabled={sending}
             />
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="bg-[#14141A] hover:bg-[#C9A96E] text-white p-2.5 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+              className="bg-[#14141A] hover:bg-[#D4B36A] text-white p-2.5 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               aria-label="Send"
             >
               <Send className="h-4 w-4" />

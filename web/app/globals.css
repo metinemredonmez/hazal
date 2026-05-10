@@ -8,7 +8,7 @@
    Card        #FFFFFF   white
    Primary     #14141A   charcoal black
    Muted       #6E6E73   warm gray
-   Accent      #C9A96E   champagne gold
+   Accent      #D4B36A   champagne gold
    Border      #E5E2DD   warm cream
    Hover       #B89757   deep gold
 */
@@ -29,15 +29,15 @@
   --secondary-foreground: #14141A;
   --muted: #F0EDE6;
   --muted-foreground: #6E6E73;
-  --accent: #C9A96E;
+  --accent: #D4B36A;
   --accent-foreground: #14141A;
   --accent-hover: #B89757;
   --destructive: #B91C1C;
   --border: #E5E2DD;
   --input: #E5E2DD;
-  --ring: #C9A96E;
+  --ring: #D4B36A;
 
-  --chart-1: #C9A96E;
+  --chart-1: #D4B36A;
   --chart-2: #14141A;
   --chart-3: #6E6E73;
   --chart-4: #B89757;
@@ -46,12 +46,12 @@
   /* Dark sidebar / dashboard chrome (always dark for premium contrast) */
   --sidebar: #0E0E0E;
   --sidebar-foreground: #F5F2EC;
-  --sidebar-primary: #C9A96E;
+  --sidebar-primary: #D4B36A;
   --sidebar-primary-foreground: #14141A;
   --sidebar-accent: #1A1A1F;
   --sidebar-accent-foreground: #F5F2EC;
   --sidebar-border: #232328;
-  --sidebar-ring: #C9A96E;
+  --sidebar-ring: #D4B36A;
 }
 
 .dark {
@@ -67,13 +67,13 @@
   --secondary-foreground: #F5F2EC;
   --muted: #1A1A1F;
   --muted-foreground: #9A9AA0;
-  --accent: #C9A96E;
+  --accent: #D4B36A;
   --accent-foreground: #14141A;
   --accent-hover: #B89757;
   --destructive: #DC2626;
   --border: #232328;
   --input: #232328;
-  --ring: #C9A96E;
+  --ring: #D4B36A;
 }
 
 @theme inline {

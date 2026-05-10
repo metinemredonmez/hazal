@@ -38,7 +38,7 @@ export function SaveSearchButton({
       <button
         onClick={() => setOpen(true)}
         className={
-          "inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase border border-[#C9A96E] text-[#C9A96E] px-4 h-11 hover:bg-[#C9A96E] hover:text-[#14141A] transition-colors " +
+          "inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase border border-[#D4B36A] text-[#D4B36A] px-4 h-11 hover:bg-[#D4B36A] hover:text-[#14141A] transition-colors " +
           className
         }
       >
@@ -111,7 +111,7 @@ function SaveSearchDialog({
       >
         <div className="bg-[#0E0E0E] text-[#F5F2EC] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Bell className="h-4 w-4 text-[#C9A96E]" />
+            <Bell className="h-4 w-4 text-[#D4B36A]" />
             <h2 className="text-sm font-medium tracking-wider uppercase">
               {locale === "tr" ? "Aramayı Kaydet" : "Save Search"}
             </h2>
@@ -136,7 +136,7 @@ function SaveSearchDialog({
             </p>
             <button
               onClick={onClose}
-              className="px-5 py-2 bg-[#14141A] text-white text-xs tracking-wider uppercase hover:bg-[#C9A96E] hover:text-[#14141A]"
+              className="px-5 py-2 bg-[#14141A] text-white text-xs tracking-wider uppercase hover:bg-[#D4B36A] hover:text-[#14141A]"
             >
               {locale === "tr" ? "Kapat" : "Close"}
             </button>
@@ -174,7 +174,7 @@ function SaveSearchDialog({
                       ? "Bebek 3+1 deniz manzaralı"
                       : "Bebek 3+1 sea-view"
                   }
-                  className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+                  className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
                 />
               </div>
 
@@ -187,7 +187,7 @@ function SaveSearchDialog({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder={locale === "tr" ? "Ahmet Yılmaz" : "John Doe"}
-                    className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+                    className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
                   />
                 </div>
                 <div>
@@ -200,7 +200,7 @@ function SaveSearchDialog({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="ornek@email.com"
-                    className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+                    className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
                   />
                 </div>
               </div>
@@ -217,7 +217,7 @@ function SaveSearchDialog({
                       "flex-1 h-10 text-xs uppercase tracking-wider border " +
                       (frequency === "daily"
                         ? "bg-[#14141A] text-white border-[#14141A]"
-                        : "bg-white border-[#E5E2DD] hover:border-[#C9A96E]")
+                        : "bg-white border-[#E5E2DD] hover:border-[#D4B36A]")
                     }
                   >
                     {locale === "tr" ? "Günlük" : "Daily"}
@@ -229,7 +229,7 @@ function SaveSearchDialog({
                       "flex-1 h-10 text-xs uppercase tracking-wider border " +
                       (frequency === "weekly"
                         ? "bg-[#14141A] text-white border-[#14141A]"
-                        : "bg-white border-[#E5E2DD] hover:border-[#C9A96E]")
+                        : "bg-white border-[#E5E2DD] hover:border-[#D4B36A]")
                     }
                   >
                     {locale === "tr" ? "Haftalık" : "Weekly"}
@@ -248,14 +248,14 @@ function SaveSearchDialog({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 h-10 text-xs uppercase tracking-wider border border-[#E5E2DD] hover:border-[#C9A96E]"
+                className="px-4 h-10 text-xs uppercase tracking-wider border border-[#E5E2DD] hover:border-[#D4B36A]"
               >
                 {locale === "tr" ? "İptal" : "Cancel"}
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-5 h-10 text-xs uppercase tracking-wider bg-[#14141A] text-white hover:bg-[#C9A96E] hover:text-[#14141A] disabled:opacity-60 inline-flex items-center gap-2"
+                className="px-5 h-10 text-xs uppercase tracking-wider bg-[#14141A] text-white hover:bg-[#D4B36A] hover:text-[#14141A] disabled:opacity-60 inline-flex items-center gap-2"
               >
                 {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 {locale === "tr" ? "Aboneliği Oluştur" : "Subscribe"}

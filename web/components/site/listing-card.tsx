@@ -69,7 +69,7 @@ export function ListingCard({ listing, size = "default" }: Props) {
             {listing.type === "SALE" ? tx.listing.forSale : tx.listing.forRent}
           </span>
           {listing.featured && (
-            <span className="text-[9px] tracking-[0.3em] uppercase bg-[#C9A96E] text-[#14141A] px-3 py-1">
+            <span className="text-[9px] tracking-[0.3em] uppercase bg-[#D4B36A] text-[#14141A] px-3 py-1">
               ★
             </span>
           )}
@@ -119,7 +119,7 @@ export function ListingCard({ listing, size = "default" }: Props) {
             className={
               "w-8 h-8 rounded-full backdrop-blur flex items-center justify-center transition-all " +
               (isCmp
-                ? "bg-[#C9A96E] text-[#14141A] shadow-lg"
+                ? "bg-[#D4B36A] text-[#14141A] shadow-lg"
                 : cmp.full
                   ? "bg-white/40 text-[#14141A]/40 cursor-not-allowed opacity-0 group-hover:opacity-100"
                   : "bg-white/85 text-[#14141A] hover:bg-white opacity-0 group-hover:opacity-100")
@@ -131,11 +131,11 @@ export function ListingCard({ listing, size = "default" }: Props) {
       </div>
 
       <div className="pt-5 pb-2">
-        <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A96E] mb-2">
+        <p className="text-[10px] tracking-[0.3em] uppercase text-[#D4B36A] mb-2">
           {CATEGORY_LABEL[listing.category]?.[locale] ?? listing.category}
           {cityLine && <span className="text-[#6E6E73]"> · {cityLine}</span>}
         </p>
-        <h3 className="font-display text-xl lg:text-2xl text-[#14141A] leading-tight group-hover:text-[#C9A96E] transition-colors">
+        <h3 className="font-display text-xl lg:text-2xl text-[#14141A] leading-tight group-hover:text-[#D4B36A] transition-colors">
           {title}
         </h3>
         <div className="mt-3 flex items-center justify-between gap-4">

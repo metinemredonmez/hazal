@@ -59,7 +59,7 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
           variant === "card" ? "bg-[#FAF8F4] p-8" : "bg-white p-10 border border-[#E5E2DD]"
         } text-center`}
       >
-        <div className="text-[#C9A96E] text-3xl mb-3">✓</div>
+        <div className="text-[#D4B36A] text-3xl mb-3">✓</div>
         <p className="font-display text-xl text-[#14141A] mb-2">
           {locale === "tr" ? "Teşekkürler" : "Thank you"}
         </p>
@@ -89,7 +89,7 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full h-11 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+            className="w-full h-11 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
             required
           />
         </div>
@@ -101,7 +101,7 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-11 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+            className="w-full h-11 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
             required
           />
         </div>
@@ -116,7 +116,7 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="+90 5XX XXX XX XX"
-          className="w-full h-11 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+          className="w-full h-11 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
           required
         />
       </div>
@@ -130,7 +130,7 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
           onChange={(e) => setMessage(e.target.value)}
           rows={5}
           placeholder={tx.inquiry.messagePlaceholder}
-          className="w-full p-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E] resize-none"
+          className="w-full p-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A] resize-none"
           required
         />
       </div>
@@ -140,7 +140,7 @@ export function InquiryForm({ listingId, variant = "card" }: Props) {
       <button
         type="submit"
         disabled={sending}
-        className="w-full h-12 bg-[#14141A] text-white text-xs tracking-[0.4em] uppercase hover:bg-[#C9A96E] hover:text-[#14141A] disabled:opacity-50 transition-colors"
+        className="w-full h-12 bg-[#14141A] text-white text-xs tracking-[0.4em] uppercase hover:bg-[#D4B36A] hover:text-[#14141A] disabled:opacity-50 transition-colors"
       >
         {sending ? tx.inquiry.sending : tx.inquiry.send}
       </button>

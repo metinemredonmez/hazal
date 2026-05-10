@@ -43,7 +43,7 @@ export function FeaturedListings() {
       <div className="max-w-[1600px] mx-auto relative">
         <div className="flex items-end justify-between mb-12 lg:mb-16">
           <div>
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
               {subtitle}
             </p>
             <h2 className="font-display font-light text-4xl lg:text-6xl text-[#14141A]">
@@ -52,7 +52,7 @@ export function FeaturedListings() {
           </div>
           <Link
             href="/ilanlar"
-            className="hidden md:flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#14141A] hover:text-[#C9A96E] group"
+            className="hidden md:flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#14141A] hover:text-[#D4B36A] group"
           >
             {tx.sections.viewAll}
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -74,7 +74,7 @@ export function FeaturedListings() {
         <div className="md:hidden mt-10 text-center">
           <Link
             href="/ilanlar"
-            className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border-b border-[#C9A96E] text-[#C9A96E] pb-1"
+            className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase border-b border-[#D4B36A] text-[#D4B36A] pb-1"
           >
             {tx.sections.viewAll} <ArrowRight className="h-3 w-3" />
           </Link>

@@ -35,7 +35,7 @@ export function ContactCTA() {
       }
     >
       <div className="max-w-3xl mx-auto text-center relative">
-        <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-5">
+        <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-5">
           {tx.contact.heading}
         </p>
         <h2 className="font-display font-light text-4xl lg:text-6xl text-[#14141A] leading-tight mb-6">
@@ -49,7 +49,7 @@ export function ContactCTA() {
                 {rest && (
                   <>
                     <br />
-                    <span className="italic text-[#C9A96E]">{rest}</span>
+                    <span className="italic text-[#D4B36A]">{rest}</span>
                   </>
                 )}
               </>

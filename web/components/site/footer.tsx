@@ -20,9 +20,9 @@ export function Footer() {
           <div className="md:col-span-2 space-y-8">
             <div>
               <p className="font-display text-2xl tracking-[0.18em] uppercase">
-                HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+                HAZAL <span className="italic font-light text-[#D4B36A]">MUTİ</span>
               </p>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mt-3">
+              <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mt-3">
                 Real Estate · İstanbul
               </p>
               <p className="text-sm text-[#F5F2EC]/60 mt-6 max-w-md leading-relaxed">
@@ -38,7 +38,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A96E] mb-4">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-[#D4B36A] mb-4">
               {tx.contact.heading}
             </p>
             <ul className="space-y-3 text-sm text-[#F5F2EC]/75">
@@ -46,7 +46,7 @@ export function Footer() {
                 <li>
                   <a
                     href={`tel:${settings.phone.replace(/\s/g, "")}`}
-                    className="flex items-center gap-2 hover:text-[#C9A96E] transition-colors"
+                    className="flex items-center gap-2 hover:text-[#D4B36A] transition-colors"
                   >
                     <Phone className="h-3.5 w-3.5" /> {settings.phone}
                   </a>
@@ -56,7 +56,7 @@ export function Footer() {
                 <li>
                   <a
                     href={`mailto:${settings.email}`}
-                    className="flex items-center gap-2 hover:text-[#C9A96E] transition-colors"
+                    className="flex items-center gap-2 hover:text-[#D4B36A] transition-colors"
                   >
                     <Mail className="h-3.5 w-3.5" /> {settings.email}
                   </a>
@@ -73,29 +73,29 @@ export function Footer() {
 
           {/* Links: İlanlar */}
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A96E] mb-4">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-[#D4B36A] mb-4">
               {tx.nav.listings}
             </p>
             <ul className="space-y-2 text-sm text-[#F5F2EC]/75">
               <li>
-                <Link href="/ilanlar" className="hover:text-[#C9A96E]">
+                <Link href="/ilanlar" className="hover:text-[#D4B36A]">
                   {tx.nav.listingsAll}
                 </Link>
               </li>
               <li>
-                <Link href="/ilanlar?type=SALE" className="hover:text-[#C9A96E]">
+                <Link href="/ilanlar?type=SALE" className="hover:text-[#D4B36A]">
                   {tx.nav.listingsSale}
                 </Link>
               </li>
               <li>
-                <Link href="/ilanlar?type=RENT" className="hover:text-[#C9A96E]">
+                <Link href="/ilanlar?type=RENT" className="hover:text-[#D4B36A]">
                   {tx.nav.listingsRent}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/ilanlar?featured=true"
-                  className="hover:text-[#C9A96E]"
+                  className="hover:text-[#D4B36A]"
                 >
                   {tx.nav.listingsFeatured}
                 </Link>
@@ -105,32 +105,32 @@ export function Footer() {
 
           {/* Links: Sayfalar */}
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A96E] mb-4">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-[#D4B36A] mb-4">
               {locale === "tr" ? "Sayfalar" : "Pages"}
             </p>
             <ul className="space-y-2 text-sm text-[#F5F2EC]/75">
               <li>
-                <Link href="/hakkimizda" className="hover:text-[#C9A96E]">
+                <Link href="/hakkimizda" className="hover:text-[#D4B36A]">
                   {tx.nav.about}
                 </Link>
               </li>
               <li>
-                <Link href="/medya" className="hover:text-[#C9A96E]">
+                <Link href="/medya" className="hover:text-[#D4B36A]">
                   {tx.nav.media}
                 </Link>
               </li>
               <li>
-                <Link href="/iletisim" className="hover:text-[#C9A96E]">
+                <Link href="/iletisim" className="hover:text-[#D4B36A]">
                   {tx.nav.contact}
                 </Link>
               </li>
               <li>
-                <Link href="/favorilerim" className="hover:text-[#C9A96E]">
+                <Link href="/favorilerim" className="hover:text-[#D4B36A]">
                   {locale === "tr" ? "Favorilerim" : "My Favorites"}
                 </Link>
               </li>
               <li>
-                <Link href="/v" className="hover:text-[#C9A96E]">
+                <Link href="/v" className="hover:text-[#D4B36A]">
                   {locale === "tr" ? "Kartvizit" : "Card"}
                 </Link>
               </li>
@@ -142,17 +142,17 @@ export function Footer() {
         <div className="mt-14 pt-8 border-t border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex gap-5 text-[10px] tracking-[0.3em] uppercase text-[#F5F2EC]/60">
             {settings?.instagram && (
-              <a href={settings.instagram} target="_blank" rel="noreferrer" className="hover:text-[#C9A96E]">
+              <a href={settings.instagram} target="_blank" rel="noreferrer" className="hover:text-[#D4B36A]">
                 Instagram
               </a>
             )}
             {settings?.youtube && (
-              <a href={settings.youtube} target="_blank" rel="noreferrer" className="hover:text-[#C9A96E]">
+              <a href={settings.youtube} target="_blank" rel="noreferrer" className="hover:text-[#D4B36A]">
                 YouTube
               </a>
             )}
             {settings?.facebook && (
-              <a href={settings.facebook} target="_blank" rel="noreferrer" className="hover:text-[#C9A96E]">
+              <a href={settings.facebook} target="_blank" rel="noreferrer" className="hover:text-[#D4B36A]">
                 Facebook
               </a>
             )}
@@ -163,10 +163,10 @@ export function Footer() {
           </p>
 
           <nav className="flex flex-wrap gap-x-5 gap-y-1 text-[10px] tracking-[0.2em] uppercase text-[#F5F2EC]/55">
-            <Link href="/gizlilik-politikasi" className="hover:text-[#C9A96E]">{tx.footer.privacy}</Link>
-            <Link href="/kvkk" className="hover:text-[#C9A96E]">{tx.footer.kvkk}</Link>
-            <Link href="/kullanim-kosullari" className="hover:text-[#C9A96E]">{tx.footer.terms}</Link>
-            <Link href="/cerez-politikasi" className="hover:text-[#C9A96E]">{tx.footer.cookies}</Link>
+            <Link href="/gizlilik-politikasi" className="hover:text-[#D4B36A]">{tx.footer.privacy}</Link>
+            <Link href="/kvkk" className="hover:text-[#D4B36A]">{tx.footer.kvkk}</Link>
+            <Link href="/kullanim-kosullari" className="hover:text-[#D4B36A]">{tx.footer.terms}</Link>
+            <Link href="/cerez-politikasi" className="hover:text-[#D4B36A]">{tx.footer.cookies}</Link>
           </nav>
         </div>
       </div>

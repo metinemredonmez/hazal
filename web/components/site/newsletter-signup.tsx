@@ -53,7 +53,7 @@ export function NewsletterSignup({ source = "footer", variant = "footer" }: News
       <div
         className={
           variant === "footer"
-            ? "flex items-center gap-2 text-sm text-[#C9A96E]"
+            ? "flex items-center gap-2 text-sm text-[#D4B36A]"
             : "flex items-center gap-2 text-sm text-[#14141A]"
         }
       >
@@ -70,7 +70,7 @@ export function NewsletterSignup({ source = "footer", variant = "footer" }: News
   if (variant === "footer") {
     return (
       <form onSubmit={submit} className="space-y-2">
-        <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A96E]">
+        <p className="text-[10px] tracking-[0.3em] uppercase text-[#D4B36A]">
           {locale === "tr" ? "Bültene Abone Ol" : "Newsletter"}
         </p>
         <p className="text-xs text-[#F5F2EC]/60">
@@ -86,13 +86,13 @@ export function NewsletterSignup({ source = "footer", variant = "footer" }: News
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={locale === "tr" ? "e-posta@adresiniz.com" : "your@email.com"}
-            className="w-full pl-9 pr-12 py-2.5 bg-[#1A1A1F] border border-[#2A2A2F] text-[#F5F2EC] placeholder-[#F5F2EC]/30 text-sm focus:outline-none focus:border-[#C9A96E]"
+            className="w-full pl-9 pr-12 py-2.5 bg-[#1A1A1F] border border-[#2A2A2F] text-[#F5F2EC] placeholder-[#F5F2EC]/30 text-sm focus:outline-none focus:border-[#D4B36A]"
             disabled={status === "loading"}
           />
           <button
             type="submit"
             disabled={status === "loading" || !email.trim()}
-            className="absolute right-1 top-1 bottom-1 px-3 bg-[#C9A96E] text-[#14141A] hover:bg-[#F5F2EC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="absolute right-1 top-1 bottom-1 px-3 bg-[#D4B36A] text-[#14141A] hover:bg-[#F5F2EC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             aria-label={locale === "tr" ? "Abone ol" : "Subscribe"}
           >
             {status === "loading" ? (
@@ -116,7 +116,7 @@ export function NewsletterSignup({ source = "footer", variant = "footer" }: News
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={locale === "tr" ? "Adınız (opsiyonel)" : "Your name (optional)"}
-          className="px-3 py-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+          className="px-3 py-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
         />
         <input
           type="email"
@@ -124,13 +124,13 @@ export function NewsletterSignup({ source = "footer", variant = "footer" }: News
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={locale === "tr" ? "e-posta@adresiniz.com" : "your@email.com"}
-          className="px-3 py-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+          className="px-3 py-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
         />
       </div>
       <button
         type="submit"
         disabled={status === "loading" || !email.trim()}
-        className="inline-flex items-center gap-2 bg-[#14141A] text-white hover:bg-[#C9A96E] px-6 py-3 text-xs tracking-[0.3em] uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="inline-flex items-center gap-2 bg-[#14141A] text-white hover:bg-[#D4B36A] px-6 py-3 text-xs tracking-[0.3em] uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         {status === "loading" ? (
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
