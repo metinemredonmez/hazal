@@ -158,7 +158,7 @@ function ListingsContent() {
     <div className="bg-[#FAF8F4] min-h-screen pt-28 lg:pt-32 pb-24">
       {/* Heading */}
       <div className="max-w-[1600px] mx-auto px-6 lg:px-10 mb-10 lg:mb-14">
-        <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+        <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
           {tx.sections.allListingsSub}
         </p>
         <h1 className="font-display font-light text-4xl lg:text-6xl text-[#14141A]">
@@ -169,7 +169,7 @@ function ListingsContent() {
       {/* Smart search */}
       <div className="max-w-[1600px] mx-auto px-6 lg:px-10 mb-6">
         <form onSubmit={smartSearch} className="relative">
-          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#C9A96E]" />
+          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#D4B36A]" />
           <input
             type="text"
             value={smartInput}
@@ -179,13 +179,13 @@ function ListingsContent() {
                 ? "Akıllı arama: '3+1 bebek deniz manzaralı 5M altı satılık'"
                 : "Smart search: '3+1 bebek seaview under 5M for sale'"
             }
-            className="w-full pl-11 pr-32 h-14 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E] shadow-sm"
+            className="w-full pl-11 pr-32 h-14 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A] shadow-sm"
             disabled={smartLoading}
           />
           <button
             type="submit"
             disabled={smartLoading || !smartInput.trim()}
-            className="absolute right-2 top-2 bottom-2 inline-flex items-center gap-2 px-4 text-xs tracking-[0.2em] uppercase bg-[#14141A] text-white hover:bg-[#C9A96E] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="absolute right-2 top-2 bottom-2 inline-flex items-center gap-2 px-4 text-xs tracking-[0.2em] uppercase bg-[#14141A] text-white hover:bg-[#D4B36A] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {smartLoading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -208,7 +208,7 @@ function ListingsContent() {
                     onClick={() => {
                       setSmartInput(ex);
                     }}
-                    className="text-[#C9A96E] hover:underline"
+                    className="text-[#D4B36A] hover:underline"
                   >
                     {ex}
                     {i < arr.length - 1 && <span className="text-[#6E6E73]"> · </span>}
@@ -228,7 +228,7 @@ function ListingsContent() {
               value={qInput}
               onChange={(e) => setQInput(e.target.value)}
               placeholder={locale === "tr" ? "Konum, ilan adı..." : "Location, name..."}
-              className="w-full pl-10 pr-4 h-11 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+              className="w-full pl-10 pr-4 h-11 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
             />
           </form>
 
@@ -240,7 +240,7 @@ function ListingsContent() {
               <SlidersHorizontal className="h-3.5 w-3.5" />
               {tx.listing.filters}
               {activeFilters > 0 && (
-                <span className="ml-1 bg-[#C9A96E] text-[#14141A] text-[10px] px-1.5 py-0.5">
+                <span className="ml-1 bg-[#D4B36A] text-[#14141A] text-[10px] px-1.5 py-0.5">
                   {activeFilters}
                 </span>
               )}
@@ -249,7 +249,7 @@ function ListingsContent() {
             <select
               value={sort}
               onChange={(e) => setParam("sort", e.target.value === "newest" ? null : e.target.value)}
-              className="h-11 px-4 bg-white border border-[#E5E2DD] text-xs tracking-[0.15em] uppercase focus:outline-none focus:border-[#C9A96E]"
+              className="h-11 px-4 bg-white border border-[#E5E2DD] text-xs tracking-[0.15em] uppercase focus:outline-none focus:border-[#D4B36A]"
             >
               <option value="newest">{tx.listing.newest}</option>
               <option value="priceAsc">{tx.listing.priceLow}</option>
@@ -267,7 +267,7 @@ function ListingsContent() {
               <select
                 value={type}
                 onChange={(e) => setParam("type", e.target.value || null)}
-                className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+                className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
               >
                 <option value="">—</option>
                 <option value="SALE">{tx.listing.forSale}</option>
@@ -281,7 +281,7 @@ function ListingsContent() {
               <select
                 value={category}
                 onChange={(e) => setParam("category", e.target.value || null)}
-                className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+                className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
               >
                 <option value="">—</option>
                 {Object.entries(CATEGORY_LABEL).map(([key, val]) => (
@@ -299,7 +299,7 @@ function ListingsContent() {
                 value={city}
                 onChange={(e) => setParam("city", e.target.value || null)}
                 placeholder="İstanbul, Bodrum..."
-                className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#C9A96E]"
+                className="w-full h-10 px-3 bg-white border border-[#E5E2DD] text-sm focus:outline-none focus:border-[#D4B36A]"
               />
             </div>
 

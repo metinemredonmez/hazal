@@ -60,23 +60,23 @@ export default function FavorilerimPage() {
         <div className="max-w-[1600px] mx-auto">
           <Link
             href="/ilanlar"
-            className="inline-flex items-center gap-2 text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] hover:text-[#F5F2EC] mb-6"
+            className="inline-flex items-center gap-2 text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] hover:text-[#F5F2EC] mb-6"
           >
             <ArrowLeft className="h-3 w-3" />
             {tx.back}
           </Link>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
             {tx.subtitle}
           </p>
           <div className="flex items-end justify-between flex-wrap gap-4">
             <h1 className="font-display font-light text-4xl lg:text-6xl flex items-center gap-3">
-              <Heart className="h-7 w-7 lg:h-10 lg:w-10 fill-[#C9A96E] text-[#C9A96E]" />
+              <Heart className="h-7 w-7 lg:h-10 lg:w-10 fill-[#D4B36A] text-[#D4B36A]" />
               {tx.title}
             </h1>
             {fav.count > 0 && (
               <button
                 onClick={fav.clear}
-                className="text-[10px] tracking-[0.3em] uppercase text-[#F5F2EC]/50 hover:text-[#C9A96E] transition-colors"
+                className="text-[10px] tracking-[0.3em] uppercase text-[#F5F2EC]/50 hover:text-[#D4B36A] transition-colors"
               >
                 {tx.clearAll}
               </button>
@@ -102,7 +102,7 @@ export default function FavorilerimPage() {
               </p>
               <Link
                 href="/ilanlar"
-                className="inline-block px-5 py-3 bg-[#14141A] text-white rounded text-sm hover:bg-[#C9A96E]"
+                className="inline-block px-5 py-3 bg-[#14141A] text-white rounded text-sm hover:bg-[#D4B36A]"
               >
                 {tx.browse}
               </Link>

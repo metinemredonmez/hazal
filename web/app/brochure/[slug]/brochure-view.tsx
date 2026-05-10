@@ -56,7 +56,7 @@ export function BrochureView({
       <div className="no-print fixed top-4 left-4 right-4 z-50 flex items-center justify-between gap-2 max-w-5xl mx-auto">
         <Link
           href={`/ilanlar/${listing.slug}`}
-          className="inline-flex items-center gap-1.5 bg-white border border-[#E5E2DD] hover:border-[#C9A96E] text-[#14141A] px-4 py-2.5 text-xs tracking-[0.2em] uppercase shadow"
+          className="inline-flex items-center gap-1.5 bg-white border border-[#E5E2DD] hover:border-[#D4B36A] text-[#14141A] px-4 py-2.5 text-xs tracking-[0.2em] uppercase shadow"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {locale === "tr" ? "İlana dön" : "Back to listing"}
@@ -64,7 +64,7 @@ export function BrochureView({
         <button
           type="button"
           onClick={() => window.print()}
-          className="inline-flex items-center gap-2 bg-[#14141A] text-white hover:bg-[#C9A96E] px-5 py-2.5 text-xs tracking-[0.2em] uppercase shadow"
+          className="inline-flex items-center gap-2 bg-[#14141A] text-white hover:bg-[#D4B36A] px-5 py-2.5 text-xs tracking-[0.2em] uppercase shadow"
         >
           <Printer className="h-3.5 w-3.5" />
           {locale === "tr" ? "PDF Olarak Yazdır" : "Print as PDF"}
@@ -88,16 +88,16 @@ export function BrochureView({
             {/* Brand on top */}
             <div className="absolute top-8 left-8">
               <p className="font-display text-2xl tracking-[0.2em] uppercase text-white">
-                HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+                HAZAL <span className="italic font-light text-[#D4B36A]">MUTİ</span>
               </p>
-              <p className="text-[9px] tracking-[0.4em] uppercase text-[#C9A96E] mt-1">
+              <p className="text-[9px] tracking-[0.4em] uppercase text-[#D4B36A] mt-1">
                 Real Estate · İstanbul
               </p>
             </div>
 
             {/* Title at bottom */}
             <div className="absolute bottom-8 left-8 right-8">
-              <p className="text-[9px] tracking-[0.4em] uppercase text-[#C9A96E] mb-2">
+              <p className="text-[9px] tracking-[0.4em] uppercase text-[#D4B36A] mb-2">
                 {listing.type === "SALE"
                   ? locale === "tr"
                     ? "Satılık"
@@ -175,12 +175,12 @@ export function BrochureView({
               <div className="space-y-1.5 text-xs text-[#14141A]">
                 {settings?.phone && (
                   <p className="flex items-center gap-2">
-                    <Phone className="h-3.5 w-3.5 text-[#C9A96E]" /> {settings.phone}
+                    <Phone className="h-3.5 w-3.5 text-[#D4B36A]" /> {settings.phone}
                   </p>
                 )}
                 {settings?.email && (
                   <p className="flex items-center gap-2">
-                    <Mail className="h-3.5 w-3.5 text-[#C9A96E]" /> {settings.email}
+                    <Mail className="h-3.5 w-3.5 text-[#D4B36A]" /> {settings.email}
                   </p>
                 )}
                 <p className="text-[10px] text-[#6E6E73] mt-2">{listingUrl}</p>
@@ -203,7 +203,7 @@ export function BrochureView({
             style={{ minHeight: "297mm" }}
           >
             <div className="mb-6">
-              <p className="text-[9px] tracking-[0.4em] uppercase text-[#C9A96E] mb-1">{brand}</p>
+              <p className="text-[9px] tracking-[0.4em] uppercase text-[#D4B36A] mb-1">{brand}</p>
               <h2 className="font-display text-2xl text-[#14141A]">
                 {locale === "tr" ? "Galeri" : "Gallery"}
               </h2>
@@ -222,7 +222,7 @@ export function BrochureView({
 
             {listing.address && (
               <div className="mt-auto pt-6 border-t border-[#E5E2DD]">
-                <p className="text-[9px] tracking-[0.4em] uppercase text-[#C9A96E] mb-2">
+                <p className="text-[9px] tracking-[0.4em] uppercase text-[#D4B36A] mb-2">
                   {locale === "tr" ? "Adres" : "Address"}
                 </p>
                 <p className="text-sm text-[#14141A]">{listing.address}</p>
@@ -253,7 +253,7 @@ function Spec({
 }) {
   return (
     <div className="border border-[#E5E2DD] p-3">
-      <div className="text-[#C9A96E] mb-1.5 [&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</div>
+      <div className="text-[#D4B36A] mb-1.5 [&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</div>
       <p className="text-[9px] tracking-[0.3em] uppercase text-[#6E6E73] mb-0.5">{label}</p>
       <p className="text-base font-light text-[#14141A]">{value}</p>
     </div>

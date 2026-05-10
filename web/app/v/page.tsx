@@ -100,7 +100,7 @@ export default function DigitalCardPage() {
       <div className="max-w-md mx-auto px-5 py-10 sm:py-14">
         {/* Hero — Foto + isim */}
         <div className="text-center">
-          <div className="mx-auto w-44 h-44 sm:w-52 sm:h-52 rounded-full overflow-hidden border-4 border-[#C9A96E]/30 shadow-2xl mb-6 ring-2 ring-[#C9A96E]/10">
+          <div className="mx-auto w-44 h-44 sm:w-52 sm:h-52 rounded-full overflow-hidden border-4 border-[#D4B36A]/30 shadow-2xl mb-6 ring-2 ring-[#D4B36A]/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={portrait}
@@ -109,11 +109,11 @@ export default function DigitalCardPage() {
               style={{ objectPosition: "center 20%" }}
             />
           </div>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-2">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-2">
             {tagline}
           </p>
           <h1 className="font-display text-3xl sm:text-4xl tracking-[0.05em] uppercase font-light">
-            HAZAL <span className="italic font-light text-[#C9A96E]">MUTİ</span>
+            HAZAL <span className="italic font-light text-[#D4B36A]">MUTİ</span>
           </h1>
           <div className="flex items-center justify-center gap-1.5 mt-3 text-[11px] text-[#F5F2EC]/60">
             <MapPin className="h-3 w-3" />
@@ -144,7 +144,7 @@ export default function DigitalCardPage() {
               href={`tel:${phone}`}
               className="flex items-center gap-3 w-full bg-[#1a1a23] hover:bg-[#252530] border border-[#2a2a35] px-5 py-4 rounded-xl transition-colors group"
             >
-              <Phone className="h-5 w-5 shrink-0 text-[#C9A96E]" />
+              <Phone className="h-5 w-5 shrink-0 text-[#D4B36A]" />
               <div className="flex-1 text-left">
                 <p className="text-xs uppercase tracking-wider text-[#F5F2EC]/50">
                   Telefon
@@ -160,7 +160,7 @@ export default function DigitalCardPage() {
               href={`mailto:${email}`}
               className="flex items-center gap-3 w-full bg-[#1a1a23] hover:bg-[#252530] border border-[#2a2a35] px-5 py-4 rounded-xl transition-colors group"
             >
-              <Mail className="h-5 w-5 shrink-0 text-[#C9A96E]" />
+              <Mail className="h-5 w-5 shrink-0 text-[#D4B36A]" />
               <div className="flex-1 text-left">
                 <p className="text-xs uppercase tracking-wider text-[#F5F2EC]/50">
                   E-posta
@@ -207,7 +207,7 @@ export default function DigitalCardPage() {
             href="/ilanlar"
             className="flex items-center gap-3 w-full bg-[#1a1a23] hover:bg-[#252530] border border-[#2a2a35] px-5 py-4 rounded-xl transition-colors group"
           >
-            <Globe className="h-5 w-5 shrink-0 text-[#C9A96E]" />
+            <Globe className="h-5 w-5 shrink-0 text-[#D4B36A]" />
             <div className="flex-1 text-left">
               <p className="text-xs uppercase tracking-wider text-[#F5F2EC]/50">
                 Aktif Portföy
@@ -222,14 +222,14 @@ export default function DigitalCardPage() {
         <div className="mt-8 grid grid-cols-2 gap-2.5">
           <button
             onClick={downloadVCard}
-            className="flex items-center justify-center gap-2 w-full bg-[#C9A96E] hover:bg-[#b8965e] text-[#14141A] px-4 py-3 rounded-xl text-xs font-medium tracking-wider uppercase transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-[#D4B36A] hover:bg-[#b8965e] text-[#14141A] px-4 py-3 rounded-xl text-xs font-medium tracking-wider uppercase transition-colors"
           >
             <Download className="h-3.5 w-3.5" />
             Rehbere Kaydet
           </button>
           <button
             onClick={shareCard}
-            className="flex items-center justify-center gap-2 w-full bg-transparent hover:bg-white/5 border border-[#C9A96E]/30 text-[#F5F2EC] px-4 py-3 rounded-xl text-xs font-medium tracking-wider uppercase transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-transparent hover:bg-white/5 border border-[#D4B36A]/30 text-[#F5F2EC] px-4 py-3 rounded-xl text-xs font-medium tracking-wider uppercase transition-colors"
           >
             <ArrowUpRight className="h-3.5 w-3.5" />
             Paylaş
@@ -243,7 +243,7 @@ export default function DigitalCardPage() {
           </p>
           <a
             href="https://hazalmuti.com"
-            className="text-[10px] text-[#C9A96E]/70 hover:text-[#C9A96E] tracking-wider"
+            className="text-[10px] text-[#D4B36A]/70 hover:text-[#D4B36A] tracking-wider"
           >
             hazalmuti.com
           </a>

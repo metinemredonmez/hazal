@@ -144,12 +144,12 @@ function KarsilastirContent() {
         <div className="max-w-[1600px] mx-auto">
           <Link
             href="/ilanlar"
-            className="inline-flex items-center gap-2 text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] hover:text-[#F5F2EC] mb-6"
+            className="inline-flex items-center gap-2 text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] hover:text-[#F5F2EC] mb-6"
           >
             <ArrowLeft className="h-3 w-3" />
             {tx.back}
           </Link>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
             {tx.subtitle}
           </p>
           <h1 className="font-display font-light text-4xl lg:text-6xl">
@@ -203,7 +203,7 @@ function KarsilastirContent() {
                   <div className="p-3">
                     <Link
                       href={`/ilanlar/${l.slug}`}
-                      className="text-sm font-medium leading-tight line-clamp-2 hover:text-[#C9A96E]"
+                      className="text-sm font-medium leading-tight line-clamp-2 hover:text-[#D4B36A]"
                     >
                       {title}
                     </Link>
@@ -216,7 +216,7 @@ function KarsilastirContent() {
             <RowLabel>{tx.price}</RowLabel>
             {listings.map((l) => (
               <Cell key={l.id}>
-                <p className="font-display text-2xl text-[#C9A96E]">
+                <p className="font-display text-2xl text-[#D4B36A]">
                   {Number(l.price).toLocaleString("tr-TR")} {l.currency}
                 </p>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
@@ -313,14 +313,14 @@ function KarsilastirContent() {
               <Cell key={l.id} className="!py-3 space-y-1.5">
                 <Link
                   href={`/ilanlar/${l.slug}`}
-                  className="block w-full text-center text-xs px-3 py-2 bg-[#14141A] text-white rounded hover:bg-[#C9A96E] transition-colors"
+                  className="block w-full text-center text-xs px-3 py-2 bg-[#14141A] text-white rounded hover:bg-[#D4B36A] transition-colors"
                 >
                   {tx.contactCTA}
                 </Link>
                 {settings?.phone && (
                   <a
                     href={`tel:${settings.phone}`}
-                    className="block w-full text-center text-[11px] px-3 py-1.5 border border-border rounded hover:border-[#C9A96E]"
+                    className="block w-full text-center text-[11px] px-3 py-1.5 border border-border rounded hover:border-[#D4B36A]"
                   >
                     <Phone className="h-3 w-3 inline mr-1" />
                     {settings.phone}
@@ -333,7 +333,7 @@ function KarsilastirContent() {
           {/* Single global contact CTA at bottom */}
           {settings && (
             <div className="mt-12 bg-[#0E0E0E] text-[#F5F2EC] p-8 lg:p-12 rounded-md text-center">
-              <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+              <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
                 {locale === "tr" ? "Karar veremiyor musunuz?" : "Can't decide?"}
               </p>
               <h2 className="font-display text-3xl lg:text-4xl font-light mb-4">
@@ -360,7 +360,7 @@ function KarsilastirContent() {
                 {settings.phone && (
                   <a
                     href={`tel:${settings.phone}`}
-                    className="inline-flex items-center gap-2 px-5 py-3 bg-[#C9A96E] text-[#14141A] rounded text-sm font-medium hover:opacity-90"
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-[#D4B36A] text-[#14141A] rounded text-sm font-medium hover:opacity-90"
                   >
                     <Phone className="h-4 w-4" />
                     {settings.phone}
@@ -368,7 +368,7 @@ function KarsilastirContent() {
                 )}
                 <Link
                   href="/iletisim"
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-transparent border border-[#C9A96E]/40 text-[#F5F2EC] rounded text-sm font-medium hover:border-[#C9A96E]"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-transparent border border-[#D4B36A]/40 text-[#F5F2EC] rounded text-sm font-medium hover:border-[#D4B36A]"
                 >
                   <Mail className="h-4 w-4" />
                   {locale === "tr" ? "Mesaj Yaz" : "Send Message"}
@@ -424,7 +424,7 @@ function EmptyState() {
         </p>
         <Link
           href="/ilanlar"
-          className="inline-block px-5 py-3 bg-[#14141A] text-white rounded text-sm hover:bg-[#C9A96E]"
+          className="inline-block px-5 py-3 bg-[#14141A] text-white rounded text-sm hover:bg-[#D4B36A]"
         >
           {locale === "tr" ? "İlanlara Git" : "Browse Listings"}
         </Link>

@@ -55,7 +55,7 @@ export default function ListingDetailView({
     return (
       <div className="bg-[#FAF8F4] min-h-screen pt-28 lg:pt-32 px-6 lg:px-10 text-center py-32">
         <p className="text-[#6E6E73]">{tx.listing.noResults}</p>
-        <Link href="/ilanlar" className="inline-flex items-center gap-2 mt-6 text-xs tracking-[0.3em] uppercase text-[#C9A96E]">
+        <Link href="/ilanlar" className="inline-flex items-center gap-2 mt-6 text-xs tracking-[0.3em] uppercase text-[#D4B36A]">
           <ArrowLeft className="h-3.5 w-3.5" /> {tx.listing.backToList}
         </Link>
       </div>
@@ -128,7 +128,7 @@ export default function ListingDetailView({
                   key={img.id}
                   onClick={() => setActiveImg(i)}
                   className={`relative shrink-0 w-20 h-14 lg:w-24 lg:h-16 overflow-hidden border-2 transition-all ${
-                    i === activeImg ? "border-[#C9A96E]" : "border-transparent opacity-60 hover:opacity-100"
+                    i === activeImg ? "border-[#D4B36A]" : "border-transparent opacity-60 hover:opacity-100"
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -144,7 +144,7 @@ export default function ListingDetailView({
       <section className="max-w-[1600px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
         <Link
           href="/ilanlar"
-          className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] hover:text-[#C9A96E] mb-8"
+          className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] hover:text-[#D4B36A] mb-8"
         >
           <ArrowLeft className="h-3 w-3" /> {tx.listing.backToList}
         </Link>
@@ -152,7 +152,7 @@ export default function ListingDetailView({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main info */}
           <div className="lg:col-span-7 xl:col-span-8">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
               {CATEGORY_LABEL[listing.category]?.[locale] ?? listing.category} ·{" "}
               {listing.type === "SALE" ? tx.listing.forSale : tx.listing.forRent}
             </p>
@@ -202,7 +202,7 @@ export default function ListingDetailView({
                   <button
                     type="button"
                     onClick={() => setTourOpen(true)}
-                    className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase bg-[#C9A96E] text-[#14141A] hover:bg-[#14141A] hover:text-white px-5 py-3 transition-colors group"
+                    className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase bg-[#D4B36A] text-[#14141A] hover:bg-[#14141A] hover:text-white px-5 py-3 transition-colors group"
                   >
                     <Box className="h-4 w-4" />
                     {tx.listing.virtualTour}
@@ -256,7 +256,7 @@ export default function ListingDetailView({
                 href={`/brochure/${listing.slug}`}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2 w-full bg-white border border-[#E5E2DD] hover:border-[#C9A96E] hover:text-[#C9A96E] text-[#14141A] px-5 py-3 text-xs tracking-[0.3em] uppercase transition-colors"
+                className="flex items-center justify-center gap-2 w-full bg-white border border-[#E5E2DD] hover:border-[#D4B36A] hover:text-[#D4B36A] text-[#14141A] px-5 py-3 text-xs tracking-[0.3em] uppercase transition-colors"
               >
                 <FileDown className="h-3.5 w-3.5" />
                 {locale === "tr" ? "Broşürü İndir (PDF)" : "Download Brochure (PDF)"}
@@ -317,7 +317,7 @@ export default function ListingDetailView({
           onClick={() => setTourOpen(false)}
         >
           <button
-            className="absolute top-6 right-6 text-white text-sm tracking-[0.3em] uppercase z-10 inline-flex items-center gap-2 hover:text-[#C9A96E]"
+            className="absolute top-6 right-6 text-white text-sm tracking-[0.3em] uppercase z-10 inline-flex items-center gap-2 hover:text-[#D4B36A]"
             onClick={() => setTourOpen(false)}
           >
             <X className="h-5 w-5" /> Kapat
@@ -344,7 +344,7 @@ export default function ListingDetailView({
           onClick={() => setVideoOpen(false)}
         >
           <button
-            className="absolute top-6 right-6 text-white text-sm tracking-[0.3em] uppercase z-10 inline-flex items-center gap-2 hover:text-[#C9A96E]"
+            className="absolute top-6 right-6 text-white text-sm tracking-[0.3em] uppercase z-10 inline-flex items-center gap-2 hover:text-[#D4B36A]"
             onClick={() => setVideoOpen(false)}
           >
             <X className="h-5 w-5" /> Kapat
@@ -391,7 +391,7 @@ function Spec({
 }) {
   return (
     <div>
-      <div className="text-[#C9A96E] mb-2 [&>svg]:h-4 [&>svg]:w-4">{icon}</div>
+      <div className="text-[#D4B36A] mb-2 [&>svg]:h-4 [&>svg]:w-4">{icon}</div>
       <p className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1">{label}</p>
       <p className="text-2xl font-light text-[#14141A]">{value}</p>
     </div>

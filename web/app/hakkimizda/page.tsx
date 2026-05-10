@@ -45,7 +45,7 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10">
         <div className="max-w-[1600px] mx-auto">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-4">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
             {heroEyebrow}
           </p>
           <h1 className="font-display font-light text-5xl lg:text-8xl leading-[0.95] max-w-5xl">
@@ -59,7 +59,7 @@ export default function AboutPage() {
                   {rest && (
                     <>
                       <br />
-                      <span className="italic text-[#C9A96E]">{rest}</span>
+                      <span className="italic text-[#D4B36A]">{rest}</span>
                     </>
                   )}
                 </>
@@ -80,7 +80,7 @@ export default function AboutPage() {
           </div>
 
           <div className="lg:col-span-7">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
               {tx.about.role}
             </p>
             <h2 className="font-display font-light text-4xl lg:text-5xl text-[#14141A] mb-8">
@@ -97,7 +97,7 @@ export default function AboutPage() {
 
             {specialties && (
               <div className="mt-10">
-                <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+                <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
                   {locale === "tr" ? "Uzmanlık alanları" : "Specialties"}
                 </p>
                 <ul className="space-y-1.5 text-[#14141A]/85">
@@ -106,7 +106,7 @@ export default function AboutPage() {
                     .filter((s) => s.trim())
                     .map((s, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <span className="text-[#C9A96E] mt-1">·</span>
+                        <span className="text-[#D4B36A] mt-1">·</span>
                         <span>{s.trim()}</span>
                       </li>
                     ))}
@@ -115,7 +115,7 @@ export default function AboutPage() {
             )}
 
             {quote && (
-              <blockquote className="mt-12 pl-6 border-l-2 border-[#C9A96E]">
+              <blockquote className="mt-12 pl-6 border-l-2 border-[#D4B36A]">
                 <p className="font-display text-xl lg:text-2xl text-[#14141A] italic leading-relaxed">
                   &ldquo;{quote}&rdquo;
                 </p>
@@ -132,29 +132,29 @@ export default function AboutPage() {
               {settings?.phone && (
                 <a
                   href={`tel:${settings.phone.replace(/\s/g, "")}`}
-                  className="flex items-center gap-3 text-[#14141A] hover:text-[#C9A96E] transition-colors"
+                  className="flex items-center gap-3 text-[#14141A] hover:text-[#D4B36A] transition-colors"
                 >
-                  <Phone className="h-4 w-4 text-[#C9A96E]" />
+                  <Phone className="h-4 w-4 text-[#D4B36A]" />
                   <span className="text-sm tracking-[0.15em]">{settings.phone}</span>
                 </a>
               )}
               {settings?.email && (
                 <a
                   href={`mailto:${settings.email}`}
-                  className="flex items-center gap-3 text-[#14141A] hover:text-[#C9A96E] transition-colors"
+                  className="flex items-center gap-3 text-[#14141A] hover:text-[#D4B36A] transition-colors"
                 >
-                  <Mail className="h-4 w-4 text-[#C9A96E]" />
+                  <Mail className="h-4 w-4 text-[#D4B36A]" />
                   <span className="text-sm tracking-[0.15em]">{settings.email}</span>
                 </a>
               )}
               <div className="flex items-center gap-5 pt-4 text-[10px] tracking-[0.3em] uppercase">
                 {settings?.instagram && (
-                  <a href={settings.instagram} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#C9A96E]">
+                  <a href={settings.instagram} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#D4B36A]">
                     Instagram
                   </a>
                 )}
                 {settings?.linkedin && (
-                  <a href={settings.linkedin} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#C9A96E]">
+                  <a href={settings.linkedin} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#D4B36A]">
                     LinkedIn
                   </a>
                 )}

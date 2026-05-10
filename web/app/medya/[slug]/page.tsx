@@ -94,12 +94,12 @@ export default async function MedyaPostPage({
       <section className="max-w-3xl mx-auto px-6 lg:px-10 py-16 lg:py-20">
         <Link
           href="/medya"
-          className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] hover:text-[#C9A96E] mb-8"
+          className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] hover:text-[#D4B36A] mb-8"
         >
           <ArrowLeft className="h-3 w-3" /> Tüm yazılar
         </Link>
 
-        <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3 inline-flex items-center gap-2">
+        <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3 inline-flex items-center gap-2">
           {post.kind === "ARTICLE" ? "Yazı" : post.kind === "PRESS" ? "Basın" : "Video"}
           {date && (
             <>

@@ -8,7 +8,7 @@ export function GaleriContent() {
   return (
     <div className="bg-[#FAF8F4] min-h-screen pt-28 lg:pt-32 pb-0">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10 mb-4">
-        <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-3">
+        <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
           {locale === "tr" ? "Galeri" : "Gallery"}
         </p>
         <h1 className="font-display font-light text-4xl lg:text-6xl text-[#14141A]">

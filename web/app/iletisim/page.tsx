@@ -28,7 +28,7 @@ export default function ContactPage() {
       {/* Hero */}
       <section className="bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10">
         <div className="max-w-[1600px] mx-auto">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-4">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
             {heroEyebrow}
           </p>
           <h1 className="font-display font-light text-5xl lg:text-8xl leading-[0.95] max-w-4xl">
@@ -42,7 +42,7 @@ export default function ContactPage() {
                   {rest && (
                     <>
                       <br />
-                      <span className="italic text-[#C9A96E]">{rest}</span>
+                      <span className="italic text-[#D4B36A]">{rest}</span>
                     </>
                   )}
                 </>
@@ -58,15 +58,15 @@ export default function ContactPage() {
         <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           {/* Direct contact */}
           <div className="lg:col-span-4">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-4">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
               {tx.contact.directContact}
             </p>
             <div className="space-y-6">
               {settings?.phone && (
                 <a href={`tel:${settings.phone.replace(/\s/g, "")}`} className="block group">
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1">Telefon</p>
-                  <p className="font-display text-2xl text-[#14141A] group-hover:text-[#C9A96E] flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-[#C9A96E]" /> {settings.phone}
+                  <p className="font-display text-2xl text-[#14141A] group-hover:text-[#D4B36A] flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-[#D4B36A]" /> {settings.phone}
                   </p>
                 </a>
               )}
@@ -78,7 +78,7 @@ export default function ContactPage() {
                   className="block group"
                 >
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1">WhatsApp</p>
-                  <p className="font-display text-2xl text-[#14141A] group-hover:text-[#C9A96E]">
+                  <p className="font-display text-2xl text-[#14141A] group-hover:text-[#D4B36A]">
                     {settings.whatsapp}
                   </p>
                 </a>
@@ -86,8 +86,8 @@ export default function ContactPage() {
               {settings?.email && (
                 <a href={`mailto:${settings.email}`} className="block group">
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#6E6E73] mb-1">E-posta</p>
-                  <p className="font-display text-2xl text-[#14141A] group-hover:text-[#C9A96E] flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-[#C9A96E]" /> {settings.email}
+                  <p className="font-display text-2xl text-[#14141A] group-hover:text-[#D4B36A] flex items-center gap-2">
+                    <Mail className="h-5 w-5 text-[#D4B36A]" /> {settings.email}
                   </p>
                 </a>
               )}
@@ -97,7 +97,7 @@ export default function ContactPage() {
                     {locale === "tr" ? "Adres" : "Address"}
                   </p>
                   <p className="text-[#14141A] flex items-start gap-2 whitespace-pre-line">
-                    <MapPin className="h-5 w-5 text-[#C9A96E] mt-0.5 shrink-0" />
+                    <MapPin className="h-5 w-5 text-[#D4B36A] mt-0.5 shrink-0" />
                     <span>{addressDisplay}</span>
                   </p>
                 </div>
@@ -109,7 +109,7 @@ export default function ContactPage() {
                     {locale === "tr" ? "Çalışma Saatleri" : "Working Hours"}
                   </p>
                   <p className="text-[#14141A] flex items-start gap-2 whitespace-pre-line">
-                    <Clock className="h-5 w-5 text-[#C9A96E] mt-0.5 shrink-0" />
+                    <Clock className="h-5 w-5 text-[#D4B36A] mt-0.5 shrink-0" />
                     <span>{workingHours}</span>
                   </p>
                 </div>
@@ -117,17 +117,17 @@ export default function ContactPage() {
 
               <div className="pt-6 flex gap-5 text-[10px] tracking-[0.3em] uppercase border-t border-[#E5E2DD] mt-2">
                 {settings?.instagram && (
-                  <a href={settings.instagram} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#C9A96E] mt-4">
+                  <a href={settings.instagram} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#D4B36A] mt-4">
                     Instagram
                   </a>
                 )}
                 {settings?.linkedin && (
-                  <a href={settings.linkedin} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#C9A96E] mt-4">
+                  <a href={settings.linkedin} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#D4B36A] mt-4">
                     LinkedIn
                   </a>
                 )}
                 {settings?.youtube && (
-                  <a href={settings.youtube} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#C9A96E] mt-4">
+                  <a href={settings.youtube} target="_blank" rel="noreferrer" className="text-[#14141A] hover:text-[#D4B36A] mt-4">
                     YouTube
                   </a>
                 )}
@@ -137,7 +137,7 @@ export default function ContactPage() {
 
           {/* Form */}
           <div className="lg:col-span-8">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#C9A96E] mb-4">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
               {tx.contact.form}
             </p>
             <InquiryForm variant="page" />
