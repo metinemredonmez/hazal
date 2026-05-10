@@ -82,7 +82,11 @@ function ListingsContent() {
       if (parsed.maxPrice) sp.set("maxPrice", String(parsed.maxPrice));
       if (parsed.q) sp.set("q", parsed.q);
       const summaryParts = [
-        parsed.type === "SALE" ? "satılık" : parsed.type === "RENT" ? "kiralık" : null,
+        parsed.type === "SALE"
+          ? locale === "tr" ? "satılık" : "for sale"
+          : parsed.type === "RENT"
+            ? locale === "tr" ? "kiralık" : "for rent"
+            : null,
         parsed.category,
         parsed.district || parsed.city,
         parsed.minBedrooms ? `${parsed.minBedrooms}+1` : null,

@@ -79,8 +79,16 @@ export function ListingCard({ listing, size = "default" }: Props) {
         <div className="absolute top-3 right-3 flex flex-col gap-1.5">
           <button
             onClick={onFav}
-            aria-label={isFav ? "Favorilerden çıkar" : "Favorilere ekle"}
-            title={isFav ? "Favorilerden çıkar" : "Favorilere ekle"}
+            aria-label={
+              isFav
+                ? locale === "tr" ? "Favorilerden çıkar" : "Remove from favorites"
+                : locale === "tr" ? "Favorilere ekle" : "Add to favorites"
+            }
+            title={
+              isFav
+                ? locale === "tr" ? "Favorilerden çıkar" : "Remove from favorites"
+                : locale === "tr" ? "Favorilere ekle" : "Add to favorites"
+            }
             className={
               "w-8 h-8 rounded-full backdrop-blur flex items-center justify-center transition-all " +
               (isFav
@@ -94,17 +102,19 @@ export function ListingCard({ listing, size = "default" }: Props) {
             onClick={onCmp}
             aria-label={
               isCmp
-                ? "Karşılaştırmadan çıkar"
+                ? locale === "tr" ? "Karşılaştırmadan çıkar" : "Remove from compare"
                 : cmp.full
-                  ? `Maks ${cmp.max} ilan karşılaştırılabilir`
-                  : "Karşılaştırmaya ekle"
+                  ? locale === "tr"
+                    ? `Maks ${cmp.max} ilan karşılaştırılabilir`
+                    : `Max ${cmp.max} listings`
+                  : locale === "tr" ? "Karşılaştırmaya ekle" : "Add to compare"
             }
             title={
               isCmp
-                ? "Karşılaştırmadan çıkar"
+                ? locale === "tr" ? "Karşılaştırmadan çıkar" : "Remove from compare"
                 : cmp.full
-                  ? `Maks ${cmp.max} ilan`
-                  : "Karşılaştır"
+                  ? locale === "tr" ? `Maks ${cmp.max} ilan` : `Max ${cmp.max}`
+                  : locale === "tr" ? "Karşılaştır" : "Compare"
             }
             className={
               "w-8 h-8 rounded-full backdrop-blur flex items-center justify-center transition-all " +
