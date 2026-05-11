@@ -76,6 +76,7 @@ export function Navbar() {
   ];
 
   return (
+    <>
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500 text-[#F5F2EC]",
@@ -168,15 +169,16 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      <MobileMenu
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        items={leftNav}
-        locale={locale}
-        onSwitchLocale={() => setLocale(locale === "tr" ? "en" : "tr")}
-      />
     </header>
+    {/* Mobile drawer — header DIŞINDA (iOS Safari fixed sızıntı fix) */}
+    <MobileMenu
+      open={mobileOpen}
+      onClose={() => setMobileOpen(false)}
+      items={leftNav}
+      locale={locale}
+      onSwitchLocale={() => setLocale(locale === "tr" ? "en" : "tr")}
+    />
+    </>
   );
 }
 
@@ -265,7 +267,12 @@ function MobileMenu({
       />
       {/* Drawer — mobilde tam ekran, tabletten itibaren %85 sağdan */}
       <aside
-        style={{ backgroundColor: "#0E0E0E" }}
+        style={{
+          backgroundColor: "#0E0E0E",
+          height: "100vh",
+          // iOS Safari için dynamic viewport
+          minHeight: "100dvh",
+        }}
         className={cn(
           "fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[88%] sm:max-w-sm text-[#F5F2EC] shadow-[0_0_80px_rgba(0,0,0,0.8)] transition-transform duration-400 ease-out lg:hidden flex flex-col",
           open ? "translate-x-0" : "translate-x-full",
