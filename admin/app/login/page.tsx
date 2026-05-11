@@ -134,9 +134,23 @@ export default function LoginPage() {
         </div>
       </section>
 
-      {/* RIGHT — form */}
-      <section className="flex items-center justify-center bg-background px-6 py-10 lg:px-14 lg:py-0">
-        <div className="w-full max-w-sm animate-slide-in-right">
+      {/* RIGHT — form (modern villa bg + blur) */}
+      <section className="relative flex items-center justify-center px-6 py-10 lg:px-14 lg:py-0 overflow-hidden">
+        {/* Background image */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center scale-105"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&q=85&auto=format&fit=crop')",
+            filter: "blur(8px)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95"
+        />
+        <div className="relative w-full max-w-sm animate-slide-in-right">
           {/* Mobile brand header */}
           <div className="mb-12 flex flex-col items-center lg:hidden select-none">
             <p className="font-display text-2xl tracking-[0.18em] uppercase">
