@@ -299,17 +299,28 @@ export default function InquiriesPage() {
                       {formatDateTime(selected.createdAt)}
                     </p>
                   </div>
-                  <Select value={selected.status} onValueChange={(v) => updateStatus(v as InquiryStatus)}>
-                    <SelectTrigger className="w-36">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="NEW">Yeni</SelectItem>
-                      <SelectItem value="CONTACTED">İletişimde</SelectItem>
-                      <SelectItem value="HOT">Sıcak</SelectItem>
-                      <SelectItem value="CLOSED">Kapandı</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Select value={selected.status} onValueChange={(v) => updateStatus(v as InquiryStatus)}>
+                      <SelectTrigger className="w-36">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NEW">Yeni</SelectItem>
+                        <SelectItem value="CONTACTED">İletişimde</SelectItem>
+                        <SelectItem value="HOT">Sıcak</SelectItem>
+                        <SelectItem value="CLOSED">Kapandı</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={deleteInquiry}
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      title="Talebi sil"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 {selected.listing && (
