@@ -170,7 +170,7 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
               preload="auto"
               muted={muted}
               playsInline
-              className="block max-h-[85vh] max-w-[95vw] w-auto h-auto rounded-sm shadow-2xl bg-black"
+              className="block h-[85vh] max-w-[95vw] w-auto rounded-sm shadow-2xl bg-black object-contain"
             />
             <div className="mt-3 flex items-center justify-between gap-4 text-white/85 w-full max-w-md">
               <div className="text-center flex-1">
