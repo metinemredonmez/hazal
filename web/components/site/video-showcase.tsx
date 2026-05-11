@@ -113,9 +113,9 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
         <div
           className={`grid gap-4 lg:gap-6 ${
             videos.length === 1
-              ? "grid-cols-1 max-w-md mx-auto"
+              ? "grid-cols-1 max-w-2xl mx-auto"
               : videos.length === 2
-                ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
+                ? "grid-cols-1 sm:grid-cols-2"
                 : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-3"
           }`}
         >
