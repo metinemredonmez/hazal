@@ -51,11 +51,15 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
         | { tr: string; en: string }
         | undefined;
       const date = home?.[`showcaseVideo${n}Date` as keyof typeof home] as string | undefined;
+      const poster = home?.[`showcaseVideo${n}Poster` as keyof typeof home] as
+        | string
+        | undefined;
       return {
         src: url,
         titleTr: pick(titleObj, "tr", `Video ${n}`),
         titleEn: pick(titleObj, "en", `Video ${n}`),
         date,
+        poster,
       } as VideoItem;
     })
     .filter((v): v is VideoItem => v !== null);
@@ -106,19 +110,36 @@ export function VideoShowcase({ videos: propVideos }: { videos?: VideoItem[] }) 
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div
+          className={`grid gap-4 lg:gap-6 ${
+            videos.length === 1
+              ? "grid-cols-1 max-w-md mx-auto"
+              : videos.length === 2
+                ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
+                : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-3"
+          }`}
+        >
           {videos.map((v) => (
             <button
               key={v.src}
               onClick={() => setActive(v)}
               className="group relative aspect-[4/5] overflow-hidden bg-[#1A1A1F] rounded-sm"
             >
+              {v.poster && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={v.poster}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              )}
               <video
                 src={withPreview(v.src)}
                 preload="metadata"
                 muted
                 playsInline
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                poster={v.poster}
+                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${v.poster ? "opacity-0 group-hover:opacity-100" : ""}`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
