@@ -805,6 +805,237 @@ Units built in 2024 without integrated smart systems are losing 12-15% in 2026 r
     daysAgo: 6,
   },
 
+  // ─── GÜNDEM 2026 — DÜNYA piyasaları ──────────────────────
+  {
+    slug: 'dubai-luks-konut-piyasasi-2026',
+    kind: 'ARTICLE',
+    titleTr: 'Dubai Lüks Konut Piyasası 2026: Marina, Palm Jumeirah ve Yeni Trendler',
+    titleEn: 'Dubai Luxury Housing 2026: Marina, Palm Jumeirah and New Trends',
+    excerptTr:
+      'Dubai prime piyasası fiyat artışında dünyada birinci. Türk yatırımcılar için fırsat ve riskler.',
+    excerptEn:
+      'Dubai prime market leads global price growth. Opportunities and risks for Turkish investors.',
+    bodyTr: `Knight Frank Prime International Residential Index 2026'ya göre Dubai, yıllık fiyat artışında **%18.2** ile dünya birincisi. İkinci sıradaki Manila bu rakamın yarısında.
+
+**Sıcak bölgeler**
+
+- **Palm Jumeirah:** villa metrekare fiyatı 8.500-15.000 USD. Son 12 ayda %22 değer kazandı.
+- **Dubai Marina:** 1+1 daireler 350.000-650.000 USD. Yıllık brüt kira getirisi %6.5-8 — dünya ortalamasının üstünde.
+- **Downtown / Business Bay:** Burj Khalifa görüş açılı daireler 800.000 USD'den başlıyor.
+- **Yeni gelen: Dubai Hills Estate** — aileye yönelik villa kampüsü, %14 yıllık değer artışı.
+
+**Türk yatırımcıya not**
+
+UAE Golden Visa (10 yıl), 2 milyon AED (≈545.000 USD) gayrimenkul yatırımıyla otomatik veriliyor. Vergi avantajı: kira gelirinden ve sermaye kazancından **sıfır vergi**.
+
+**Riskler**
+
+Aşırı arz endişesi: 2026'da 80.000+ yeni konut piyasaya gelecek. Mid-segmentte (300-500K USD) doluluk düşebilir. Premium segment (1M+ USD) görece güvenli.
+
+**İstanbul ile karşılaştırma**
+
+Aynı m² için: Bebek Boğaz manzaralı 15.000 USD/m² · Palm Jumeirah villası 12.000 USD/m². İstanbul kira yield düşük (%2-3); Dubai net %5+ veriyor. Yatırım amaçlı Dubai daha cazip, yaşam amaçlı İstanbul daha derin opsiyon sunar.`,
+    bodyEn: `According to Knight Frank's Prime International Residential Index 2026, Dubai leads global price growth at **18.2% YoY**. Manila in second place is at half that.
+
+**Hotspots**
+
+- **Palm Jumeirah:** villa pricing 8,500-15,000 USD per m². Up 22% over 12 months.
+- **Dubai Marina:** 1-bed units at 350,000-650,000 USD. Gross rental yield 6.5-8% — above global average.
+- **Downtown / Business Bay:** Burj Khalifa-view units from 800,000 USD.
+- **Emerging: Dubai Hills Estate** — family villa community, 14% annual appreciation.
+
+**Note to Turkish investors**
+
+UAE Golden Visa (10 years) is granted automatically with a 2M AED (~545,000 USD) property investment. Tax advantage: **zero tax** on rental income and capital gains.
+
+**Risks**
+
+Oversupply concern: 80,000+ new units enter the market in 2026. Mid-segment (300-500K USD) occupancy could dip. Premium segment (1M+ USD) is relatively safe.
+
+**Vs İstanbul**
+
+Per m²: Bosphorus-view Bebek at 15,000 USD/m² · Palm Jumeirah villa at 12,000 USD/m². İstanbul rental yields are low (2-3%); Dubai delivers 5%+ net. For pure investment Dubai is more attractive; for depth and lifestyle İstanbul offers more options.`,
+    coverImage:
+      'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 2,
+  },
+
+  {
+    slug: 'londra-prime-konut-2026-mayfair-knightsbridge',
+    kind: 'ARTICLE',
+    titleTr: 'Londra Prime Konut 2026: Mayfair ve Knightsbridge Geri Dönüyor',
+    titleEn: 'London Prime 2026: Mayfair and Knightsbridge Are Back',
+    excerptTr:
+      'Brexit sonrası soğuyan Londra prime piyasası 2026\'da toparlanıyor. Çok değerli bölgelerde alıcı geri döndü.',
+    excerptEn:
+      'Post-Brexit cooled, London prime is recovering in 2026. High-end neighborhoods see buyers return.',
+    bodyTr: `Londra'nın super-prime piyasası (10M GBP üstü) son 18 ayda **%12 toparlandı**. Brexit sonrası 2020-2024'te yaklaşık %25 değer kaybetmişti.
+
+**Bölgesel performans**
+
+- **Mayfair:** m² fiyatı 35.000-55.000 GBP. Türk, Suudi, Hint alıcılar dominant.
+- **Knightsbridge / Belgravia:** townhouse 8-25M GBP bandında. Penthouse'lar 40M+.
+- **Notting Hill / Holland Park:** family-friendly, m² 18.000-28.000 GBP. Avrupalı executive ailelerin gözdesi.
+- **Yeni trend: King's Cross / Marylebone** — kültür yatırımları sonrası m² %30 yükseldi.
+
+**Stamp Duty problemi**
+
+2M GBP üstü konutta Stamp Duty %15. Yabancı alıcılarda +%2 surcharge — yani 5M konutta vergi 760.000 GBP. Bu, alım kararını yavaşlatan en büyük faktör.
+
+**Long lease vs freehold**
+
+Londra'da çoğu daire **leasehold** (uzun kira). 999 yıllık lease ile freehold neredeyse aynı; ama 80 yıl altı lease yatırım için riskli — değer kaybeder. Alım öncesi mutlaka **leasehold çevre dökümünü** isteyin.
+
+**Türk alıcı için**
+
+Eğitim odaklı aileler için Londra hâlâ **birinci tercih**. Vize/visa açısından Investor Tier 1 program kapalı; ama Innovator Founder vizesi ile gayrimenkul + iş kurmak mümkün. Konsültasyon şart.`,
+    bodyEn: `London's super-prime market (above 10M GBP) has **recovered 12%** over the past 18 months. Post-Brexit (2020-2024) it had lost roughly 25%.
+
+**Regional performance**
+
+- **Mayfair:** 35,000-55,000 GBP per m². Turkish, Saudi, Indian buyers dominate.
+- **Knightsbridge / Belgravia:** townhouses 8-25M GBP. Penthouses 40M+.
+- **Notting Hill / Holland Park:** family-friendly, 18,000-28,000 GBP/m². Favored by European executive families.
+- **Emerging: King's Cross / Marylebone** — up 30%/m² after cultural investments.
+
+**Stamp Duty problem**
+
+15% Stamp Duty above 2M GBP. Foreign buyers add 2% surcharge — so on a 5M home tax is 760,000 GBP. The single largest factor slowing purchase decisions.
+
+**Long lease vs freehold**
+
+Most London apartments are **leasehold**. A 999-year lease is nearly identical to freehold; but anything under 80 years is risky — depreciates. Always demand the **leasehold history report** before purchase.
+
+**For Turkish buyers**
+
+London remains the **top choice** for education-focused families. Visa-wise: Investor Tier 1 is closed; Innovator Founder visa supports property + business setup. Get specialist counsel.`,
+    coverImage:
+      'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 4,
+  },
+
+  {
+    slug: 'new-york-manhattan-luks-konut-2026',
+    kind: 'ARTICLE',
+    titleTr: 'New York Manhattan 2026: Billionaire\'s Row ve Park Avenue',
+    titleEn: 'New York Manhattan 2026: Billionaire\'s Row and Park Avenue',
+    excerptTr:
+      '57. Cadde ultra-prime piyasası rekor kırıyor. Türk alıcılar için NY pencereleri.',
+    excerptEn:
+      '57th Street ultra-prime market is breaking records. NY opportunities for Turkish buyers.',
+    bodyTr: `Manhattan'da super-prime satışları (25M USD üstü) 2026 Q1'de yıllık %34 arttı. Billionaire's Row (57. Cadde) bu artışın motoru.
+
+**Sıcak adresler**
+
+- **Billionaire's Row (57. Cd.):** 432 Park Avenue, One57, Central Park Tower. 50-100M USD penthouse'lar 6-8 ayda satılıyor.
+- **Park Avenue (üst doğu):** klasik pre-war co-op daireler 15-40M. Yatırım değil, "old money" yaşam alanı.
+- **Tribeca / SoHo:** loft tarzı, m² 25.000-40.000 USD. Yaratıcı sektör (finans + tech) executive'leri.
+- **Hudson Yards:** yeni inşa, modern mimari, 5-25M bandı. Aile dostu.
+
+**Vergi yapısı**
+
+NY State + NYC kombine eyalet vergisi yüksek (%10+). Property tax yıllık ortalama 0.9-1.2%. Yabancı alıcılar için FIRPTA stopajı %15. Türk alıcılar için danışmanlık gideri kaçınılmaz.
+
+**Co-op vs Condo**
+
+NY'da iki tip mülkiyet:
+- **Co-op:** binayı yöneten board onayı şart. Yabancı alıcılar genelde reddedilir, %75 finansman + %25 peşin gibi katı kurallar.
+- **Condo:** standart freehold benzeri; yabancılara açık, daha esnek. Türk alıcılar için **mutlaka condo** önerisi.
+
+**2026 fırsat**
+
+Yıl sonu seçim sonrası belirsizlik fiyatları geçici düşürebilir. Q4 2026 — Q1 2027 alım için fırsat penceresi olabilir.`,
+    bodyEn: `Manhattan super-prime sales (above 25M USD) rose 34% YoY in Q1 2026. Billionaire's Row (57th Street) drives the growth.
+
+**Hotspots**
+
+- **Billionaire's Row (57th St):** 432 Park Avenue, One57, Central Park Tower. 50-100M USD penthouses move in 6-8 months.
+- **Park Avenue (Upper East):** classic pre-war co-ops at 15-40M. "Old money" living, not investment.
+- **Tribeca / SoHo:** loft style, 25,000-40,000 USD/m². Creative sector + finance/tech executives.
+- **Hudson Yards:** new construction, modern, 5-25M range. Family-friendly.
+
+**Tax structure**
+
+Combined NY State + NYC tax is high (10%+). Annual property tax 0.9-1.2%. FIRPTA withholding 15% for foreign sellers. Tax counsel is non-optional.
+
+**Co-op vs Condo**
+
+NY has two ownership types:
+- **Co-op:** board approval required. Foreign buyers usually rejected; 75% finance + 25% down minimums.
+- **Condo:** standard freehold-like; open to foreigners, flexible. For Turkish buyers, **always recommend condo**.
+
+**2026 window**
+
+Post-election uncertainty in Q4 could temporarily dip prices. Q4 2026 — Q1 2027 may be a buy window.`,
+    coverImage:
+      'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 7,
+  },
+
+  {
+    slug: 'monaco-cote-azur-prime-2026',
+    kind: 'ARTICLE',
+    titleTr: 'Monaco ve Côte d\'Azur Prime Piyasası 2026',
+    titleEn: 'Monaco and Côte d\'Azur Prime Market 2026',
+    excerptTr:
+      'Dünyanın en pahalı metrekaresi: Monaco. Sıfır vergi avantajı, vatandaşlık ve yaşam standardı.',
+    excerptEn:
+      'The world\'s most expensive square meter: Monaco. Zero-tax advantage, residency and lifestyle.',
+    bodyTr: `Monaco hâlâ dünyanın en pahalı gayrimenkul piyasası. Ortalama m² fiyatı **52.000 € — küresel rekor**. Carré d'Or (Casino bölgesi) penthouse'lar 80.000-100.000 €/m².
+
+**Niye bu kadar pahalı**
+
+- 2 km² yüzölçümü, sınırlı arz
+- Gelir vergisi yok (Fransız vatandaşları hariç)
+- Sermaye kazancı vergisi yok
+- Miras vergisi düşük
+- Schengen erişimi + yüksek güvenlik
+
+**Residency**
+
+Monaco residency için kanıtlanmış 500.000 € banka mevduatı + uzun vadeli kira/satın alma kontratı yeter. Pasaport DEĞİL — sadece oturma. 10 yıl sonra vatandaşlık başvurusu hakkı.
+
+**Côte d'Azur alternatif**
+
+Monaco bütçesi olmayanlar için **Cap Ferrat, Cap d'Antibes, Saint-Jean-Cap-Ferrat** villalar 8-30M €. Manzara aynı, vergi avantajı yok ama yaşam standardı eşdeğer. m² 25.000-40.000 €.
+
+**Türk alıcı**
+
+Monaco'da Türk koloni küçük ama büyüyor (gemicilik + endüstri). Cote d'Azur'da daha geniş Türk varlığı. **Vergi optimizasyonu için Monaco residency + Türkiye / Türk vatandaşlığı kombinasyonu** etkili strateji.
+
+**Yatırım perspektifi**
+
+Monaco fiyatları her zaman crisis-proof olmuştur. 2008 ve 2020 düşüşlerinde diğer prime piyasalardan en az etkilenen. Sermaye koruma için ideal — sermaye büyütme için optimal değil (yıllık %3-5 kapital appreciation).`,
+    bodyEn: `Monaco remains the world's most expensive real estate. Average price **52,000 €/m² — a global record**. Carré d'Or (Casino district) penthouses range 80,000-100,000 €/m².
+
+**Why so expensive**
+
+- 2 km² land area, limited supply
+- No income tax (except French nationals)
+- No capital gains tax
+- Low inheritance tax
+- Schengen access + top security
+
+**Residency**
+
+For Monaco residency: 500,000 € bank deposit + long-term lease/purchase contract suffices. Not a passport — just residence. Citizenship eligibility after 10 years.
+
+**Côte d'Azur alternative**
+
+For those without Monaco budget: **Cap Ferrat, Cap d'Antibes, Saint-Jean-Cap-Ferrat** villas 8-30M €. Same views, no tax advantage but equal lifestyle. 25,000-40,000 €/m².
+
+**Turkish buyers**
+
+Small but growing Turkish presence in Monaco (shipping + industry). Larger Turkish community in Côte d'Azur. **Monaco residency + Turkish citizenship combo** is an effective tax-optimization strategy.
+
+**Investment angle**
+
+Monaco prices have always been crisis-proof. In 2008 and 2020 dips, it suffered least among prime markets. Ideal for capital preservation — not optimal for growth (3-5% annual appreciation).`,
+    coverImage:
+      'https://images.unsplash.com/photo-1533632359083-0185df1be85d?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 9,
+  },
+
   {
     slug: 'bodrum-cesme-yaz-2026-kiralik-piyasasi',
     kind: 'ARTICLE',
@@ -914,7 +1145,7 @@ async function main(reset = false) {
   }
 
   console.log(`\n✅ ${POSTS.length} blog/medya yazısı yüklendi`);
-  console.log('   📝 13 makale (ARTICLE) — 8 evergreen + 5 gündem 2026');
+  console.log('   📝 17 makale (ARTICLE) — 8 evergreen + 5 Türkiye gündem + 4 Dünya gündem');
   console.log('   📰 3 basın haberi (PRESS) — dış link');
   console.log('   🎬 1 video (VIDEO) — sanal tur');
   console.log('\n🌐 Web: https://hazalmuti.com/medya');

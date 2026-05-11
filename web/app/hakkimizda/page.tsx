@@ -48,7 +48,7 @@ export default function AboutPage() {
           <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
             {heroEyebrow}
           </p>
-          <h1 className="font-display font-light text-5xl lg:text-8xl leading-[0.95] max-w-5xl">
+          <h1 className="font-display font-light text-3xl lg:text-5xl leading-[1.05] max-w-4xl">
             {(() => {
               const lines = heroTitle.split("\n");
               const first = lines[0];

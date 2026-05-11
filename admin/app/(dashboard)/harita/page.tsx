@@ -94,7 +94,7 @@ const LAYER_META: Record<LayerKey, { label: string; color: string; icon: React.C
   visited: { label: "Geçmiş ziyaretler", color: "#6B7280", icon: History },
 };
 
-const ISTANBUL_CENTER: [number, number] = [29.0428, 41.0773]; // [lng, lat] - Bebek
+const ISTANBUL_CENTER: [number, number] = [27.1287, 38.4192]; // [lng, lat] - İzmir merkez (Konak)
 
 interface SelectedItem {
   source: "listing" | "appointment" | "event" | "visited";
