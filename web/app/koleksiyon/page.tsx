@@ -157,7 +157,7 @@ export default function KoleksiyonPage() {
       <section className="bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10">
         <div className="max-w-[1600px] mx-auto">
           <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
-            {locale === "tr" ? "KOLEKSİYON" : "COLLECTION"}
+            {locale === "tr" ? "PROJELERİMİZ" : "OUR PROJECTS"}
           </p>
           <h1 className="font-display font-light text-3xl lg:text-5xl leading-[1.05] max-w-4xl">
             {locale === "tr" ? (

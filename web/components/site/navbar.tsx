@@ -51,17 +51,18 @@ export function Navbar() {
       label: tx.nav.about,
       href: "/hakkimizda",
     },
+    // İLANLAR menüsü şimdilik gizli — /ilanlar route aktif, veriler DB'de
+    // {
+    //   label: tx.nav.listings,
+    //   children: [
+    //     { label: tx.nav.listingsAll, href: "/ilanlar" },
+    //     { label: tx.nav.listingsSale, href: "/ilanlar?type=SALE" },
+    //     { label: tx.nav.listingsRent, href: "/ilanlar?type=RENT" },
+    //     { label: tx.nav.listingsFeatured, href: "/ilanlar?featured=true" },
+    //   ],
+    // },
     {
-      label: tx.nav.listings,
-      children: [
-        { label: tx.nav.listingsAll, href: "/ilanlar" },
-        { label: tx.nav.listingsSale, href: "/ilanlar?type=SALE" },
-        { label: tx.nav.listingsRent, href: "/ilanlar?type=RENT" },
-        { label: tx.nav.listingsFeatured, href: "/ilanlar?featured=true" },
-      ],
-    },
-    {
-      label: locale === "tr" ? "KOLEKSİYON" : "COLLECTION",
+      label: locale === "tr" ? "PROJELERİMİZ" : "OUR PROJECTS",
       href: "/koleksiyon",
     },
     {

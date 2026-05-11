@@ -60,7 +60,7 @@ export function FeaturedCollection() {
         <div className="flex items-end justify-between gap-6 mb-10 lg:mb-14 flex-wrap">
           <div>
             <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
-              {locale === "tr" ? "ÖNE ÇIKAN KOLEKSİYON" : "FEATURED COLLECTION"}
+              {locale === "tr" ? "PROJELERİMİZ" : "OUR PROJECTS"}
             </p>
             <h2 className="font-display font-light text-3xl lg:text-5xl leading-[1.05] max-w-3xl">
               {locale === "tr" ? (
@@ -82,7 +82,7 @@ export function FeaturedCollection() {
             href="/koleksiyon"
             className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#0E0E0E] hover:text-[#D4B36A] transition-colors"
           >
-            {locale === "tr" ? "Koleksiyonu Gör" : "View Collection"}
+            {locale === "tr" ? "Tümünü Gör" : "View All"}
             <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
