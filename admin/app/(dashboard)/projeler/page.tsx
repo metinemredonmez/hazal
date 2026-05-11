@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Plus, Edit3, Trash2, Loader2, Landmark, ExternalLink, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit3, Trash2, Loader2, Landmark, ExternalLink, GripVertical, Eye, EyeOff, Upload, Image as ImageIcon, Video as VideoIcon, X } from "lucide-react";
 import { Topbar } from "@/components/admin/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -331,20 +331,84 @@ function ProjectForm({
       {/* Media */}
       <section className="space-y-3">
         <h4 className="text-sm font-semibold border-b pb-2">Görsel & Video</h4>
-        <Field label="Hero Görsel URL (kartta poster, detayda fallback)">
-          <Input value={value.heroImage} onChange={(e) => set({ heroImage: e.target.value })} placeholder="/sample-apartments/DSC_0276.jpg" />
+
+        {/* Hero Image */}
+        <Field label="Hero Görsel (kartta poster, detayda fallback)">
+          <div className="flex gap-2 items-start">
+            {value.heroImage && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={value.heroImage.startsWith("http") ? value.heroImage : `https://hazalmuti.com${value.heroImage.startsWith("/") ? "" : "/"}${value.heroImage}`}
+                alt=""
+                className="w-20 h-20 object-cover bg-muted rounded border"
+              />
+            )}
+            <div className="flex-1 space-y-2">
+              <SingleUploader
+                accept="image/*"
+                onUploaded={(url) => set({ heroImage: url })}
+                label="Görsel Yükle"
+              />
+              <Input value={value.heroImage} onChange={(e) => set({ heroImage: e.target.value })} placeholder="/sample-apartments/DSC_0276.jpg  veya  https://..." />
+            </div>
+          </div>
         </Field>
-        <Field label="Hero Video URL (opsiyonel — varsa autoplay)">
-          <Input value={value.heroVideo ?? ""} onChange={(e) => set({ heroVideo: e.target.value || null })} placeholder="/showcase/oasis-2026-02-24.mp4" />
+
+        {/* Hero Video */}
+        <Field label="Hero Video (opsiyonel — varsa autoplay)">
+          <div className="space-y-2">
+            <SingleUploader
+              accept="video/*"
+              onUploaded={(url) => set({ heroVideo: url })}
+              label="Video Yükle (max 30MB)"
+            />
+            <Input value={value.heroVideo ?? ""} onChange={(e) => set({ heroVideo: e.target.value || null })} placeholder="/showcase/oasis-2026-02-24.mp4  veya  https://..." />
+          </div>
         </Field>
-        <Field label="Galeri URL'leri (her satıra bir URL)">
-          <Textarea
-            rows={5}
-            value={value.gallery.join("\n")}
-            onChange={(e) => set({ gallery: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
-            placeholder={"/sample-apartments/DSC_0214.jpg\n/sample-apartments/DSC_0241.jpg"}
-          />
+
+        {/* Gallery */}
+        <Field label="Galeri">
+          <div className="space-y-3">
+            <MultiUploader
+              accept="image/*"
+              onUploaded={(urls) => set({ gallery: [...value.gallery, ...urls] })}
+              label="Toplu Görsel Yükle (en fazla 20)"
+            />
+            {value.gallery.length > 0 && (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                {value.gallery.map((u, i) => (
+                  <div key={u + i} className="relative group aspect-square">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={u.startsWith("http") ? u : `https://hazalmuti.com${u.startsWith("/") ? "" : "/"}${u}`}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover rounded border bg-muted"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => set({ gallery: value.gallery.filter((_, idx) => idx !== i) })}
+                      className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                      title="Kaldır"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <details className="text-xs">
+              <summary className="cursor-pointer text-muted-foreground">Manuel URL düzenle</summary>
+              <Textarea
+                rows={5}
+                className="mt-2"
+                value={value.gallery.join("\n")}
+                onChange={(e) => set({ gallery: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
+                placeholder={"/sample-apartments/DSC_0214.jpg\n/sample-apartments/DSC_0241.jpg"}
+              />
+            </details>
+          </div>
         </Field>
+
         <Field label="Broşür / Dış Link (opsiyonel)">
           <Input value={value.brochureUrl ?? ""} onChange={(e) => set({ brochureUrl: e.target.value || null })} placeholder="https://atilganinsaat.com/proje/oasis" />
         </Field>
@@ -524,6 +588,106 @@ function Field({
         {required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       {children}
+    </div>
+  );
+}
+
+function SingleUploader({
+  accept,
+  onUploaded,
+  label,
+}: {
+  accept: string;
+  onUploaded: (url: string) => void;
+  label: string;
+}) {
+  const ref = React.useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = React.useState(false);
+
+  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error("Dosya 30MB'dan büyük olamaz");
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("files", file);
+      const res = await api<Array<{ url: string }>>("/api/admin/uploads", { method: "POST", body: fd });
+      const url = res[0]?.url;
+      if (!url) throw new Error("Upload başarısız");
+      onUploaded(url);
+      toast.success("Yüklendi");
+    } catch (err: any) {
+      toast.error(err?.message || "Upload başarısız");
+    } finally {
+      setUploading(false);
+      if (ref.current) ref.current.value = "";
+    }
+  };
+
+  return (
+    <div>
+      <input ref={ref} type="file" accept={accept} className="hidden" onChange={onChange} />
+      <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => ref.current?.click()}>
+        {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+        {label}
+      </Button>
+    </div>
+  );
+}
+
+function MultiUploader({
+  accept,
+  onUploaded,
+  label,
+}: {
+  accept: string;
+  onUploaded: (urls: string[]) => void;
+  label: string;
+}) {
+  const ref = React.useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = React.useState(false);
+
+  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    if (files.length > 20) {
+      toast.error("En fazla 20 dosya seçebilirsin");
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      for (const f of Array.from(files)) {
+        if (f.size > 30 * 1024 * 1024) {
+          toast.error(`${f.name} 30MB'dan büyük, atlandı`);
+          continue;
+        }
+        fd.append("files", f);
+      }
+      const res = await api<Array<{ url: string }>>("/api/admin/uploads", { method: "POST", body: fd });
+      const urls = res.map((r) => r.url).filter(Boolean);
+      if (urls.length === 0) throw new Error("Hiçbir dosya yüklenemedi");
+      onUploaded(urls);
+      toast.success(`${urls.length} dosya yüklendi`);
+    } catch (err: any) {
+      toast.error(err?.message || "Upload başarısız");
+    } finally {
+      setUploading(false);
+      if (ref.current) ref.current.value = "";
+    }
+  };
+
+  return (
+    <div>
+      <input ref={ref} type="file" accept={accept} multiple className="hidden" onChange={onChange} />
+      <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => ref.current?.click()}>
+        {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+        {label}
+      </Button>
     </div>
   );
 }
