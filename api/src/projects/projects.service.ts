@@ -82,15 +82,24 @@ export class ProjectsService {
 
   async create(input: ProjectInput) {
     const slug = input.slug?.trim() || slugify(input.nameEn || input.nameTr);
-    return this.prisma.project.create({
-      data: this.toData(input, slug),
-    });
+    const data: Prisma.ProjectCreateInput = {
+      slug,
+      nameTr: input.nameTr,
+      nameEn: input.nameEn,
+      ...this.commonData(input),
+    };
+    return this.prisma.project.create({ data });
   }
 
   async update(id: string, input: ProjectInput) {
     await this.getOne(id);
-    const slug = input.slug?.trim() || undefined;
-    const data: Prisma.ProjectUpdateInput = this.toData(input, slug);
+    const slug = input.slug?.trim();
+    const data: Prisma.ProjectUpdateInput = {
+      nameTr: input.nameTr,
+      nameEn: input.nameEn,
+      ...(slug ? { slug } : {}),
+      ...this.commonData(input),
+    };
     return this.prisma.project.update({ where: { id }, data });
   }
 
@@ -100,14 +109,8 @@ export class ProjectsService {
     return { ok: true };
   }
 
-  private toData(
-    i: ProjectInput,
-    slug?: string,
-  ): Prisma.ProjectCreateInput & Prisma.ProjectUpdateInput {
-    const data: Prisma.ProjectCreateInput & Prisma.ProjectUpdateInput = {
-      nameTr: i.nameTr,
-      nameEn: i.nameEn,
-      ...(slug && { slug }),
+  private commonData(i: ProjectInput) {
+    return {
       brandTr: i.brandTr ?? '',
       brandEn: i.brandEn ?? '',
       taglineTr: i.taglineTr ?? '',
@@ -130,6 +133,5 @@ export class ProjectsService {
       order: i.order ?? 0,
       isPublished: i.isPublished ?? true,
     };
-    return data;
   }
 }

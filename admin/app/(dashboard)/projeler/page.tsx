@@ -159,6 +159,10 @@ export default function ProjelerPage() {
     }
   };
 
+  // Relative path'leri public site origin'ine map et (admin'de symlink yok)
+  const absUrl = (u: string) =>
+    !u ? "" : u.startsWith("http") ? u : `https://hazalmuti.com${u.startsWith("/") ? u : `/${u}`}`;
+
   const onDelete = async (p: Project) => {
     if (!(await confirmDialog({ title: `${p.nameTr} silinsin mi?`, confirmLabel: "Sil" }))) return;
     try {
@@ -207,7 +211,7 @@ export default function ProjelerPage() {
                 <div className="flex">
                   {p.heroImage && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.heroImage} alt="" className="w-32 h-32 object-cover bg-muted" />
+                    <img src={absUrl(p.heroImage)} alt="" className="w-32 h-32 object-cover bg-muted" />
                   )}
                   <CardContent className="flex-1 p-4 space-y-2">
                     <div className="flex items-start justify-between gap-2">
