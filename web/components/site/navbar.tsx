@@ -61,6 +61,10 @@ export function Navbar() {
       ],
     },
     {
+      label: locale === "tr" ? "KOLEKSİYON" : "COLLECTION",
+      href: "/koleksiyon",
+    },
+    {
       label: tx.nav.media,
       href: "/medya",
     },
