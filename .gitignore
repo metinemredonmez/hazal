@@ -14,3 +14,4 @@ Thumbs.db
 
 # Anything inside backend/ already has its own .gitignore.
 # Keeping this top-level minimal.
+.claude/worktrees/
