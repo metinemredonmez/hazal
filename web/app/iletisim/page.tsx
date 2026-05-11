@@ -23,11 +23,22 @@ export default function ContactPage() {
   const customAddress = pick(contact?.addressLine, locale, "");
   const addressDisplay = customAddress || settings?.address || "";
 
+  const heroImage =
+    (contact as { heroImageUrl?: string } | undefined)?.heroImageUrl ??
+    "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=2400&q=85&auto=format&fit=crop";
+
   return (
     <div className="bg-[#FAF8F4]">
       {/* Hero */}
-      <section className="bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10">
-        <div className="max-w-[1600px] mx-auto">
+      <section
+        className="relative bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10 overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(14,14,14,0.94) 0%, rgba(14,14,14,0.78) 45%, rgba(14,14,14,0.48) 100%), url(${heroImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="max-w-[1600px] mx-auto relative">
           <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
             {heroEyebrow}
           </p>
