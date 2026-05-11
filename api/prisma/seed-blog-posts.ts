@@ -605,6 +605,269 @@ Turkish contractor and industrialist families dominate. Foreign interest exists 
       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1600&q=80&auto=format&fit=crop',
     daysAgo: 8,
   },
+
+  // ─── GÜNDEM 2026 — yeni eklendi ─────────────────────────────
+  {
+    slug: 'tcmb-faiz-indirimi-konut-piyasasi-2026',
+    kind: 'ARTICLE',
+    titleTr: 'TCMB Faiz İndirimi ve Lüks Konut Piyasasına Etkisi',
+    titleEn: 'CBRT Rate Cuts and Their Impact on Luxury Housing',
+    excerptTr:
+      'Merkez Bankası faiz indirimleri lüks segmentte talebi nasıl etkiliyor? Krediye dayalı alıcı oranı, fiyat beklentileri ve yatırımcı stratejisi.',
+    excerptEn:
+      'How are CBRT rate cuts shaping luxury-segment demand? Mortgage-driven buyer share, price expectations, and investor strategy.',
+    bodyTr: `Merkez Bankası 2026'nın ilk yarısında politika faizini kademeli olarak indirmeye başladı. Bu gelişme, lüks gayrimenkul piyasasında uzun süredir bekletilen alımları harekete geçirdi.
+
+**Krediye dayalı alıcı geri dönüyor**
+
+2024-2025 boyunca yüksek faiz ortamında nakit alıcılar baskındı; lüks segmentte oran %85'e ulaşmıştı. 2026 Q1 itibarıyla kredili alıcı oranı %30 bandına yükseldi. Özellikle 8-25 milyon TL aralığındaki dairelerde bu dönüşüm net görülüyor.
+
+**Premium segmentte talep yoğun**
+
+Bebek, Etiler, Nişantaşı gibi A+ bölgelerde son 3 ayda gösterim sayısı geçen yılın aynı dönemine göre %42 arttı. Yalı segmentinde ise alıcılar fiyat müzakeresine açık ama vazgeçmiyor — net satış sayısı yıllık %18 yukarıda.
+
+**Yatırımcıya not**
+
+Faiz indirim döngüsü orta vadede arzı sıkıştırabilir; satıcılar fiyat beklentisini yukarı çekiyor. 2026 H2'de Boğaz hattı ve Bodrum koylarında ek %8-12 değer artışı bekleniyor.`,
+    bodyEn: `The CBRT began a gradual rate-cut cycle in H1 2026. The shift unlocked deferred demand in the luxury real estate market.
+
+**Mortgage-driven buyers return**
+
+Through 2024-2025 cash buyers dominated; their share peaked at 85% in the luxury segment. By Q1 2026 mortgage-buyer share climbed back to ~30%. The shift is clearest in the 8-25M TRY range.
+
+**Strong premium demand**
+
+In tier-A neighborhoods like Bebek, Etiler, Nişantaşı, viewing counts rose 42% YoY over the last 3 months. Mansion buyers negotiate harder but don't walk away — net sales count is up 18%.
+
+**Investor note**
+
+The cutting cycle could tighten supply in the medium term; sellers are raising asking prices. We expect an additional 8-12% appreciation along the Bosphorus and Bodrum coves in H2 2026.`,
+    coverImage:
+      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 1,
+  },
+
+  {
+    slug: 'istanbul-deprem-master-plan-yapi-stoku-2026',
+    kind: 'ARTICLE',
+    titleTr: 'İstanbul Deprem Master Planı ve Yapı Stoku Yenileme Dalgası',
+    titleEn: "İstanbul's Earthquake Master Plan and the Renewal Wave",
+    excerptTr:
+      'Kentsel dönüşüm ivmelendi. Eski yapı stoku eriyor, sıfır deprem dayanıklı projeler premium fiyatlandırıyor. Alıcılar ne sormalı?',
+    excerptEn:
+      'Urban transformation has accelerated. Old stock is shrinking, brand-new earthquake-resistant projects command premium prices. What should buyers ask?',
+    bodyTr: `1999 öncesi yapı stoku, İstanbul'un toplam konut envanterinin %47'sini oluşturuyor. 2026 Master Planı bu stoku 7 yıl içinde %70 oranında yenilemeyi hedefliyor.
+
+**Premium aranır oldu: sıfır + güçlendirilmiş**
+
+Alıcılar artık ilanın ilk üç kriteri arasına şunları koyuyor:
+- Yapı yılı **2020+** (TBDY-2018 yönetmeliği sonrası)
+- **Performans raporu** (DASK + zorunlu deprem analizi)
+- Zemin etüdü ve **temel tipi**
+
+A+ bölgelerde 2020 sonrası inşa edilmiş dairelerde fiyat primi %25-35 seviyesine ulaştı.
+
+**Eski stoka ne olacak?**
+
+Bebek ve Cihangir gibi tarihi dokuda **güçlendirme + restorasyon** ekonomik olarak mantıklı. Levent, Mecidiyeköy gibi 90'lar stoku bölgelerinde **yıkıp yapma** daha sık. Tapuyu beklerken müteahhit seçimi en kritik karar — referansları sor.
+
+**Yatırımcıya tavsiye**
+
+Kentsel dönüşüm hak sahibi dairelerde proje süresi 22-36 ay. Bu sürede kira yardımı + taahhüt %30-50 büyüklük artışı, doğru projede yıllık %20+ getiri sağlıyor.`,
+    bodyEn: `Pre-1999 housing stock accounts for 47% of İstanbul's total inventory. The 2026 Master Plan targets renewing 70% of that stock over 7 years.
+
+**Buyers now demand new build + reinforced**
+
+Top three filters in listings have shifted to:
+- Construction year **2020+** (post TBDY-2018 code)
+- **Performance report** (DASK + mandatory seismic analysis)
+- Soil survey + **foundation type**
+
+In tier-A neighborhoods, the price premium for 2020+ buildings has reached 25-35%.
+
+**What about old stock?**
+
+In historic fabrics like Bebek and Cihangir, **reinforcement + restoration** makes economic sense. In Levent and Mecidiyeköy where 1990s stock dominates, **demolish-and-rebuild** is more common. Contractor selection is the most critical decision while waiting on title — ask for references.
+
+**Investor note**
+
+For owners exchanging old units in urban-renewal projects, the cycle takes 22-36 months. With rent assistance + 30-50% area upgrade, the right project yields 20%+ annualized.`,
+    coverImage:
+      'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 3,
+  },
+
+  {
+    slug: 'yabanci-alici-vatandaslik-400k-usd-guncel-durum',
+    kind: 'ARTICLE',
+    titleTr: 'Yabancı Alıcı ve 400.000 USD Vatandaşlık Eşiği: 2026 Güncel Durum',
+    titleEn: 'Foreign Buyers and the 400,000 USD Citizenship Threshold: 2026 Update',
+    excerptTr:
+      'Vatandaşlık programı 2026 koşulları, sık tercih edilen bölgeler ve süreçte dikkat edilecek hukuki noktalar.',
+    excerptEn:
+      'Citizenship-by-investment program in 2026: top neighborhoods, processing times and key legal points.',
+    bodyTr: `Türk vatandaşlığı için gayrimenkul yatırım eşiği 400.000 USD seviyesinde sabit. 2026 başında Tapu Müdürlüğü süreçleri kısaldı; ortalama süreç **22 günden 12 güne** indi.
+
+**Yabancı alıcının haritası**
+
+- **Körfez ülkeleri (BAE, Suudi, Katar):** Bebek, Etiler, Sarıyer
+- **Avrupalı yatırımcılar:** Cihangir, Galata, Karaköy (tarihi karakter)
+- **Iranlı alıcılar:** Beylikdüzü, Esenyurt (orta segment yoğun, ama lüks segmente kayış var)
+- **Rus alıcılar:** Bodrum, Antalya kıyıları + İstanbul karma
+
+**Süreçte dikkat**
+
+1. **Çift dilli sözleşme şart** — Türkçe + İngilizce; noter onayı.
+2. **CMB ekspertiz** zorunlu; bağımsız değerleme şirketi seçimi yatırımcıya kalmasın, gayrimenkul danışmanı yönlendirmesi alın.
+3. **5 yıl satış kısıtı** — vatandaşlık aldıktan sonra mülkün 5 yıl satılmaması taahhüt edilir.
+4. **Yıllık vergi yükü** (emlak vergisi + kira gelir vergisi) önceden hesaplanmalı.
+
+**2026 trendi**
+
+Mart 2026 itibarıyla aylık 2.800+ vatandaşlık onayı. Bu, geçen yılın aynı ayına göre %38 artış. Beklenti: yıl sonuna kadar Boğaz hattında yabancı alıcı oranı %22'ye ulaşır.`,
+    bodyEn: `The Turkish citizenship-by-investment threshold remains fixed at 400,000 USD. Land Registry processing has shortened from 22 to **12 days** on average in early 2026.
+
+**Foreign buyer geography**
+
+- **Gulf states (UAE, Saudi, Qatar):** Bebek, Etiler, Sarıyer
+- **European investors:** Cihangir, Galata, Karaköy (historic character)
+- **Iranian buyers:** Beylikdüzü, Esenyurt (mid-segment heavy, shifting upmarket)
+- **Russian buyers:** Bodrum, Antalya coastline + İstanbul mixed
+
+**Process notes**
+
+1. **Bilingual contract is mandatory** — Turkish + English, notarized.
+2. **CMB appraisal** is required; don't let the appraisal firm be chosen for you — get an advisor's recommendation.
+3. **5-year sale restriction** — after citizenship, the property cannot be sold for 5 years.
+4. **Annual taxes** (property tax + rental income tax) should be modeled in advance.
+
+**2026 trend**
+
+By March 2026, monthly approvals exceed 2,800 — up 38% YoY. Expectation: foreign buyer share along the Bosphorus reaches 22% by year-end.`,
+    coverImage:
+      'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 5,
+  },
+
+  {
+    slug: 'smart-home-surdurulebilirlik-2026-trendi',
+    kind: 'ARTICLE',
+    titleTr: 'Smart Home ve Sürdürülebilirlik: 2026 Lüks Konut Standartı',
+    titleEn: 'Smart Home & Sustainability: The New 2026 Luxury Standard',
+    excerptTr:
+      'Akıllı ev sistemleri, enerji sertifikası ve güneş entegrasyonu — premium alıcılar artık standart olarak bekliyor.',
+    excerptEn:
+      'Smart-home systems, energy certifications and solar integration — premium buyers now expect them as standard.',
+    bodyTr: `2026'da lüks konut artıcı ekstra değil; **standart**. Premium segmentte alıcılar şu üç başlığı sıralı sorduğunda fiyat müzakeresine açık değil:
+
+**1. Akıllı ev altyapısı**
+
+KNX veya Crestron tabanlı tam entegrasyon; ışık, perde, klima, güvenlik ve enerji izleme tek panelden. Sesli komut (Alexa/Siri/Google) entegrasyonu artık bonus değil, beklenti.
+
+**2. Enerji performansı**
+
+BEP-TR enerji kimlik belgesinde **A sınıfı** zorunlu hale geldi. Çatı güneş paneli (3-5 kW), batarya depolama (10-15 kWh) ve ısı pompası premium projelerde standart.
+
+**3. Su ve hava kalitesi**
+
+Yağmur suyu hasadı, gri su yeniden kullanımı, MERV-13+ filtrasyon, CO₂ sensörlü havalandırma — sağlığa duyarlı alıcılar için kritik kriterler.
+
+**Fiyat etkisi**
+
+Tam akıllı + A sınıfı enerji + yenilenebilir entegre projelerde fiyat primi %18-25. Yatırım geri dönüş süresi (enerji tasarrufu üzerinden) 7-9 yıl.
+
+**Yeniden satış değeri**
+
+2024'te inşa edilmiş ama akıllı sistem entegre edilmemiş daireler 2026 piyasasında %12-15 değer kaybı yaşıyor. Retrofit maliyeti 800-1.500 TL/m² bandında.`,
+    bodyEn: `In 2026, luxury isn't extras — it's **standard**. In the premium segment, buyers run through three checks and won't negotiate price unless all are met:
+
+**1. Smart-home infrastructure**
+
+Full KNX or Crestron integration: lighting, blinds, HVAC, security and energy monitoring from one panel. Voice assistant (Alexa/Siri/Google) integration is no longer a bonus — it's expected.
+
+**2. Energy performance**
+
+A-class on the BEP-TR energy certificate is now mandatory. Rooftop solar (3-5 kW), battery storage (10-15 kWh) and heat pumps are standard in premium projects.
+
+**3. Water and air quality**
+
+Rainwater harvesting, grey-water reuse, MERV-13+ filtration, CO₂-sensor ventilation — critical criteria for health-conscious buyers.
+
+**Price impact**
+
+Fully smart + A-class energy + renewable-integrated projects command an 18-25% premium. Payback (via energy savings) lands at 7-9 years.
+
+**Resale**
+
+Units built in 2024 without integrated smart systems are losing 12-15% in 2026 resale value. Retrofit cost runs 800-1,500 TRY per m².`,
+    coverImage:
+      'https://images.unsplash.com/photo-1558002038-1055907df827?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 6,
+  },
+
+  {
+    slug: 'bodrum-cesme-yaz-2026-kiralik-piyasasi',
+    kind: 'ARTICLE',
+    titleTr: 'Bodrum & Çeşme Yaz 2026: Premium Kiralık Piyasası Raporu',
+    titleEn: 'Bodrum & Çeşme Summer 2026: Premium Rental Market Report',
+    excerptTr:
+      'Haftalık kira fiyatları, doluluk takvimi ve müzakere noktaları. Mayıs-Eylül için planlama rehberi.',
+    excerptEn:
+      'Weekly rental prices, occupancy calendar and negotiation points. A planning guide for May to September.',
+    bodyTr: `2026 yaz sezonu için premium villa kiralık piyasası rekor seviyede erken rezervasyona ulaştı. Mart sonu itibarıyla Yalıkavak ve Çeşme kıyı şeridinde **doluluk %78**.
+
+**Haftalık kira aralıkları (Temmuz-Ağustos)**
+
+| Bölge | 4+1 Villa | 6+1 Villa (havuzlu) | Yalı/Premium |
+|---|---|---|---|
+| Yalıkavak | 8.500-12.000 € | 18.000-28.000 € | 45.000+ € |
+| Türkbükü | 7.500-10.500 € | 16.000-24.000 € | 38.000+ € |
+| Alaçatı/Çeşme | 6.500-9.500 € | 14.000-22.000 € | 32.000+ € |
+| Göcek | 9.000-13.500 € | 20.000-30.000 € | 50.000+ € |
+
+**Müzakere noktaları**
+
+- **Erken rezervasyon** (Mart-Nisan) %12-18 indirim alabilir
+- **2+ hafta blok** için %10 indirim standart
+- Temizlik, klima, havuz bakımı kira içine **mutlaka** yazılmalı
+- Depozito 1 haftalık kira; iade süresi sözleşmede 7 iş gününü geçmesin
+
+**Yatırımcı perspektifi**
+
+Premium kıyı villaları yıllık brüt %4-7 yield veriyor. Net (vergi + bakım + sigorta düşüldükten sonra) yıllık %2.5-4 seviyesinde. **Asıl getiri sermaye kazancında** — son 5 yılda Yalıkavak villalarında dolar bazında %180+ değer artışı.
+
+**Dikkat: yeni regülasyon**
+
+Mart 2026'da yürürlüğe giren turizm kiralama izin belgesi (TKB) zorunluluğu, lisanssız kiralamalarda 50.000-200.000 TL idari para cezasına denk geliyor. Mülkünüzü kiraya verecekseniz **önce TKB başvurusu** yapın.`,
+    bodyEn: `Premium villa rentals hit record-early bookings for summer 2026. By end of March, occupancy reached **78%** along the Yalıkavak and Çeşme coastlines.
+
+**Weekly rental ranges (July-August)**
+
+| Region | 4-bed Villa | 6-bed (with pool) | Mansion/Premium |
+|---|---|---|---|
+| Yalıkavak | 8,500-12,000 € | 18,000-28,000 € | 45,000+ € |
+| Türkbükü | 7,500-10,500 € | 16,000-24,000 € | 38,000+ € |
+| Alaçatı/Çeşme | 6,500-9,500 € | 14,000-22,000 € | 32,000+ € |
+| Göcek | 9,000-13,500 € | 20,000-30,000 € | 50,000+ € |
+
+**Negotiation points**
+
+- **Early booking** (March-April) lands a 12-18% discount
+- **2+ week blocks** standard 10% off
+- Cleaning, AC, pool maintenance **must** be included in rent
+- Deposit equals one week's rent; refund window in contract should be ≤ 7 business days
+
+**Investor angle**
+
+Premium coastal villas yield 4-7% gross annually. Net (after tax + maintenance + insurance) lands at 2.5-4%. **The real return is in capital appreciation** — Yalıkavak villas posted 180%+ USD gains over 5 years.
+
+**Heads-up: new regulation**
+
+The Tourism Rental Permit (TKB), effective March 2026, imposes 50,000-200,000 TRY fines for unlicensed short-term rentals. Apply for TKB **before** listing your property.`,
+    coverImage:
+      'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=1600&q=80&auto=format&fit=crop',
+    daysAgo: 4,
+  },
 ];
 
 async function main(reset = false) {
@@ -651,7 +914,7 @@ async function main(reset = false) {
   }
 
   console.log(`\n✅ ${POSTS.length} blog/medya yazısı yüklendi`);
-  console.log('   📝 8 makale (ARTICLE)');
+  console.log('   📝 13 makale (ARTICLE) — 8 evergreen + 5 gündem 2026');
   console.log('   📰 3 basın haberi (PRESS) — dış link');
   console.log('   🎬 1 video (VIDEO) — sanal tur');
   console.log('\n🌐 Web: https://hazalmuti.com/medya');
