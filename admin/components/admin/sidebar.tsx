@@ -20,6 +20,7 @@ import {
   Newspaper,
   AtSign,
   FolderOpen,
+  Landmark,
   Map as MapIcon,
   Users,
   BookOpen,
@@ -32,6 +33,7 @@ import { Separator } from "@/components/ui/separator";
 
 const NAV: Array<{ label: string; href: string; icon: React.ComponentType<{ className?: string }> }> = [
   { label: "Panel", href: "/", icon: LayoutDashboard },
+  { label: "Projeler", href: "/projeler", icon: Landmark },
   { label: "İlanlar", href: "/listings", icon: Building2 },
   { label: "Talepler", href: "/inquiries", icon: Inbox },
   { label: "Müşteriler", href: "/musteriler", icon: Users },

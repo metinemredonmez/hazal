@@ -661,3 +661,43 @@ model SavedSearch {
   @@index([active, frequency])
   @@index([email])
 }
+
+
+// ────────────────────────────────────────────────────────────
+// Project (Projelerimiz / Showcase Collection)
+// Hazal'ın tanıttığı dış geliştirici projeleri (Atılgan vb.).
+// İlanlardan ayrı bir tür: konut projesi tanıtımı.
+// ────────────────────────────────────────────────────────────
+model Project {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  brandTr       String   @default("")
+  brandEn       String   @default("")
+  nameTr        String
+  nameEn        String
+  taglineTr     String   @default("")
+  taglineEn     String   @default("")
+  locationTr    String   @default("")
+  locationEn    String   @default("")
+  descriptionTr String   @default("")
+  descriptionEn String   @default("")
+  heroImage     String   @default("")
+  heroVideo     String?
+  // specs: [{labelTr, labelEn, valueTr, valueEn}]
+  specs         Json     @default("[]")
+  featuresTr    String[] @default([])
+  featuresEn    String[] @default([])
+  gallery       String[] @default([])
+  brochureUrl   String?
+  statusTr      String   @default("")
+  statusEn      String   @default("")
+  statusTone    String   @default("live") // "live" | "exclusive"
+  featured      Boolean  @default(false)
+  order         Int      @default(0)
+  isPublished   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isPublished, order])
+  @@index([slug])
+}

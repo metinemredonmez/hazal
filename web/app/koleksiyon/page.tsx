@@ -2,83 +2,64 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, Building2, MapPin, Ruler, Layers, ShieldCheck } from "lucide-react";
+import { ArrowRight, MapPin, Layers, ShieldCheck } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
+import type { Project } from "@/lib/projects";
+import { API_URL } from "@/lib/api";
 
-type Spec = { label: { tr: string; en: string }; value: { tr: string; en: string } };
-
-type Project = {
-  slug: string;
-  brand: string;
-  name: { tr: string; en: string };
-  tagline: { tr: string; en: string };
-  heroImage: string;
-  heroVideo?: string;
-  location: { tr: string; en: string };
-  description: { tr: string; en: string };
-  specs: Spec[];
-  features: { tr: string[]; en: string[] };
-  gallery: string[];
-  brochureUrl?: string;
-  status: { tr: string; en: string };
-  statusTone: "live" | "exclusive";
-};
-
-const PROJECTS: Project[] = [
+// Fallback — kullanılır eğer API boş/erişilemezse
+const FALLBACK: Project[] = [
   {
+    id: "fallback-oasis",
     slug: "atilgan-oasis",
-    brand: "Atılgan İnşaat",
-    name: { tr: "Atılgan Oasis", en: "Atılgan Oasis" },
-    tagline: {
-      tr: "Mavişehir'de deniz, doğa ve müstakil yaşam — zamansız bir villa konsepti.",
-      en: "Sea, nature and detached living in Mavişehir — a timeless villa concept.",
-    },
+    brandTr: "Atılgan İnşaat",
+    brandEn: "Atılgan İnşaat",
+    nameTr: "Atılgan Oasis",
+    nameEn: "Atılgan Oasis",
+    taglineTr: "Mavişehir'de deniz, doğa ve müstakil yaşam — zamansız bir villa konsepti.",
+    taglineEn: "Sea, nature and detached living in Mavişehir — a timeless villa concept.",
+    locationTr: "Mavişehir · Karşıyaka · İzmir",
+    locationEn: "Mavişehir · Karşıyaka · İzmir",
+    descriptionTr:
+      "Atılgan Oasis, Mavişehir'in prestijli aksında 78 adet villadan oluşan butik bir villa projesidir. Deniz hattına yakın konumu, akıllı ev sistemleri ve özel yüzme havuzlu villaları ile İzmir'in yükselen değerleri arasında öne çıkar.",
+    descriptionEn:
+      "Atılgan Oasis is a boutique 78-villa development on Mavişehir's prestigious axis. With its proximity to the coastline, full smart-home integration and private pools, it stands out among İzmir's rising values.",
     heroImage: "/sample-apartments/DSC_0276.jpg",
     heroVideo: "/showcase/oasis-2026-02-24.mp4",
-    location: {
-      tr: "Mavişehir · Karşıyaka · İzmir",
-      en: "Mavişehir · Karşıyaka · İzmir",
-    },
-    description: {
-      tr: "Atılgan Oasis, Mavişehir'in prestijli aksında 78 adet villadan oluşan butik bir villa projesidir. Deniz hattına yakın konumu, akıllı ev sistemleri ve özel yüzme havuzlu villaları ile İzmir'in yükselen değerleri arasında öne çıkar.",
-      en: "Atılgan Oasis is a boutique 78-villa development on Mavişehir's prestigious axis. With its proximity to the coastline, full smart-home integration and private pools, it stands out among İzmir's rising values.",
-    },
     specs: [
-      { label: { tr: "Daire tipleri", en: "Villa types" }, value: { tr: "4+1 · 5+1 · 8+1", en: "4+1 · 5+1 · 8+1" } },
-      { label: { tr: "Villa büyüklüğü", en: "Villa size" }, value: { tr: "426 – 869 m²", en: "426 – 869 m²" } },
-      { label: { tr: "Toplam villa", en: "Total villas" }, value: { tr: "78 villa", en: "78 villas" } },
-      { label: { tr: "Konum", en: "Location" }, value: { tr: "Mavişehir / Karşıyaka", en: "Mavişehir / Karşıyaka" } },
+      { labelTr: "Daire tipleri", labelEn: "Villa types", valueTr: "4+1 · 5+1 · 8+1", valueEn: "4+1 · 5+1 · 8+1" },
+      { labelTr: "Villa büyüklüğü", labelEn: "Villa size", valueTr: "426 – 869 m²", valueEn: "426 – 869 m²" },
+      { labelTr: "Toplam villa", labelEn: "Total villas", valueTr: "78 villa", valueEn: "78 villas" },
+      { labelTr: "Konum", labelEn: "Location", valueTr: "Mavişehir / Karşıyaka", valueEn: "Mavişehir / Karşıyaka" },
     ],
-    features: {
-      tr: [
-        "Her villaya özel yüzme havuzu",
-        "Her villaya özel bahçe",
-        "Akıllı ev sistemleri (KNX)",
-        "Yüz tanıma + parmak izi giriş",
-        "Görüntülü diafon",
-        "Şömine, ebeveyn banyosu, giyinme odası",
-        "Full ankastre mutfak + kiler",
-        "Yerden ısıtma & soğutma",
-        "Fitness salonu",
-        "7/24 güvenlik",
-        "Her villaya özel otopark",
-        "Jakuzi, barbekü, teras",
-      ],
-      en: [
-        "Private swimming pool per villa",
-        "Private garden per villa",
-        "Smart-home systems (KNX)",
-        "Face recognition + fingerprint entry",
-        "Video intercom",
-        "Fireplace, master bath, dressing room",
-        "Full built-in kitchen + pantry",
-        "Underfloor heating & cooling",
-        "Fitness center",
-        "24/7 security",
-        "Private parking per villa",
-        "Jacuzzi, BBQ, terrace",
-      ],
-    },
+    featuresTr: [
+      "Her villaya özel yüzme havuzu",
+      "Her villaya özel bahçe",
+      "Akıllı ev sistemleri (KNX)",
+      "Yüz tanıma + parmak izi giriş",
+      "Görüntülü diafon",
+      "Şömine, ebeveyn banyosu, giyinme odası",
+      "Full ankastre mutfak + kiler",
+      "Yerden ısıtma & soğutma",
+      "Fitness salonu",
+      "7/24 güvenlik",
+      "Her villaya özel otopark",
+      "Jakuzi, barbekü, teras",
+    ],
+    featuresEn: [
+      "Private swimming pool per villa",
+      "Private garden per villa",
+      "Smart-home systems (KNX)",
+      "Face recognition + fingerprint entry",
+      "Video intercom",
+      "Fireplace, master bath, dressing room",
+      "Full built-in kitchen + pantry",
+      "Underfloor heating & cooling",
+      "Fitness center",
+      "24/7 security",
+      "Private parking per villa",
+      "Jacuzzi, BBQ, terrace",
+    ],
     gallery: [
       "/sample-apartments/DSC_0214.jpg",
       "/sample-apartments/DSC_0241.jpg",
@@ -90,51 +71,52 @@ const PROJECTS: Project[] = [
       "/sample-apartments/DSC_0301.jpg",
     ],
     brochureUrl: "https://atilganinsaat.com/proje/oasis",
-    status: { tr: "Satışı devam eden proje", en: "On sale" },
+    statusTr: "Satışı devam eden proje",
+    statusEn: "On sale",
     statusTone: "live",
+    featured: true,
+    order: 0,
+    isPublished: true,
   },
   {
+    id: "fallback-royal",
     slug: "atilgan-royal",
-    brand: "Atılgan İnşaat",
-    name: { tr: "Atılgan Royal", en: "Atılgan Royal" },
-    tagline: {
-      tr: "Atılgan koleksiyonunun premium tier'ı — sınırlı sayıda özel villa, mahremiyet ve zarafet.",
-      en: "The premium tier of the Atılgan collection — a limited series of private villas with discretion and refinement.",
-    },
+    brandTr: "Atılgan İnşaat",
+    brandEn: "Atılgan İnşaat",
+    nameTr: "Atılgan Royal",
+    nameEn: "Atılgan Royal",
+    taglineTr: "Atılgan koleksiyonunun premium tier'ı — sınırlı sayıda özel villa, mahremiyet ve zarafet.",
+    taglineEn: "The premium tier of the Atılgan collection — a limited series of private villas with discretion and refinement.",
+    locationTr: "Mavişehir · Karşıyaka · İzmir",
+    locationEn: "Mavişehir · Karşıyaka · İzmir",
+    descriptionTr:
+      "Atılgan Royal, Atılgan Oasis koleksiyonu içinde özel olarak tanımlanmış bir seçkidir. Sınırlı sayıda mahrem konumlu villadan oluşur; kapsam, malzeme ve sosyal alan ayrıcalıkları standart koleksiyonun üzerine inşa edilir. Detaylar şahsi görüşme ile paylaşılır.",
+    descriptionEn:
+      "Atılgan Royal is a curated selection within the broader Atılgan Oasis collection — a limited number of villas in discreet positions, with elevated specifications and exclusive amenities. Details are shared in private consultation.",
     heroImage: "/sample-apartments/DSC_0287.jpg",
     heroVideo: "/showcase/oasis-2025-11-25.mp4",
-    location: {
-      tr: "Mavişehir · Karşıyaka · İzmir",
-      en: "Mavişehir · Karşıyaka · İzmir",
-    },
-    description: {
-      tr: "Atılgan Royal, Atılgan Oasis koleksiyonu içinde özel olarak tanımlanmış bir seçkidir. Sınırlı sayıda mahrem konumlu villadan oluşur; kapsam, malzeme ve sosyal alan ayrıcalıkları standart koleksiyonun üzerine inşa edilir. Detaylar şahsi görüşme ile paylaşılır.",
-      en: "Atılgan Royal is a curated selection within the broader Atılgan Oasis collection — a limited number of villas in discreet positions, with elevated specifications and exclusive amenities. Details are shared in private consultation.",
-    },
     specs: [
-      { label: { tr: "Seçki", en: "Selection" }, value: { tr: "Mahdut sayıda villa", en: "Limited number of villas" } },
-      { label: { tr: "Tip aralığı", en: "Type range" }, value: { tr: "5+1 · 8+1 premium", en: "5+1 · 8+1 premium" } },
-      { label: { tr: "Konum", en: "Location" }, value: { tr: "Private sok. / Mavişehir", en: "Private street / Mavişehir" } },
-      { label: { tr: "Erişim", en: "Access" }, value: { tr: "Davet ile görüşme", en: "By invitation only" } },
+      { labelTr: "Seçki", labelEn: "Selection", valueTr: "Mahdut sayıda villa", valueEn: "Limited number of villas" },
+      { labelTr: "Tip aralığı", labelEn: "Type range", valueTr: "5+1 · 8+1 premium", valueEn: "5+1 · 8+1 premium" },
+      { labelTr: "Konum", labelEn: "Location", valueTr: "Private sok. / Mavişehir", valueEn: "Private street / Mavişehir" },
+      { labelTr: "Erişim", labelEn: "Access", valueTr: "Davet ile görüşme", valueEn: "By invitation only" },
     ],
-    features: {
-      tr: [
-        "Mahremiyet odaklı konumlama",
-        "Genişletilmiş özel havuz + spa alanı",
-        "Premium malzeme ve teslim seçenekleri",
-        "Özelleştirilebilir iç mimari",
-        "Ayrıcalıklı concierge hizmeti",
-        "Diğer detaylar şahsi görüşmede paylaşılır",
-      ],
-      en: [
-        "Privacy-focused positioning",
-        "Extended private pool + spa area",
-        "Premium material and delivery options",
-        "Customizable interior architecture",
-        "Concierge service",
-        "Further details shared in private consultation",
-      ],
-    },
+    featuresTr: [
+      "Mahremiyet odaklı konumlama",
+      "Genişletilmiş özel havuz + spa alanı",
+      "Premium malzeme ve teslim seçenekleri",
+      "Özelleştirilebilir iç mimari",
+      "Ayrıcalıklı concierge hizmeti",
+      "Diğer detaylar şahsi görüşmede paylaşılır",
+    ],
+    featuresEn: [
+      "Privacy-focused positioning",
+      "Extended private pool + spa area",
+      "Premium material and delivery options",
+      "Customizable interior architecture",
+      "Concierge service",
+      "Further details shared in private consultation",
+    ],
     gallery: [
       "/sample-apartments/DSC_0287.jpg",
       "/sample-apartments/DSC_0289.jpg",
@@ -143,13 +125,34 @@ const PROJECTS: Project[] = [
       "/sample-apartments/DSC_0299.jpg",
       "/sample-apartments/DSC_0303.jpg",
     ],
-    status: { tr: "Davet ile", en: "By invitation" },
+    brochureUrl: null,
+    statusTr: "Davet ile",
+    statusEn: "By invitation",
     statusTone: "exclusive",
+    featured: true,
+    order: 1,
+    isPublished: true,
   },
 ];
 
 export default function KoleksiyonPage() {
   const [locale] = useLocale();
+  const [projects, setProjects] = React.useState<Project[]>([]);
+  const [loaded, setLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch(`${API_URL}/api/projects`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: Project[]) => {
+        const list = Array.isArray(data) ? data : [];
+        setProjects(list.length > 0 ? list : FALLBACK);
+        setLoaded(true);
+      })
+      .catch(() => {
+        setProjects(FALLBACK);
+        setLoaded(true);
+      });
+  }, []);
 
   return (
     <div className="bg-[#FAF8F4]">
@@ -162,32 +165,38 @@ export default function KoleksiyonPage() {
           <h1 className="font-display font-light text-3xl lg:text-5xl leading-[1.05] max-w-4xl">
             {locale === "tr" ? (
               <>
-                Atılgan Royal &amp; Oasis,
+                Hazal'ın seçtiği,
                 <br />
-                <span className="italic text-[#D4B36A]">İzmir'in yükselen değeri.</span>
+                <span className="italic text-[#D4B36A]">imzalı projeler.</span>
               </>
             ) : (
               <>
-                Atılgan Royal &amp; Oasis,
+                Curated by Hazal,
                 <br />
-                <span className="italic text-[#D4B36A]">İzmir's rising value.</span>
+                <span className="italic text-[#D4B36A]">signature developments.</span>
               </>
             )}
           </h1>
           <p className="mt-8 text-base lg:text-lg text-[#F5F2EC]/70 max-w-2xl">
             {locale === "tr"
-              ? "Karşıyaka Mavişehir aksında geliştirilen butik villa koleksiyonu. Atılgan İnşaat ile birlikte sunulan iki seçki: standart koleksiyon ve private tier."
-              : "A boutique villa collection developed along the Karşıyaka Mavişehir axis. Two curated tiers from Atılgan İnşaat: standard collection and private."}
+              ? "Yüksek standartlı geliştiriciler ile birlikte sunulan, Hazal Muti seçkili portföy."
+              : "A curated portfolio in partnership with high-standard developers, signed by Hazal Muti."}
           </p>
         </div>
       </section>
 
       {/* Projects */}
-      <section className="py-16 lg:py-24 px-6 lg:px-10 space-y-20 lg:space-y-32">
+      <section className="py-16 lg:py-24 px-6 lg:px-10">
         <div className="max-w-[1600px] mx-auto space-y-20 lg:space-y-32">
-          {PROJECTS.map((p, idx) => (
-            <ProjectBlock key={p.slug} project={p} reverse={idx % 2 === 1} locale={locale} />
-          ))}
+          {!loaded ? (
+            <div className="h-96 animate-pulse bg-[#0E0E0E]/5" />
+          ) : projects.length === 0 ? (
+            <p className="text-center text-muted-foreground py-16">
+              {locale === "tr" ? "Henüz proje yok." : "No projects yet."}
+            </p>
+          ) : (
+            projects.map((p, idx) => <ProjectBlock key={p.id} project={p} reverse={idx % 2 === 1} locale={locale} />)
+          )}
         </div>
       </section>
 
@@ -200,7 +209,7 @@ export default function KoleksiyonPage() {
           <h2 className="font-display font-light text-3xl lg:text-5xl leading-[1.05]">
             {locale === "tr" ? (
               <>
-                Koleksiyonu birlikte
+                Projeleri birlikte
                 <br />
                 <span className="italic text-[#D4B36A]">inceleyelim.</span>
               </>
@@ -208,7 +217,7 @@ export default function KoleksiyonPage() {
               <>
                 Let's review the
                 <br />
-                <span className="italic text-[#D4B36A]">collection together.</span>
+                <span className="italic text-[#D4B36A]">projects together.</span>
               </>
             )}
           </h2>
@@ -242,6 +251,8 @@ function ProjectBlock({
   locale: "tr" | "en";
 }) {
   const [lightboxIdx, setLightboxIdx] = React.useState<number | null>(null);
+  const t = (tr: string, en: string) => (locale === "tr" ? tr : en);
+  const tArr = (tr: string[], en: string[]) => (locale === "tr" ? tr : en);
 
   return (
     <div className="space-y-12">
@@ -261,44 +272,56 @@ function ProjectBlock({
               />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={p.heroImage} alt={p.name[locale]} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={p.heroImage} alt={t(p.nameTr, p.nameEn)} className="absolute inset-0 w-full h-full object-cover" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
             <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3 text-white">
               <div>
-                <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A]">{p.brand}</p>
-                <h3 className="font-display text-2xl lg:text-4xl leading-tight mt-1">{p.name[locale]}</h3>
+                {(p.brandTr || p.brandEn) && (
+                  <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A]">{t(p.brandTr, p.brandEn)}</p>
+                )}
+                <h3 className="font-display text-2xl lg:text-4xl leading-tight mt-1">{t(p.nameTr, p.nameEn)}</h3>
               </div>
-              <span
-                className={`text-[10px] tracking-[0.25em] uppercase px-3 py-1.5 ${
-                  p.statusTone === "live"
-                    ? "bg-[#D4B36A] text-[#0E0E0E]"
-                    : "border border-[#D4B36A] text-[#D4B36A]"
-                }`}
-              >
-                {p.status[locale]}
-              </span>
+              {(p.statusTr || p.statusEn) && (
+                <span
+                  className={`text-[10px] tracking-[0.25em] uppercase px-3 py-1.5 ${
+                    p.statusTone === "live"
+                      ? "bg-[#D4B36A] text-[#0E0E0E]"
+                      : "border border-[#D4B36A] text-[#D4B36A]"
+                  }`}
+                >
+                  {t(p.statusTr, p.statusEn)}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         <div className="lg:col-span-5 space-y-6">
-          <p className="font-display text-xl lg:text-2xl leading-snug text-[#0E0E0E]">{p.tagline[locale]}</p>
-          <p className="inline-flex items-center gap-2 text-sm text-[#666]">
-            <MapPin className="h-4 w-4 text-[#D4B36A]" />
-            {p.location[locale]}
-          </p>
-          <p className="text-[15px] leading-[1.75] text-[#3A3A3A]">{p.description[locale]}</p>
+          {(p.taglineTr || p.taglineEn) && (
+            <p className="font-display text-xl lg:text-2xl leading-snug text-[#0E0E0E]">{t(p.taglineTr, p.taglineEn)}</p>
+          )}
+          {(p.locationTr || p.locationEn) && (
+            <p className="inline-flex items-center gap-2 text-sm text-[#666]">
+              <MapPin className="h-4 w-4 text-[#D4B36A]" />
+              {t(p.locationTr, p.locationEn)}
+            </p>
+          )}
+          {(p.descriptionTr || p.descriptionEn) && (
+            <p className="text-[15px] leading-[1.75] text-[#3A3A3A]">{t(p.descriptionTr, p.descriptionEn)}</p>
+          )}
 
           {/* Specs grid */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
-            {p.specs.map((s) => (
-              <div key={s.label[locale]} className="border-t border-[#0E0E0E]/10 pt-3">
-                <p className="text-[10px] tracking-[0.25em] uppercase text-[#999] mb-1">{s.label[locale]}</p>
-                <p className="text-sm font-medium text-[#0E0E0E]">{s.value[locale]}</p>
-              </div>
-            ))}
-          </div>
+          {p.specs.length > 0 && (
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
+              {p.specs.map((s, i) => (
+                <div key={i} className="border-t border-[#0E0E0E]/10 pt-3">
+                  <p className="text-[10px] tracking-[0.25em] uppercase text-[#999] mb-1">{t(s.labelTr, s.labelEn)}</p>
+                  <p className="text-sm font-medium text-[#0E0E0E]">{t(s.valueTr, s.valueEn)}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex items-center gap-3 pt-2 flex-wrap">
             {p.brochureUrl && (
@@ -323,49 +346,53 @@ function ProjectBlock({
       </div>
 
       {/* Features list */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        <div className="lg:col-span-3">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3 flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5" />
-            {locale === "tr" ? "Proje Özellikleri" : "Project Features"}
-          </p>
+      {tArr(p.featuresTr, p.featuresEn).length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          <div className="lg:col-span-3">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3 flex items-center gap-2">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              {locale === "tr" ? "Proje Özellikleri" : "Project Features"}
+            </p>
+          </div>
+          <ul className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+            {tArr(p.featuresTr, p.featuresEn).map((f, i) => (
+              <li key={i} className="text-sm text-[#3A3A3A] flex items-start gap-2">
+                <span className="text-[#D4B36A] mt-1">•</span>
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-          {p.features[locale].map((f) => (
-            <li key={f} className="text-sm text-[#3A3A3A] flex items-start gap-2">
-              <span className="text-[#D4B36A] mt-1">•</span>
-              <span>{f}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      )}
 
       {/* Gallery thumbs */}
-      <div>
-        <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3 flex items-center gap-2">
-          <Layers className="h-3.5 w-3.5" />
-          {locale === "tr" ? "Galeri" : "Gallery"}
-        </p>
-        <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-3">
-          {p.gallery.map((src, i) => (
-            <button
-              key={src}
-              onClick={() => setLightboxIdx(i)}
-              className="relative aspect-[4/3] overflow-hidden bg-[#0E0E0E] group"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-              />
-            </button>
-          ))}
+      {p.gallery.length > 0 && (
+        <div>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3 flex items-center gap-2">
+            <Layers className="h-3.5 w-3.5" />
+            {locale === "tr" ? "Galeri" : "Gallery"}
+          </p>
+          <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-3">
+            {p.gallery.map((src, i) => (
+              <button
+                key={src + i}
+                onClick={() => setLightboxIdx(i)}
+                className="relative aspect-[4/3] overflow-hidden bg-[#0E0E0E] group"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                />
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Lightbox */}
-      {lightboxIdx !== null && (
+      {lightboxIdx !== null && p.gallery[lightboxIdx] && (
         <div
           className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 lg:p-10"
           onClick={() => setLightboxIdx(null)}

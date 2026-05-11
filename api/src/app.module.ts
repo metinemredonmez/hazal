@@ -23,6 +23,7 @@ import { MailTemplatesModule } from './mail-templates/mail-templates.module';
 import { MorningSummaryModule } from './morning-summary/morning-summary.module';
 import { VisitedLocationsModule } from './visited-locations/visited-locations.module';
 import { SavedSearchesModule } from './saved-searches/saved-searches.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { SavedSearchesModule } from './saved-searches/saved-searches.module';
     MorningSummaryModule,
     VisitedLocationsModule,
     SavedSearchesModule,
+    ProjectsModule,
   ],
 })
 export class AppModule {}
