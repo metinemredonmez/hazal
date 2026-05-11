@@ -61,12 +61,23 @@ interface PageContent {
     workingHours?: BilingualText;
     addressLine?: BilingualText;
   };
+  collection?: {
+    eyebrow?: BilingualText;
+    title?: BilingualText;
+    description?: BilingualText;
+    ctaLabel?: BilingualText;
+    ctaSectionEyebrow?: BilingualText;
+    ctaSectionTitle?: BilingualText;
+    ctaSectionDescription?: BilingualText;
+    ctaSectionButton?: BilingualText;
+  };
 }
 
-type Section = "home" | "about" | "contact";
+type Section = "home" | "about" | "contact" | "collection";
 
 const SECTIONS: Array<{ id: Section; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "home", label: "Anasayfa", icon: Home },
+  { id: "collection", label: "Koleksiyon / Projeler", icon: Home },
   { id: "about", label: "Hakkımda Sayfası", icon: User },
   { id: "contact", label: "İletişim Sayfası", icon: Phone },
 ];
@@ -212,6 +223,9 @@ export default function WebSettingsPage() {
         )}
         {section === "contact" && (
           <ContactSection getBi={getBi} setBi={setBi} getStr={getStr} setStr={setStr} />
+        )}
+        {section === "collection" && (
+          <CollectionSection getBi={getBi} setBi={setBi} />
         )}
 
         <div className="flex justify-end sticky bottom-3 z-10 lg:pr-52">
@@ -626,6 +640,103 @@ function ContactSection({
             onTr={(v) => setBi(["contact", "addressLine"], "tr", v)}
             onEn={(v) => setBi(["contact", "addressLine"], "en", v)}
             multiline
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function CollectionSection({
+  getBi,
+  setBi,
+}: {
+  getBi: (path: string[]) => BilingualText;
+  setBi: (path: string[], lang: "tr" | "en", value: string) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xs">Anasayfa & /koleksiyon Hero</CardTitle>
+          <p className="text-[10px] text-muted-foreground">
+            Anasayfada "Öne Çıkan Koleksiyon" bölümü ve /koleksiyon hero başlığını yönetir.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <BiInput
+            label="Eyebrow (başlık üstündeki küçük yazı)"
+            hint="Örn: 'PROJELERİMİZ'"
+            tr={getBi(["collection", "eyebrow"]).tr}
+            en={getBi(["collection", "eyebrow"]).en}
+            onTr={(v) => setBi(["collection", "eyebrow"], "tr", v)}
+            onEn={(v) => setBi(["collection", "eyebrow"], "en", v)}
+          />
+          <BiInput
+            label="Başlık"
+            hint="2 satır için Enter'a bas. İkinci satır italik altın renkte gösterilir."
+            tr={getBi(["collection", "title"]).tr}
+            en={getBi(["collection", "title"]).en}
+            onTr={(v) => setBi(["collection", "title"], "tr", v)}
+            onEn={(v) => setBi(["collection", "title"], "en", v)}
+            multiline
+          />
+          <BiInput
+            label="Açıklama (sadece /koleksiyon hero altında)"
+            tr={getBi(["collection", "description"]).tr}
+            en={getBi(["collection", "description"]).en}
+            onTr={(v) => setBi(["collection", "description"], "tr", v)}
+            onEn={(v) => setBi(["collection", "description"], "en", v)}
+            multiline
+          />
+          <BiInput
+            label="Anasayfa CTA buton metni"
+            hint="Örn: 'Tümünü Gör' → /koleksiyon'a yönlendirir"
+            tr={getBi(["collection", "ctaLabel"]).tr}
+            en={getBi(["collection", "ctaLabel"]).en}
+            onTr={(v) => setBi(["collection", "ctaLabel"], "tr", v)}
+            onEn={(v) => setBi(["collection", "ctaLabel"], "en", v)}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xs">/koleksiyon Alt İletişim Bölümü</CardTitle>
+          <p className="text-[10px] text-muted-foreground">
+            /koleksiyon sayfası en altta gösterilen "İletişime Geç" çağrı bölümü.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <BiInput
+            label="Eyebrow"
+            tr={getBi(["collection", "ctaSectionEyebrow"]).tr}
+            en={getBi(["collection", "ctaSectionEyebrow"]).en}
+            onTr={(v) => setBi(["collection", "ctaSectionEyebrow"], "tr", v)}
+            onEn={(v) => setBi(["collection", "ctaSectionEyebrow"], "en", v)}
+          />
+          <BiInput
+            label="Başlık (2 satır)"
+            tr={getBi(["collection", "ctaSectionTitle"]).tr}
+            en={getBi(["collection", "ctaSectionTitle"]).en}
+            onTr={(v) => setBi(["collection", "ctaSectionTitle"], "tr", v)}
+            onEn={(v) => setBi(["collection", "ctaSectionTitle"], "en", v)}
+            multiline
+          />
+          <BiInput
+            label="Açıklama"
+            tr={getBi(["collection", "ctaSectionDescription"]).tr}
+            en={getBi(["collection", "ctaSectionDescription"]).en}
+            onTr={(v) => setBi(["collection", "ctaSectionDescription"], "tr", v)}
+            onEn={(v) => setBi(["collection", "ctaSectionDescription"], "en", v)}
+            multiline
+          />
+          <BiInput
+            label="Buton metni"
+            tr={getBi(["collection", "ctaSectionButton"]).tr}
+            en={getBi(["collection", "ctaSectionButton"]).en}
+            onTr={(v) => setBi(["collection", "ctaSectionButton"], "tr", v)}
+            onEn={(v) => setBi(["collection", "ctaSectionButton"], "en", v)}
           />
         </CardContent>
       </Card>

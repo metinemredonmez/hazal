@@ -4,6 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
+import { useSettings } from "@/lib/use-settings";
+import { pageContent, pick } from "@/lib/page-content";
 import type { Project } from "@/lib/projects";
 import { API_URL } from "@/lib/api";
 
@@ -67,8 +69,18 @@ const FALLBACK: Project[] = [
 
 export function FeaturedCollection() {
   const [locale] = useLocale();
+  const settings = useSettings();
+  const cmsCollection = pageContent(settings).collection;
   const [projects, setProjects] = React.useState<Project[]>([]);
   const [loaded, setLoaded] = React.useState(false);
+
+  const eyebrow = pick(cmsCollection?.eyebrow, locale, locale === "tr" ? "PROJELERİMİZ" : "OUR PROJECTS");
+  const titleRaw = pick(
+    cmsCollection?.title,
+    locale,
+    locale === "tr" ? "Hazal'ın seçtiği,\nimzalı projeler." : "Curated by Hazal,\nsignature developments.",
+  );
+  const ctaLabel = pick(cmsCollection?.ctaLabel, locale, locale === "tr" ? "Tümünü Gör" : "View All");
 
   React.useEffect(() => {
     fetch(`${API_URL}/api/projects/featured`)
@@ -99,30 +111,31 @@ export function FeaturedCollection() {
       <div className="max-w-[1600px] mx-auto">
         <div className="flex items-end justify-between gap-6 mb-10 lg:mb-14 flex-wrap">
           <div>
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">
-              {locale === "tr" ? "PROJELERİMİZ" : "OUR PROJECTS"}
-            </p>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-3">{eyebrow}</p>
             <h2 className="font-display font-light text-3xl lg:text-5xl leading-[1.05] max-w-3xl">
-              {locale === "tr" ? (
-                <>
-                  Hazal'ın seçtiği,
-                  <br />
-                  <span className="italic text-[#D4B36A]">imzalı projeler.</span>
-                </>
-              ) : (
-                <>
-                  Curated by Hazal,
-                  <br />
-                  <span className="italic text-[#D4B36A]">signature developments.</span>
-                </>
-              )}
+              {(() => {
+                const lines = titleRaw.split("\n");
+                const first = lines[0];
+                const rest = lines.slice(1).join(" ");
+                return (
+                  <>
+                    {first}
+                    {rest && (
+                      <>
+                        <br />
+                        <span className="italic text-[#D4B36A]">{rest}</span>
+                      </>
+                    )}
+                  </>
+                );
+              })()}
             </h2>
           </div>
           <Link
             href="/koleksiyon"
             className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#0E0E0E] hover:text-[#D4B36A] transition-colors"
           >
-            {locale === "tr" ? "Tümünü Gör" : "View All"}
+            {ctaLabel}
             <ArrowRight className="h-3 w-3" />
           </Link>
         </div>

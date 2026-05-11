@@ -4,6 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, MapPin, Layers, ShieldCheck } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
+import { useSettings } from "@/lib/use-settings";
+import { pageContent, pick } from "@/lib/page-content";
 import type { Project } from "@/lib/projects";
 import { API_URL } from "@/lib/api";
 
@@ -137,8 +139,38 @@ const FALLBACK: Project[] = [
 
 export default function KoleksiyonPage() {
   const [locale] = useLocale();
+  const settings = useSettings();
+  const cms = pageContent(settings).collection;
   const [projects, setProjects] = React.useState<Project[]>([]);
   const [loaded, setLoaded] = React.useState(false);
+
+  const eyebrow = pick(cms?.eyebrow, locale, locale === "tr" ? "PROJELERİMİZ" : "OUR PROJECTS");
+  const titleRaw = pick(
+    cms?.title,
+    locale,
+    locale === "tr" ? "Hazal'ın seçtiği,\nimzalı projeler." : "Curated by Hazal,\nsignature developments.",
+  );
+  const description = pick(
+    cms?.description,
+    locale,
+    locale === "tr"
+      ? "Yüksek standartlı geliştiriciler ile birlikte sunulan, Hazal Muti seçkili portföy."
+      : "A curated portfolio in partnership with high-standard developers, signed by Hazal Muti.",
+  );
+  const ctaSectionEyebrow = pick(cms?.ctaSectionEyebrow, locale, locale === "tr" ? "İLETİŞİM" : "CONTACT");
+  const ctaSectionTitle = pick(
+    cms?.ctaSectionTitle,
+    locale,
+    locale === "tr" ? "Projeleri birlikte\ninceleyelim." : "Let's review the\nprojects together.",
+  );
+  const ctaSectionDescription = pick(
+    cms?.ctaSectionDescription,
+    locale,
+    locale === "tr"
+      ? "Plan, fiyat ve müsait villalar için Hazal Muti'ye doğrudan ulaşın."
+      : "Reach Hazal Muti directly for plans, prices and available villas.",
+  );
+  const ctaSectionButton = pick(cms?.ctaSectionButton, locale, locale === "tr" ? "İletişime Geç" : "Get in Touch");
 
   React.useEffect(() => {
     fetch(`${API_URL}/api/projects`)
@@ -159,29 +191,26 @@ export default function KoleksiyonPage() {
       {/* Hero */}
       <section className="bg-[#0E0E0E] text-[#F5F2EC] pt-32 lg:pt-40 pb-20 lg:pb-28 px-6 lg:px-10">
         <div className="max-w-[1600px] mx-auto">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
-            {locale === "tr" ? "PROJELERİMİZ" : "OUR PROJECTS"}
-          </p>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">{eyebrow}</p>
           <h1 className="font-display font-light text-3xl lg:text-5xl leading-[1.05] max-w-4xl">
-            {locale === "tr" ? (
-              <>
-                Hazal'ın seçtiği,
-                <br />
-                <span className="italic text-[#D4B36A]">imzalı projeler.</span>
-              </>
-            ) : (
-              <>
-                Curated by Hazal,
-                <br />
-                <span className="italic text-[#D4B36A]">signature developments.</span>
-              </>
-            )}
+            {(() => {
+              const lines = titleRaw.split("\n");
+              const first = lines[0];
+              const rest = lines.slice(1).join(" ");
+              return (
+                <>
+                  {first}
+                  {rest && (
+                    <>
+                      <br />
+                      <span className="italic text-[#D4B36A]">{rest}</span>
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </h1>
-          <p className="mt-8 text-base lg:text-lg text-[#F5F2EC]/70 max-w-2xl">
-            {locale === "tr"
-              ? "Yüksek standartlı geliştiriciler ile birlikte sunulan, Hazal Muti seçkili portföy."
-              : "A curated portfolio in partnership with high-standard developers, signed by Hazal Muti."}
-          </p>
+          <p className="mt-8 text-base lg:text-lg text-[#F5F2EC]/70 max-w-2xl whitespace-pre-line">{description}</p>
         </div>
       </section>
 
@@ -203,35 +232,32 @@ export default function KoleksiyonPage() {
       {/* CTA */}
       <section className="bg-[#0E0E0E] text-[#F5F2EC] py-20 lg:py-28 px-6 lg:px-10">
         <div className="max-w-[1100px] mx-auto text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">
-            {locale === "tr" ? "İLETİŞİM" : "CONTACT"}
-          </p>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-[#D4B36A] mb-4">{ctaSectionEyebrow}</p>
           <h2 className="font-display font-light text-3xl lg:text-5xl leading-[1.05]">
-            {locale === "tr" ? (
-              <>
-                Projeleri birlikte
-                <br />
-                <span className="italic text-[#D4B36A]">inceleyelim.</span>
-              </>
-            ) : (
-              <>
-                Let's review the
-                <br />
-                <span className="italic text-[#D4B36A]">projects together.</span>
-              </>
-            )}
+            {(() => {
+              const lines = ctaSectionTitle.split("\n");
+              const first = lines[0];
+              const rest = lines.slice(1).join(" ");
+              return (
+                <>
+                  {first}
+                  {rest && (
+                    <>
+                      <br />
+                      <span className="italic text-[#D4B36A]">{rest}</span>
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </h2>
-          <p className="mt-6 text-base text-[#F5F2EC]/70 max-w-xl mx-auto">
-            {locale === "tr"
-              ? "Plan, fiyat ve müsait villalar için Hazal Muti'ye doğrudan ulaşın."
-              : "Reach Hazal Muti directly for plans, prices and available villas."}
-          </p>
+          <p className="mt-6 text-base text-[#F5F2EC]/70 max-w-xl mx-auto whitespace-pre-line">{ctaSectionDescription}</p>
           <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
             <Link
               href="/iletisim"
               className="inline-flex items-center gap-2 px-8 py-3.5 border border-[#D4B36A] text-[#D4B36A] hover:bg-[#D4B36A] hover:text-[#0E0E0E] transition-colors text-[11px] tracking-[0.3em] uppercase"
             >
-              {locale === "tr" ? "İletişime Geç" : "Get in Touch"}
+              {ctaSectionButton}
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>

@@ -169,6 +169,18 @@ export interface PageContent {
     workingHours?: BilingualText;
     addressLine?: BilingualText;
   };
+  collection?: {
+    // Homepage "FeaturedCollection" section + /koleksiyon hero
+    eyebrow?: BilingualText;
+    title?: BilingualText; // supports \n for line break
+    description?: BilingualText;
+    ctaLabel?: BilingualText;
+    // /koleksiyon bottom CTA
+    ctaSectionEyebrow?: BilingualText;
+    ctaSectionTitle?: BilingualText;
+    ctaSectionDescription?: BilingualText;
+    ctaSectionButton?: BilingualText;
+  };
 }
 
 export interface ListingStats {
