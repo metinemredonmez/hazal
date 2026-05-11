@@ -35,14 +35,13 @@ export function AboutTeaser() {
     <section className="bg-[#0E0E0E] text-[#F5F2EC] py-24 lg:py-32 px-6 lg:px-10">
       <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
         <div className="lg:col-span-5 order-2 lg:order-1">
-          <div className="relative aspect-[3/4] bg-[#1A1A1F] overflow-hidden">
+          <div className="aspect-[3/4] bg-[#1A1A1F] overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={portrait}
               alt="Hazal Muti"
-              className="w-full h-full object-cover scale-105 blur-[2px]"
+              className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/50 to-black/70" />
           </div>
         </div>
 
